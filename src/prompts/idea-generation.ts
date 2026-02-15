@@ -1,7 +1,7 @@
 // Idea Generation Prompt Template
 // This prompt is used by the /api/generate-ideas route
 
-import type { UserProfile, CauseArea, VentureType, CommitmentLevel } from "@/types";
+import type { UserProfile, CauseArea, VentureType } from "@/types";
 import { CAUSE_AREAS } from "@/lib/constants";
 
 // Map cause IDs to readable names

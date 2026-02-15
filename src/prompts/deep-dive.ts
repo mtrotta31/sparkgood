@@ -5,7 +5,7 @@
 // - Steady Builders → Structured but accessible, 3-page plans
 // - All-In → Full professional frameworks
 
-import type { UserProfile, Idea, CauseArea, VentureType, CommitmentLevel } from "@/types";
+import type { UserProfile, Idea, CauseArea, CommitmentLevel } from "@/types";
 import { CAUSE_AREAS } from "@/lib/constants";
 
 // Helper to get cause labels
@@ -47,7 +47,7 @@ export function generateViabilityPrompt(idea: Idea, profile: UserProfile): strin
   return generateAllInViabilityPrompt(idea, profile, ventureType, causes);
 }
 
-function generateWeekendViabilityPrompt(idea: Idea, profile: UserProfile, causes: string): string {
+function generateWeekendViabilityPrompt(idea: Idea, _profile: UserProfile, _causes: string): string {
   return `You help people figure out if their weekend project will work. No MBA jargon. Just "yes, and here's how."
 
 ## The Project
@@ -255,7 +255,7 @@ export function generateBusinessPlanPrompt(idea: Idea, profile: UserProfile): st
   return generateAllInPlanPrompt(idea, profile);
 }
 
-function generateWeekendPlanPrompt(idea: Idea, profile: UserProfile): string {
+function generateWeekendPlanPrompt(idea: Idea, _profile: UserProfile): string {
   return `You create simple 1-page action plans for weekend projects. No business jargon. Just what they need to do.
 
 ## The Project
@@ -505,7 +505,7 @@ export function generateMarketingPrompt(idea: Idea, profile: UserProfile): strin
   return generateAllInMarketingPrompt(idea, profile);
 }
 
-function generateWeekendMarketingPrompt(idea: Idea, profile: UserProfile): string {
+function generateWeekendMarketingPrompt(idea: Idea, _profile: UserProfile): string {
   return `You write simple outreach messages for weekend community projects. No marketing jargon. Just friendly invitations.
 
 ## The Project
@@ -562,7 +562,7 @@ Return this structure with SIMPLE, FRIENDLY content:
 - Return ONLY valid JSON`;
 }
 
-function generateSteadyMarketingPrompt(idea: Idea, profile: UserProfile): string {
+function generateSteadyMarketingPrompt(idea: Idea, _profile: UserProfile): string {
   return `You create practical outreach content for ongoing community projects. Clear, friendly, action-oriented.
 
 ## The Project
@@ -707,7 +707,7 @@ export function generateRoadmapPrompt(idea: Idea, profile: UserProfile): string 
   return generateAllInRoadmapPrompt(idea, profile);
 }
 
-function generateWeekendRoadmapPrompt(idea: Idea, profile: UserProfile): string {
+function generateWeekendRoadmapPrompt(idea: Idea, _profile: UserProfile): string {
   return `You create simple checklists for weekend projects. No phases, no dependencies — just what to do and when.
 
 ## The Project

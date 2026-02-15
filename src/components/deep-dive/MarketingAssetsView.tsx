@@ -8,7 +8,7 @@ interface MarketingAssetsViewProps {
   ideaName: string;
 }
 
-export default function MarketingAssetsView({ assets, ideaName }: MarketingAssetsViewProps) {
+export default function MarketingAssetsView({ assets, ideaName: _ideaName }: MarketingAssetsViewProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const copyToClipboard = async (text: string, field: string) => {

@@ -152,7 +152,7 @@ function getMockData(
   }
 }
 
-function getMockViability(idea: Idea, profile: UserProfile): ViabilityReport {
+function getMockViability(_idea: Idea, _profile: UserProfile): ViabilityReport {
   return {
     marketSize:
       "The community resource-sharing market is estimated at $150 billion globally, with peer-to-peer sharing platforms growing 25% annually. Locally, neighborhoods with 5,000+ households represent ideal initial markets.",
@@ -486,7 +486,7 @@ P.S. — Know a neighbor who would love this? Forward this email. The more peopl
   };
 }
 
-function getMockRoadmap(profile: UserProfile): ActionRoadmap {
+function getMockRoadmap(_profile: UserProfile): ActionRoadmap {
   return {
     quickWins: [
       {
@@ -646,7 +646,7 @@ function getMockRoadmap(profile: UserProfile): ActionRoadmap {
 // WEEKEND WARRIOR MOCK DATA - Dramatically simplified
 // ============================================================================
 
-function getMockWeekendViability(idea: Idea): ViabilityReport {
+function getMockWeekendViability(_idea: Idea): ViabilityReport {
   return {
     marketSize:
       "Park cleanups work everywhere. People like clean parks and meeting neighbors. This is a proven model.",
@@ -686,7 +686,7 @@ function getMockWeekendViability(idea: Idea): ViabilityReport {
   };
 }
 
-function getMockSteadyViability(idea: Idea, profile: UserProfile): ViabilityReport {
+function getMockSteadyViability(_idea: Idea, _profile: UserProfile): ViabilityReport {
   return {
     marketSize:
       "After-school tutoring programs are one of the most proven interventions in education. The demand far exceeds supply in most communities.",
@@ -746,7 +746,7 @@ function getMockSteadyViability(idea: Idea, profile: UserProfile): ViabilityRepo
   };
 }
 
-function getMockWeekendPlan(idea: Idea): BusinessPlan {
+function getMockWeekendPlan(_idea: Idea): BusinessPlan {
   return {
     executiveSummary:
       "You're organizing a neighborhood park cleanup on Saturday. Success = people show up, trash gets collected, everyone feels good about their neighborhood. That's it.",
@@ -807,7 +807,7 @@ function getMockWeekendPlan(idea: Idea): BusinessPlan {
   };
 }
 
-function getMockSteadyPlan(idea: Idea, profile: UserProfile): BusinessPlan {
+function getMockSteadyPlan(idea: Idea, _profile: UserProfile): BusinessPlan {
   return {
     executiveSummary: `${idea.name} provides free after-school tutoring to students who need help but can't afford private tutors. Starting with reading and math for grades 3-8, we'll meet weekly at the public library with a small team of volunteer tutors.
 
@@ -899,7 +899,7 @@ Ongoing: Every Saturday, 10am-12pm. Arrive 10 min early to set up. Match tutors 
   };
 }
 
-function getMockWeekendMarketing(idea: Idea): MarketingAssets {
+function getMockWeekendMarketing(_idea: Idea): MarketingAssets {
   return {
     elevatorPitch:
       "We're cleaning up Oak Street Park this Saturday. Want to come?",
@@ -961,7 +961,7 @@ See you there!`,
   };
 }
 
-function getMockSteadyMarketing(idea: Idea): MarketingAssets {
+function getMockSteadyMarketing(_idea: Idea): MarketingAssets {
   return {
     elevatorPitch:
       "We provide free tutoring for local kids who need help in school. Every Saturday at the library, volunteer tutors work one-on-one with students on reading and math. No fees, no pressure — just neighbors helping neighbors' kids succeed.",

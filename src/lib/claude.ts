@@ -2,6 +2,7 @@
 // Wrapper for Anthropic API calls
 
 // Lazy-loaded Anthropic client (only initialized when needed)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let anthropicClient: any = null;
 
 async function getAnthropicClient() {
@@ -56,6 +57,7 @@ export async function sendMessage(
     });
 
     // Extract text from response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const textBlock = response.content.find((block: any) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       throw new Error("No text response from Claude");
@@ -175,7 +177,7 @@ export async function sendMessageForJSON<T>(
 
   try {
     return JSON.parse(jsonString) as T;
-  } catch (error) {
+  } catch (_error) {
     console.error("Failed to parse JSON response. Raw response:", response);
     console.error("Extracted JSON string:", jsonString);
     throw new Error("Failed to parse Claude response as JSON");

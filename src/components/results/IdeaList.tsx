@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button, FadeIn } from "@/components/ui";
 import IdeaCard from "./IdeaCard";
 import type { Idea } from "@/types";
