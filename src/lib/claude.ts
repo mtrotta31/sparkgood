@@ -177,7 +177,7 @@ export async function sendMessageForJSON<T>(
 
   try {
     return JSON.parse(jsonString) as T;
-  } catch (_error) {
+  } catch {
     console.error("Failed to parse JSON response. Raw response:", response);
     console.error("Extracted JSON string:", jsonString);
     throw new Error("Failed to parse Claude response as JSON");
