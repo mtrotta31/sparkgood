@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp list:*)",
+      "WebSearch",
+      "Bash(claude mcp remove:*)",
+      "mcp__perplexity__perplexity_research",
+      "Bash(npx create-next-app:*)",
+      "Bash(npx create-next-app@14 sparkgood-temp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "mcp__perplexity__perplexity_ask",
+      "mcp__firecrawl__firecrawl_search",
+      "mcp__firecrawl__firecrawl_scrape",
+      "Bash(npm run dev:*)",
+      "Bash(wc:*)",
+      "Bash(npm --version:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(/usr/local/bin/npm install @anthropic-ai/sdk --prefix /Users/matthewtrotta/sparkgood)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(chmod:*)",
+      "Bash(git init:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "perplexity",
+    "playwright",
+    "firecrawl"
+  ]
+}

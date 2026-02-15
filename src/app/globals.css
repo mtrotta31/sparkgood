@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SparkGood Brand Variables */
+:root {
+  /* Colors */
+  --spark: #F59E0B;
+  --accent: #F97316;
+  --charcoal: #1C1412;
+  --charcoal-dark: #0F0B09;
+  --warmwhite: #F5F0EB;
+  --warmwhite-muted: #D4CBC4;
+  --success: #22C55E;
+  --error: #EF4444;
+
+  /* Light mode (not primary, but available) */
+  --background: #F5F0EB;
+  --foreground: #1C1412;
+}
+
+/* SparkGood uses dark mode by default - "campfire energy" */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0F0B09;
+    --foreground: #F5F0EB;
+  }
+}
+
+/* Force dark mode for SparkGood brand */
+html {
+  color-scheme: dark;
+}
+
+body {
+  color: var(--warmwhite);
+  background: var(--charcoal-dark);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Heading styles using Playfair Display */
+  .heading-display {
+    font-family: var(--font-playfair), Georgia, serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* Spark text gradient effect */
+  .text-spark-gradient {
+    background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(245, 158, 11, 0.3);
+  color: #F5F0EB;
+}
+
+/* Focus states */
+:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--charcoal-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--charcoal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3230;
+}
