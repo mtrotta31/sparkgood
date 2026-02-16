@@ -128,6 +128,35 @@ function extractUrls(text: string, citations: string[]): string[] {
 }
 
 /**
+ * Extract key search terms from idea description
+ * Makes queries simple and Google-like
+ */
+function extractKeyTerms(description: string, causeArea: string): string {
+  // Remove common filler words and keep the essence
+  const fillerWords = [
+    'a', 'an', 'the', 'for', 'to', 'and', 'or', 'that', 'which', 'with',
+    'personalized', 'innovative', 'revolutionary', 'unique', 'new',
+    'helping', 'providing', 'offering', 'creating', 'building',
+    'platform', 'service', 'solution', 'app', 'tool', 'system'
+  ];
+
+  const words = description.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 2 && !fillerWords.includes(word));
+
+  // Take the most important 3-5 words
+  const keyWords = words.slice(0, 5);
+
+  // If causeArea isn't already in the key words, add it
+  if (!keyWords.some(w => causeArea.toLowerCase().includes(w))) {
+    keyWords.push(causeArea.replace(/_/g, ' '));
+  }
+
+  return keyWords.join(' ');
+}
+
+/**
  * Extract organization/competitor names from text
  */
 function extractCompetitorNames(text: string): string[] {
@@ -153,6 +182,7 @@ function extractCompetitorNames(text: string): string[] {
 
 /**
  * Conduct comprehensive market research for a social impact idea
+ * Uses SIMPLE search queries like a user would type into Google
  */
 export async function conductMarketResearch(
   ideaName: string,
@@ -160,33 +190,23 @@ export async function conductMarketResearch(
   causeArea: string,
   ventureType: string,
   format: string,
-  location: string = "United States"
+  _location: string = "United States"
 ): Promise<MarketResearchData> {
-  // Build highly specific research queries
-  const ventureTypeLabel = ventureType === 'business' ? 'social enterprise or B-corp' :
-    ventureType === 'nonprofit' ? 'nonprofit organization' : 'community project or volunteer initiative';
+  // Extract key terms from the idea for simple searches
+  const keyTerms = extractKeyTerms(ideaDescription, causeArea);
+  const businessType = ventureType === 'business' ? 'companies' :
+    ventureType === 'nonprofit' ? 'nonprofits' : 'organizations';
 
-  const formatLabel = format === 'online' ? 'online/digital-first' :
-    format === 'in_person' ? 'in-person/local' : 'hybrid online and in-person';
-
+  // SIMPLE queries - like what a user would actually Google
   const queries = [
-    // Market size and demand - very specific
-    `What is the current market size and demand for ${causeArea} initiatives in the ${location}?
-    Specifically looking for: ${ventureTypeLabel} models that operate ${formatLabel}.
-    Include: specific statistics from 2023-2024, growth rates, target demographics, and unmet needs.
-    Context: We're researching "${ideaName}" - ${ideaDescription}`,
+    // Query 1: Search the idea description directly
+    ideaDescription,
 
-    // Competitors and similar organizations - very specific
-    `List the top 5-10 ${ventureTypeLabel}s working on ${causeArea} in the ${location}.
-    For each, provide: organization name, website URL, founding year, what they do, who they serve, and their ${formatLabel} approach.
-    Focus on: successful models similar to "${ideaName}" (${ideaDescription}).
-    Exclude: large national foundations - we want operational organizations serving beneficiaries directly.`,
+    // Query 2: Find actual competitors/similar companies
+    `${keyTerms} ${businessType}`,
 
-    // Funding and sustainability - very specific
-    `What funding and revenue models work for ${causeArea} ${ventureTypeLabel}s in the ${location}?
-    Include: specific grant programs accepting applications, foundation names with average grant sizes,
-    and revenue models that similar ${formatLabel} organizations use successfully.
-    Context: early-stage venture similar to "${ideaName}".`,
+    // Query 3: Simple market query
+    `${keyTerms} market size trends`,
   ];
 
   // Execute all queries in parallel

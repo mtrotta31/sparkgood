@@ -219,3 +219,6 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+// Re-export asset types
+export * from "./assets";

@@ -1,14 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import type { ActionRoadmap } from "@/types";
+import type { ActionRoadmap, Idea, UserProfile } from "@/types";
+import type { GeneratedAsset } from "@/types/assets";
+import { isBuildableTask, detectAssetType } from "@/types/assets";
+import BuildAssetModal from "./BuildAssetModal";
 
 interface ActionRoadmapViewProps {
   roadmap: ActionRoadmap;
+  idea?: Idea;
+  profile?: UserProfile;
 }
 
-export default function ActionRoadmapView({ roadmap }: ActionRoadmapViewProps) {
+export default function ActionRoadmapView({ roadmap, idea, profile }: ActionRoadmapViewProps) {
   const [expandedPhase, setExpandedPhase] = useState<number>(0);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState<string>("");
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [buildError, setBuildError] = useState<string | null>(null);
+  const [generatedAsset, setGeneratedAsset] = useState<GeneratedAsset | null>(null);
 
   const getCostBadge = (cost: string) => {
     switch (cost) {
@@ -40,6 +52,95 @@ export default function ActionRoadmapView({ roadmap }: ActionRoadmapViewProps) {
     }
   };
 
+  // Handle "Build This For Me" click
+  const handleBuildClick = async (taskDescription: string) => {
+    if (!idea) {
+      console.error("No idea provided for asset building");
+      return;
+    }
+
+    const assetType = detectAssetType(taskDescription);
+    if (!assetType) {
+      console.error("Could not detect asset type");
+      return;
+    }
+
+    // Open modal and start building
+    setCurrentTask(taskDescription);
+    setIsModalOpen(true);
+    setIsBuilding(true);
+    setBuildError(null);
+    setGeneratedAsset(null);
+
+    try {
+      const response = await fetch("/api/build-asset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskDescription,
+          assetType,
+          idea: {
+            name: idea.name,
+            tagline: idea.tagline,
+            problem: idea.problem,
+            audience: idea.audience,
+            impact: idea.impact,
+            revenueModel: idea.revenueModel,
+            causeAreas: idea.causeAreas,
+          },
+          profile: profile ? {
+            ventureType: profile.ventureType,
+            format: profile.format,
+            experience: profile.experience,
+            budget: profile.budget,
+            commitment: profile.commitment,
+          } : {},
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setGeneratedAsset(result.data);
+      } else {
+        setBuildError(result.error || "Failed to generate asset");
+      }
+    } catch (err) {
+      console.error("Error building asset:", err);
+      setBuildError("Something went wrong. Please try again.");
+    } finally {
+      setIsBuilding(false);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setGeneratedAsset(null);
+    setBuildError(null);
+    setCurrentTask("");
+  };
+
+  // Build button component
+  const BuildButton = ({ taskDescription }: { taskDescription: string }) => {
+    const assetType = detectAssetType(taskDescription);
+    if (!assetType || !idea) return null;
+
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleBuildClick(taskDescription);
+        }}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-spark/20 text-spark text-xs font-medium hover:bg-spark/30 transition-colors border border-spark/30"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>
+        Build This
+      </button>
+    );
+  };
+
   return (
     <div className="space-y-8">
       {/* Quick Wins */}
@@ -64,9 +165,10 @@ export default function ActionRoadmapView({ roadmap }: ActionRoadmapViewProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-warmwhite text-sm leading-relaxed">{win.task}</p>
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex flex-wrap items-center gap-3 mt-2">
                   <span className="text-xs text-warmwhite-dim">{win.timeframe}</span>
                   {getCostBadge(win.cost)}
+                  {isBuildableTask(win.task) && <BuildButton taskDescription={win.task} />}
                 </div>
               </div>
             </div>
@@ -136,6 +238,7 @@ export default function ActionRoadmapView({ roadmap }: ActionRoadmapViewProps) {
                                 Depends on: {task.dependencies.join(", ")}
                               </span>
                             )}
+                            {isBuildableTask(task.task) && <BuildButton taskDescription={task.task} />}
                           </div>
                         </div>
                       </div>
@@ -197,6 +300,16 @@ export default function ActionRoadmapView({ roadmap }: ActionRoadmapViewProps) {
           </li>
         </ol>
       </div>
+
+      {/* Build Asset Modal */}
+      <BuildAssetModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        asset={generatedAsset}
+        isLoading={isBuilding}
+        error={buildError}
+        taskDescription={currentTask}
+      />
     </div>
   );
 }

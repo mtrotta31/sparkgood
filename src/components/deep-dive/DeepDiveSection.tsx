@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FadeIn } from "@/components/ui";
 import ViabilityReport from "./ViabilityReport";
 import BusinessPlanView from "./BusinessPlanView";
@@ -79,17 +79,33 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
   const [marketing, setMarketing] = useState<MarketingAssets | null>(null);
   const [roadmap, setRoadmap] = useState<ActionRoadmap | null>(null);
 
-  // Fetch content for a specific tab
+  // Track which tabs have been fetched to prevent duplicate requests
+  const fetchedTabs = useRef<Set<TabId>>(new Set());
+  // Track current request to ignore stale responses
+  const currentRequestId = useRef<number>(0);
+
+  // Check if content exists for a tab
+  const hasContent = useCallback((tabId: TabId): boolean => {
+    switch (tabId) {
+      case "viability": return viability !== null;
+      case "plan": return plan !== null;
+      case "marketing": return marketing !== null;
+      case "roadmap": return roadmap !== null;
+    }
+  }, [viability, plan, marketing, roadmap]);
+
+  // Fetch content for a specific tab - stable reference, doesn't depend on content state
   const fetchContent = useCallback(async (tabId: TabId) => {
-    // Check if we already have the content
-    if (
-      (tabId === "viability" && viability) ||
-      (tabId === "plan" && plan) ||
-      (tabId === "marketing" && marketing) ||
-      (tabId === "roadmap" && roadmap)
-    ) {
+    // Skip if already fetched or currently fetching
+    if (fetchedTabs.current.has(tabId)) {
       return;
     }
+
+    // Mark as fetching to prevent duplicate requests
+    fetchedTabs.current.add(tabId);
+
+    // Generate request ID to track this specific request
+    const requestId = ++currentRequestId.current;
 
     setLoadingTab(tabId);
     setError(null);
@@ -107,7 +123,14 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
 
       const result = await response.json();
 
+      // Ignore stale responses (from cancelled/old requests)
+      if (requestId !== currentRequestId.current) {
+        console.log("Ignoring stale response for", tabId);
+        return;
+      }
+
       if (result.success && result.data) {
+        // Set content ONCE - this is the only version the user will see
         switch (tabId) {
           case "viability":
             setViability(result.data as ViabilityReportType);
@@ -124,19 +147,28 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
         }
       } else {
         setError(result.error || "Failed to load content");
+        // Remove from fetched set so user can retry
+        fetchedTabs.current.delete(tabId);
       }
     } catch (err) {
       console.error("Error fetching deep dive content:", err);
       setError("Something went wrong. Please try again.");
+      // Remove from fetched set so user can retry
+      fetchedTabs.current.delete(tabId);
     } finally {
-      setLoadingTab(null);
+      // Only clear loading if this is still the current request
+      if (requestId === currentRequestId.current) {
+        setLoadingTab(null);
+      }
     }
-  }, [idea, profile, viability, plan, marketing, roadmap]);
+  }, [idea, profile]); // Note: NO content state dependencies - prevents re-fetch loops
 
   // Fetch content when tab changes
   useEffect(() => {
-    fetchContent(activeTab);
-  }, [activeTab, fetchContent]);
+    if (!hasContent(activeTab)) {
+      fetchContent(activeTab);
+    }
+  }, [activeTab, fetchContent, hasContent]);
 
   // Get content for current tab
   const getCurrentContent = () => {
@@ -304,7 +336,7 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
               <MarketingAssetsView assets={marketing} ideaName={idea.name} />
             )}
             {activeTab === "roadmap" && roadmap && (
-              <ActionRoadmapView roadmap={roadmap} />
+              <ActionRoadmapView roadmap={roadmap} idea={idea} profile={profile} />
             )}
           </FadeIn>
         )}

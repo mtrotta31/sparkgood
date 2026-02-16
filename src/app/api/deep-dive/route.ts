@@ -51,11 +51,15 @@ type DeepDiveResponse = ViabilityReport | BusinessPlan | MarketingAssets | Actio
 
 // Cache research data per session to avoid redundant API calls
 // In production, this would be stored in Redis or similar
-const researchCache = new Map<string, {
-  marketResearch: MarketResearchData;
+interface CachedResearch {
+  marketResearch: MarketResearchData | null;
   competitorInsights: CompetitorInsight[];
   timestamp: number;
-}>();
+  researchAttempted: boolean; // Whether we tried to do research (even if it failed)
+  useResearch: boolean; // Final decision: should we use research-enhanced prompts?
+}
+
+const researchCache = new Map<string, CachedResearch>();
 
 // Generate cache key from idea name and profile
 function getCacheKey(idea: Idea, profile: UserProfile): string {
@@ -122,20 +126,34 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check for research data in cache or conduct new research
+    // ========================================================================
+    // STEP 1: CHECK CACHE OR CONDUCT RESEARCH (BLOCKING - complete before generating)
+    // ========================================================================
     const cacheKey = getCacheKey(idea, profile);
-    let researchData = researchCache.get(cacheKey);
+    let cachedData = researchCache.get(cacheKey);
 
-    // If no cache or expired, conduct fresh research
-    if (!researchData || !isCacheValid(researchData.timestamp)) {
+    // Make the research decision ONCE and cache it
+    if (!cachedData || !isCacheValid(cachedData.timestamp)) {
       const hasPerplexityKey = !!perplexityKey;
       const hasFirecrawlKey = !!firecrawlKey;
 
+      // Initialize cache entry with decision tracking
+      cachedData = {
+        marketResearch: null,
+        competitorInsights: [],
+        timestamp: Date.now(),
+        researchAttempted: false,
+        useResearch: false, // Will be set to true only if research succeeds AND is high quality
+      };
+
       if (hasPerplexityKey) {
+        cachedData.researchAttempted = true;
+        console.log("Attempting research for:", idea.name);
+
         try {
           const primaryCause = idea.causeAreas?.[0] || profile.causes?.[0] || "social impact";
 
-          // Step 1: Market research via Perplexity
+          // Step 1: Market research via Perplexity (BLOCKING)
           const marketResearch = await conductMarketResearch(
             idea.name,
             idea.tagline,
@@ -144,75 +162,81 @@ export async function POST(request: NextRequest) {
             profile.format || "both"
           );
 
-          // Step 2: Scrape competitor websites via Firecrawl (if we have the key and URLs)
-          let competitorInsights: CompetitorInsight[] = [];
+          cachedData.marketResearch = marketResearch;
+
+          // Step 2: Scrape competitor websites via Firecrawl (if available)
           if (hasFirecrawlKey && marketResearch.competitorUrls.length > 0) {
             try {
-              competitorInsights = await scrapeCompetitors(marketResearch.competitorUrls);
+              cachedData.competitorInsights = await scrapeCompetitors(marketResearch.competitorUrls);
             } catch (scrapeError) {
               console.warn("Firecrawl scraping failed:", scrapeError);
             }
           }
 
-          // Cache the research data
-          researchData = {
-            marketResearch,
-            competitorInsights,
-            timestamp: Date.now(),
-          };
-          researchCache.set(cacheKey, researchData);
+          // Step 3: Check quality and make FINAL decision
+          if (isResearchQualityGood(marketResearch)) {
+            cachedData.useResearch = true;
+            console.log("Research quality GOOD - will use research-enhanced prompts");
+          } else {
+            cachedData.useResearch = false;
+            console.log("Research quality LOW - falling back to Claude-only generation");
+          }
 
         } catch (researchError) {
-          console.warn("Research APIs failed, using AI generation only:", researchError);
+          console.warn("Research APIs failed:", researchError);
+          cachedData.useResearch = false;
         }
+      } else {
+        console.log("No Perplexity key - using Claude-only generation");
+        cachedData.useResearch = false;
       }
+
+      // Cache the decision
+      researchCache.set(cacheKey, cachedData);
     }
 
-    // Generate the appropriate prompt and call Claude
+    // ========================================================================
+    // STEP 2: GENERATE CONTENT (using the cached decision)
+    // ========================================================================
     let data: DeepDiveResponse;
 
-    // Check if research exists AND is good quality
-    const hasResearch = researchData &&
-      researchData.marketResearch &&
-      isResearchQualityGood(researchData.marketResearch);
-
-    if (researchData && researchData.marketResearch && !hasResearch) {
-      console.log("Research data exists but quality is too low - falling back to Claude-only generation");
-    }
+    // Use the cached decision - this never changes for this idea/profile combo
+    const useResearch = cachedData.useResearch;
+    console.log(`Generating ${section} content with research=${useResearch}`);
 
     // Convert cached research data to ResearchData format for prompts
-    // Maps from Perplexity/Firecrawl types to research-enhanced-prompts types
-    const formattedResearch: ResearchData | undefined = hasResearch && researchData
+    // Only create this if we decided to use research
+    const formattedResearch: ResearchData | undefined = useResearch && cachedData.marketResearch
       ? {
           marketResearch: {
             query: `market research for ${idea.name}`,
-            answer: `Market Size: ${researchData.marketResearch.marketSize}\n\nTrends: ${researchData.marketResearch.trends}\n\nFunding: ${researchData.marketResearch.fundingLandscape}`,
-            sources: researchData.marketResearch.rawResponses?.flatMap(r =>
+            answer: `Market Size: ${cachedData.marketResearch.marketSize}\n\nTrends: ${cachedData.marketResearch.trends}\n\nFunding: ${cachedData.marketResearch.fundingLandscape}`,
+            sources: cachedData.marketResearch.rawResponses?.flatMap(r =>
               r.citations.map(url => ({ title: url, url, snippet: "" }))
             ) || [],
           } as PerplexityResult,
           demandSignals: {
             query: `demand signals for ${idea.name}`,
-            answer: researchData.marketResearch.demandSignals || "",
+            answer: cachedData.marketResearch.demandSignals || "",
             sources: [],
           } as PerplexityResult,
           existingSolutions: {
             query: `existing solutions for ${idea.name}`,
-            answer: `Competitors: ${researchData.marketResearch.competitorNames?.join(", ") || "None identified"}`,
-            sources: researchData.marketResearch.competitorUrls?.map(url => ({
+            answer: `Competitors: ${cachedData.marketResearch.competitorNames?.join(", ") || "None identified"}`,
+            sources: cachedData.marketResearch.competitorUrls?.map(url => ({
               title: url,
               url,
               snippet: "",
             })) || [],
           } as PerplexityResult,
-          competitors: researchData.competitorInsights?.map((c) => ({
+          competitors: cachedData.competitorInsights?.map((c) => ({
             url: c.url,
             title: c.name,
             description: c.description,
-            pricing: c.pricingModel, // Map pricingModel -> pricing
-            services: c.keyMessages, // Map keyMessages -> services
+            pricing: c.pricingModel,
+            services: c.keyMessages,
             targetAudience: c.targetAudience,
-            uniqueValue: c.differentiators?.join(", ") || c.tagline, // Map differentiators -> uniqueValue
+            uniqueValue: c.differentiators?.join(", ") || c.tagline,
           } as FirecrawlResult)) || [],
         }
       : undefined;
