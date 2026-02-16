@@ -428,7 +428,6 @@ export default function BuilderPage() {
             selectedIdea={selectedIdea}
             onContinue={() => goToStep("deep_dive")}
             onSaveSingleIdea={handleSaveSingleIdea}
-            profileId={profileId || undefined}
           />
         );
 

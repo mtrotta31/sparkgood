@@ -18,7 +18,6 @@ interface IdeaListProps {
   onContinue: () => void;
   onSaveIdeas?: (ideas: Idea[]) => Promise<void>;
   onSaveSingleIdea?: (idea: Idea) => Promise<{ success: boolean; savedId?: string; alreadySaved?: boolean }>;
-  profileId?: string;
 }
 
 export default function IdeaList({
@@ -31,7 +30,6 @@ export default function IdeaList({
   onContinue,
   onSaveIdeas,
   onSaveSingleIdea,
-  profileId,
 }: IdeaListProps) {
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
