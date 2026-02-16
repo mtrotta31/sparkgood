@@ -17,7 +17,9 @@ import {
 } from "@/components/steps";
 import { IdeaList } from "@/components/results";
 import { DeepDiveSection } from "@/components/deep-dive";
+import { useAuth } from "@/contexts/AuthContext";
 import { STEP_PROGRESS } from "@/lib/constants";
+import { loadPendingSession, clearPendingSession } from "@/lib/sessionState";
 import type {
   UserProfile,
   VentureType as VentureTypeValue,
@@ -58,6 +60,10 @@ export default function BuilderPage() {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const hasStartedGenerating = useRef(false);
+
+  // Auth state
+  const { user } = useAuth();
+  const hasRestoredSession = useRef(false);
 
   // Progress calculation
   const progress = STEP_PROGRESS[currentStep] || 0;
@@ -147,7 +153,44 @@ export default function BuilderPage() {
     }
   }, [currentStep]);
 
-  
+  // Restore session state after auth completes
+  useEffect(() => {
+    // Only run when user becomes authenticated and we haven't already restored
+    if (!user || hasRestoredSession.current) return;
+
+    const pendingSession = loadPendingSession();
+    if (!pendingSession) return;
+
+    // Mark as restored to prevent running again
+    hasRestoredSession.current = true;
+
+    // Restore the saved state
+    setProfile(pendingSession.profile);
+    setIdeas(pendingSession.ideas as ExtendedIdea[]);
+
+    // Find and set the selected idea
+    if (pendingSession.selectedIdeaId) {
+      const selected = pendingSession.ideas.find(
+        (idea) => idea.id === pendingSession.selectedIdeaId
+      );
+      if (selected) {
+        setSelectedIdea(selected as ExtendedIdea);
+      }
+    }
+
+    // Navigate to the appropriate step based on pending action
+    if (pendingSession.pendingAction === "deep_dive" && pendingSession.selectedIdeaId) {
+      // Go directly to deep dive
+      setCurrentStep("deep_dive");
+    } else {
+      // Go to ideas list
+      setCurrentStep("ideas");
+    }
+
+    // Clear the pending session
+    clearPendingSession();
+  }, [user]);
+
   // Step navigation logic
   const getNextStep = (current: StepName): StepName => {
     const stepOrder: StepName[] = [
@@ -344,6 +387,7 @@ export default function BuilderPage() {
         return (
           <IdeaList
             ideas={ideas}
+            profile={profile}
             onSelectIdea={handleSelectIdea}
             onRegenerate={handleRegenerate}
             isRegenerating={isRegenerating}

@@ -405,9 +405,11 @@ FIRECRAWL_API_KEY=fc-...
 # App config
 NEXT_PUBLIC_APP_URL=https://sparkgood.io
 
-# Future
-# SUPABASE_URL=
-# SUPABASE_ANON_KEY=
+# Authentication (Supabase)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Future: Payments
 # STRIPE_SECRET_KEY=
 # STRIPE_PUBLISHABLE_KEY=
 ```

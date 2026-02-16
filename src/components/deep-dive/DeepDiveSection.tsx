@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FadeIn } from "@/components/ui";
+import { useUserData } from "@/hooks";
 import ViabilityReport from "./ViabilityReport";
 import BusinessPlanView from "./BusinessPlanView";
 import MarketingAssetsView from "./MarketingAssetsView";
@@ -72,6 +73,7 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
   const [activeTab, setActiveTab] = useState<TabId>("viability");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   // Content state for each section
   const [viability, setViability] = useState<ViabilityReportType | null>(null);
@@ -83,6 +85,11 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
   const fetchedTabs = useRef<Set<TabId>>(new Set());
   // Track current request to ignore stale responses
   const currentRequestId = useRef<number>(0);
+  // Track which tabs have been saved
+  const savedTabs = useRef<Set<TabId>>(new Set());
+
+  // User data hook for saving results
+  const { isAuthenticated, saveDeepDiveResult } = useUserData();
 
   // Check if content exists for a tab
   const hasContent = useCallback((tabId: TabId): boolean => {
@@ -170,6 +177,34 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
     }
   }, [activeTab, fetchContent, hasContent]);
 
+  // Auto-save results when logged in and content is loaded
+  useEffect(() => {
+    const saveResults = async () => {
+      if (!isAuthenticated || !idea.id) return;
+
+      // Save each section as it loads, but only once
+      if (viability && !savedTabs.current.has("viability")) {
+        savedTabs.current.add("viability");
+        const success = await saveDeepDiveResult(idea.id, { viability });
+        if (success) setIsSaved(true);
+      }
+      if (plan && !savedTabs.current.has("plan")) {
+        savedTabs.current.add("plan");
+        await saveDeepDiveResult(idea.id, { businessPlan: plan });
+      }
+      if (marketing && !savedTabs.current.has("marketing")) {
+        savedTabs.current.add("marketing");
+        await saveDeepDiveResult(idea.id, { marketing });
+      }
+      if (roadmap && !savedTabs.current.has("roadmap")) {
+        savedTabs.current.add("roadmap");
+        await saveDeepDiveResult(idea.id, { roadmap });
+      }
+    };
+
+    saveResults();
+  }, [isAuthenticated, idea.id, viability, plan, marketing, roadmap, saveDeepDiveResult]);
+
   // Get content for current tab
   const getCurrentContent = () => {
     switch (activeTab) {
@@ -220,9 +255,19 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
               </button>
             </div>
 
-            <span className="text-xs font-medium text-spark bg-spark/10 px-2 md:px-3 py-1 rounded-full">
-              Premium
-            </span>
+            <div className="flex items-center gap-2">
+              {isSaved && (
+                <span className="text-xs text-green-400 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Saved
+                </span>
+              )}
+              <span className="text-xs font-medium text-spark bg-spark/10 px-2 md:px-3 py-1 rounded-full">
+                Premium
+              </span>
+            </div>
           </div>
 
           {/* Idea title */}

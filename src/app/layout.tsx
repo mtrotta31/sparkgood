@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
+import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
 
 // Display font for headings - distinctive, human, warm
@@ -68,7 +69,7 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${dmSans.variable} font-body antialiased min-h-screen`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
