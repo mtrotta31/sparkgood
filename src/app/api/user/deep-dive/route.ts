@@ -49,21 +49,18 @@ export async function POST(request: Request) {
       .single();
 
     // Build the update object with only provided fields
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: Record<string, any> = {};
+    const updateData: Record<string, unknown> = {};
     if (viability !== undefined) updateData.viability = viability;
     if (businessPlan !== undefined) updateData.business_plan = businessPlan;
     if (marketing !== undefined) updateData.marketing = marketing;
     if (roadmap !== undefined) updateData.roadmap = roadmap;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let result: any;
+    let result;
     if (existing) {
       // Update existing record
       const { data, error } = await supabase
         .from("deep_dive_results")
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update(updateData as any)
+        .update(updateData)
         .eq("id", existing.id)
         .select()
         .single();
@@ -84,8 +81,7 @@ export async function POST(request: Request) {
           user_id: user.id,
           idea_id: ideaId,
           ...updateData,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any)
+        })
         .select()
         .single();
 
