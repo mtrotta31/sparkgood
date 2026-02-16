@@ -80,7 +80,7 @@ export default function IdeaList({
         profile,
         ideas,
         selectedIdeaId: idea.id,
-        pendingAction: "save_single_idea",
+        pendingAction: "save_ideas",
       });
       setPendingSaveIdea(idea);
       setPendingAction("save");
