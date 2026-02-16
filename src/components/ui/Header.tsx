@@ -120,11 +120,18 @@ export default function Header({
                           </div>
                           <div className="py-1">
                             <Link
-                              href="/builder"
+                              href="/projects"
                               className="block px-4 py-2 text-sm text-warmwhite-muted hover:text-warmwhite hover:bg-warmwhite/5 transition-colors"
                               onClick={() => setShowUserMenu(false)}
                             >
                               My Projects
+                            </Link>
+                            <Link
+                              href="/builder"
+                              className="block px-4 py-2 text-sm text-warmwhite-muted hover:text-warmwhite hover:bg-warmwhite/5 transition-colors"
+                              onClick={() => setShowUserMenu(false)}
+                            >
+                              Start New Project
                             </Link>
                             <button
                               onClick={handleSignOut}

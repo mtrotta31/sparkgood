@@ -22,7 +22,8 @@
       "Bash(chmod:*)",
       "Bash(git init:*)",
       "Bash(echo:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(npx next build)"
     ]
   },
   "enabledMcpjsonServers": [
