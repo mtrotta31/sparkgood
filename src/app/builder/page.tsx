@@ -18,6 +18,7 @@ import {
 import { IdeaList } from "@/components/results";
 import { DeepDiveSection } from "@/components/deep-dive";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserData } from "@/hooks";
 import { STEP_PROGRESS } from "@/lib/constants";
 import { loadPendingSession, clearPendingSession } from "@/lib/sessionState";
 import type {
@@ -63,7 +64,9 @@ export default function BuilderPage() {
 
   // Auth state
   const { user } = useAuth();
+  const { saveSingleIdea, saveProfile } = useUserData();
   const hasRestoredSession = useRef(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
 
   // Progress calculation
   const progress = STEP_PROGRESS[currentStep] || 0;
@@ -90,6 +93,17 @@ export default function BuilderPage() {
   // Generate ideas from API
   const generateIdeas = useCallback(async () => {
     setGenerationError(null);
+
+    // If user is logged in, save profile first to get profileId
+    if (user) {
+      console.log("[builder] Saving profile before generating ideas");
+      const savedProfileId = await saveProfile(profile);
+      if (savedProfileId) {
+        console.log("[builder] Profile saved with ID:", savedProfileId);
+        setProfileId(savedProfileId);
+      }
+    }
+
     try {
       const response = await fetch("/api/generate-ideas", {
         method: "POST",
@@ -100,6 +114,7 @@ export default function BuilderPage() {
       const result = await response.json();
 
       if (result.success && result.data) {
+        console.log("[builder] Generated", result.data.length, "ideas");
         setIdeas(result.data);
         setSelectedIdea(null);
         return true;
@@ -112,7 +127,7 @@ export default function BuilderPage() {
       setGenerationError("Something went wrong. Please try again.");
       return false;
     }
-  }, [profile]);
+  }, [profile, user, saveProfile]);
 
   // Regenerate ideas
   const handleRegenerate = useCallback(async () => {
@@ -125,6 +140,25 @@ export default function BuilderPage() {
   const handleSelectIdea = useCallback((idea: ExtendedIdea) => {
     setSelectedIdea(idea);
   }, []);
+
+  // Handle saving a single idea
+  const handleSaveSingleIdea = useCallback(async (idea: ExtendedIdea) => {
+    console.log("[builder] Saving single idea:", idea.name);
+
+    // If we don't have a profileId yet and user is logged in, save profile first
+    let currentProfileId = profileId;
+    if (!currentProfileId && user) {
+      console.log("[builder] No profileId, saving profile first");
+      currentProfileId = await saveProfile(profile);
+      if (currentProfileId) {
+        setProfileId(currentProfileId);
+      }
+    }
+
+    const result = await saveSingleIdea(idea, currentProfileId || undefined);
+    console.log("[builder] Save single idea result:", result);
+    return result;
+  }, [profileId, user, profile, saveProfile, saveSingleIdea]);
 
   // Generate ideas when entering the generating step
   useEffect(() => {
@@ -393,6 +427,8 @@ export default function BuilderPage() {
             isRegenerating={isRegenerating}
             selectedIdea={selectedIdea}
             onContinue={() => goToStep("deep_dive")}
+            onSaveSingleIdea={handleSaveSingleIdea}
+            profileId={profileId || undefined}
           />
         );
 
@@ -407,6 +443,7 @@ export default function BuilderPage() {
             idea={selectedIdea}
             profile={profile}
             onBack={() => goToStep("ideas")}
+            profileId={profileId || undefined}
           />
         );
 

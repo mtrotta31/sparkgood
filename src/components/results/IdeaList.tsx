@@ -17,6 +17,8 @@ interface IdeaListProps {
   selectedIdea: Idea | null;
   onContinue: () => void;
   onSaveIdeas?: (ideas: Idea[]) => Promise<void>;
+  onSaveSingleIdea?: (idea: Idea) => Promise<{ success: boolean; savedId?: string; alreadySaved?: boolean }>;
+  profileId?: string;
 }
 
 export default function IdeaList({
@@ -28,10 +30,13 @@ export default function IdeaList({
   selectedIdea,
   onContinue,
   onSaveIdeas,
+  onSaveSingleIdea,
+  profileId,
 }: IdeaListProps) {
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<"continue" | "save" | null>(null);
+  const [pendingSaveIdea, setPendingSaveIdea] = useState<Idea | null>(null);
 
   // Handle continue click - prompt for auth if not logged in
   const handleContinue = useCallback(() => {
@@ -69,16 +74,39 @@ export default function IdeaList({
     }
   }, [user, onSaveIdeas, ideas, profile, selectedIdea]);
 
+  // Handle request to save single idea (triggers auth if needed)
+  const handleRequestSaveIdea = useCallback((idea: Idea) => {
+    if (!user) {
+      // Save current state to localStorage before auth flow
+      savePendingSession({
+        profile,
+        ideas,
+        selectedIdeaId: idea.id,
+        pendingAction: "save_single_idea",
+      });
+      setPendingSaveIdea(idea);
+      setPendingAction("save");
+      setShowAuthModal(true);
+      return;
+    }
+  }, [user, profile, ideas]);
+
   // Handle successful auth - execute pending action
   // Note: This may not fire if page reloads, so builder page also checks for pending session
-  const handleAuthSuccess = useCallback(() => {
+  const handleAuthSuccess = useCallback(async () => {
     if (pendingAction === "continue") {
       onContinue();
-    } else if (pendingAction === "save" && onSaveIdeas) {
-      onSaveIdeas(ideas);
+    } else if (pendingAction === "save") {
+      if (pendingSaveIdea && onSaveSingleIdea) {
+        // Save the pending single idea
+        await onSaveSingleIdea(pendingSaveIdea);
+      } else if (onSaveIdeas) {
+        await onSaveIdeas(ideas);
+      }
     }
     setPendingAction(null);
-  }, [pendingAction, onContinue, onSaveIdeas, ideas]);
+    setPendingSaveIdea(null);
+  }, [pendingAction, onContinue, onSaveIdeas, onSaveSingleIdea, ideas, pendingSaveIdea]);
 
   return (
     <>
@@ -109,6 +137,9 @@ export default function IdeaList({
               isSelected={selectedIdea?.id === idea.id}
               onSelect={() => onSelectIdea(idea)}
               onContinue={handleContinue}
+              onSave={onSaveSingleIdea ? () => onSaveSingleIdea(idea) : undefined}
+              isAuthenticated={!!user}
+              onRequestAuth={() => handleRequestSaveIdea(idea)}
             />
           ))}
         </div>

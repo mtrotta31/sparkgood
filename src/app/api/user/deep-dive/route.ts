@@ -14,6 +14,8 @@ interface DeepDiveUpdate {
 }
 
 export async function POST(request: Request) {
+  console.log("[deep-dive] Starting save deep dive request");
+
   try {
     const supabase = await createClient();
 
@@ -23,7 +25,10 @@ export async function POST(request: Request) {
       error: authError,
     } = await supabase.auth.getUser();
 
+    console.log("[deep-dive] Auth check:", { userId: user?.id, authError: authError?.message });
+
     if (authError || !user) {
+      console.log("[deep-dive] Not authenticated");
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
@@ -33,7 +38,16 @@ export async function POST(request: Request) {
     const { ideaId, viability, businessPlan, marketing, roadmap } =
       await request.json() as DeepDiveUpdate;
 
+    console.log("[deep-dive] Received data:", {
+      ideaId,
+      hasViability: !!viability,
+      hasBusinessPlan: !!businessPlan,
+      hasMarketing: !!marketing,
+      hasRoadmap: !!roadmap,
+    });
+
     if (!ideaId) {
+      console.log("[deep-dive] Missing ideaId");
       return NextResponse.json(
         { success: false, error: "Idea ID required" },
         { status: 400 }
@@ -41,12 +55,14 @@ export async function POST(request: Request) {
     }
 
     // First check if a deep dive record exists for this idea
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from("deep_dive_results")
       .select("id")
       .eq("idea_id", ideaId)
       .eq("user_id", user.id)
       .single();
+
+    console.log("[deep-dive] Existing record check:", { existingId: existing?.id, error: existingError?.code });
 
     // Build the update object with only provided fields
     const updateData: Record<string, unknown> = {};
@@ -58,6 +74,7 @@ export async function POST(request: Request) {
     let result;
     if (existing) {
       // Update existing record
+      console.log("[deep-dive] Updating existing record:", existing.id);
       const { data, error } = await supabase
         .from("deep_dive_results")
         .update(updateData)
@@ -66,7 +83,7 @@ export async function POST(request: Request) {
         .single();
 
       if (error) {
-        console.error("Error updating deep dive:", error);
+        console.error("[deep-dive] Error updating deep dive:", error);
         return NextResponse.json(
           { success: false, error: "Failed to update deep dive results" },
           { status: 500 }
@@ -75,6 +92,7 @@ export async function POST(request: Request) {
       result = data;
     } else {
       // Insert new record
+      console.log("[deep-dive] Inserting new record for idea:", ideaId);
       const { data, error } = await supabase
         .from("deep_dive_results")
         .insert({
@@ -86,7 +104,7 @@ export async function POST(request: Request) {
         .single();
 
       if (error) {
-        console.error("Error saving deep dive:", error);
+        console.error("[deep-dive] Error saving deep dive:", error);
         return NextResponse.json(
           { success: false, error: "Failed to save deep dive results" },
           { status: 500 }
@@ -94,6 +112,8 @@ export async function POST(request: Request) {
       }
       result = data;
     }
+
+    console.log("[deep-dive] Successfully saved:", { deepDiveId: result.id });
 
     return NextResponse.json({
       success: true,

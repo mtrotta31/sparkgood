@@ -50,10 +50,15 @@ export function useUserData() {
     }
   }, [user]);
 
-  // Save ideas
+  // Save ideas (batch)
   const saveIdeas = useCallback(
     async (ideas: Idea[], profileId?: string, selectedIdeaId?: string): Promise<boolean> => {
-      if (!user) return false;
+      if (!user) {
+        console.log("[useUserData] saveIdeas: No user, skipping save");
+        return false;
+      }
+
+      console.log("[useUserData] saveIdeas: Saving", ideas.length, "ideas");
 
       try {
         const response = await fetch("/api/user/ideas", {
@@ -63,10 +68,47 @@ export function useUserData() {
         });
 
         const result = await response.json();
+        console.log("[useUserData] saveIdeas result:", result);
         return result.success;
       } catch (error) {
-        console.error("Error saving ideas:", error);
+        console.error("[useUserData] Error saving ideas:", error);
         return false;
+      }
+    },
+    [user]
+  );
+
+  // Save a single idea to My Projects
+  const saveSingleIdea = useCallback(
+    async (idea: Idea, profileId?: string): Promise<{ success: boolean; savedId?: string; alreadySaved?: boolean }> => {
+      if (!user) {
+        console.log("[useUserData] saveSingleIdea: No user, skipping save");
+        return { success: false };
+      }
+
+      console.log("[useUserData] saveSingleIdea: Saving idea", idea.id, idea.name);
+
+      try {
+        const response = await fetch("/api/user/ideas/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea, profileId }),
+        });
+
+        const result = await response.json();
+        console.log("[useUserData] saveSingleIdea result:", result);
+
+        if (result.success) {
+          return {
+            success: true,
+            savedId: result.data.savedId,
+            alreadySaved: result.data.alreadySaved,
+          };
+        }
+        return { success: false };
+      } catch (error) {
+        console.error("[useUserData] Error saving single idea:", error);
+        return { success: false };
       }
     },
     [user]
@@ -151,6 +193,7 @@ export function useUserData() {
     saveProfile,
     loadProfile,
     saveIdeas,
+    saveSingleIdea,
     loadIdeas,
     saveDeepDiveResult,
     loadDeepDiveResults,

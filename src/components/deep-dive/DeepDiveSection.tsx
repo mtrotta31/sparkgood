@@ -67,9 +67,10 @@ interface DeepDiveSectionProps {
   idea: Idea;
   profile: UserProfile;
   onBack: () => void;
+  profileId?: string;
 }
 
-export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSectionProps) {
+export default function DeepDiveSection({ idea, profile, onBack, profileId }: DeepDiveSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>("viability");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -82,15 +83,50 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
   const [marketing, setMarketing] = useState<MarketingAssets | null>(null);
   const [roadmap, setRoadmap] = useState<ActionRoadmap | null>(null);
 
+  // The saved idea ID from Supabase (used for deep dive results)
+  const [savedIdeaId, setSavedIdeaId] = useState<string | null>(null);
+
   // Track which tabs have been fetched to prevent duplicate requests
   const fetchedTabs = useRef<Set<TabId>>(new Set());
   // Track current request to ignore stale responses
   const currentRequestId = useRef<number>(0);
   // Track which tabs have been saved
   const savedTabs = useRef<Set<TabId>>(new Set());
+  // Track if we've attempted to save the idea
+  const hasAttemptedSaveIdea = useRef(false);
 
   // User data hook for saving results
   const { isAuthenticated, saveDeepDiveResult } = useUserData();
+
+  // Save the idea to Supabase when entering deep dive (if authenticated)
+  useEffect(() => {
+    const saveIdeaToProjects = async () => {
+      if (!isAuthenticated || hasAttemptedSaveIdea.current) return;
+      hasAttemptedSaveIdea.current = true;
+
+      console.log("[DeepDiveSection] Saving idea to projects:", idea.name);
+
+      try {
+        const response = await fetch("/api/user/ideas/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea, profileId }),
+        });
+
+        const result = await response.json();
+        console.log("[DeepDiveSection] Save idea result:", result);
+
+        if (result.success) {
+          setSavedIdeaId(result.data.savedId);
+          setIsSaved(true);
+        }
+      } catch (err) {
+        console.error("[DeepDiveSection] Error saving idea:", err);
+      }
+    };
+
+    saveIdeaToProjects();
+  }, [isAuthenticated, idea, profileId]);
 
   // Check if content exists for a tab
   const hasContent = useCallback((tabId: TabId): boolean => {
@@ -181,30 +217,41 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
   // Auto-save results when logged in and content is loaded
   useEffect(() => {
     const saveResults = async () => {
-      if (!isAuthenticated || !idea.id) return;
+      // Need savedIdeaId (from Supabase saved_ideas table) to save deep dive results
+      if (!isAuthenticated || !savedIdeaId) {
+        console.log("[DeepDiveSection] Skipping auto-save:", { isAuthenticated, savedIdeaId });
+        return;
+      }
+
+      console.log("[DeepDiveSection] Auto-saving deep dive results for:", savedIdeaId);
 
       // Save each section as it loads, but only once
       if (viability && !savedTabs.current.has("viability")) {
         savedTabs.current.add("viability");
-        const success = await saveDeepDiveResult(idea.id, { viability });
+        console.log("[DeepDiveSection] Saving viability for:", savedIdeaId);
+        const success = await saveDeepDiveResult(savedIdeaId, { viability });
+        console.log("[DeepDiveSection] Viability save result:", success);
         if (success) setIsSaved(true);
       }
       if (plan && !savedTabs.current.has("plan")) {
         savedTabs.current.add("plan");
-        await saveDeepDiveResult(idea.id, { businessPlan: plan });
+        console.log("[DeepDiveSection] Saving business plan for:", savedIdeaId);
+        await saveDeepDiveResult(savedIdeaId, { businessPlan: plan });
       }
       if (marketing && !savedTabs.current.has("marketing")) {
         savedTabs.current.add("marketing");
-        await saveDeepDiveResult(idea.id, { marketing });
+        console.log("[DeepDiveSection] Saving marketing for:", savedIdeaId);
+        await saveDeepDiveResult(savedIdeaId, { marketing });
       }
       if (roadmap && !savedTabs.current.has("roadmap")) {
         savedTabs.current.add("roadmap");
-        await saveDeepDiveResult(idea.id, { roadmap });
+        console.log("[DeepDiveSection] Saving roadmap for:", savedIdeaId);
+        await saveDeepDiveResult(savedIdeaId, { roadmap });
       }
     };
 
     saveResults();
-  }, [isAuthenticated, idea.id, viability, plan, marketing, roadmap, saveDeepDiveResult]);
+  }, [isAuthenticated, savedIdeaId, viability, plan, marketing, roadmap, saveDeepDiveResult]);
 
   // Get content for current tab
   const getCurrentContent = () => {

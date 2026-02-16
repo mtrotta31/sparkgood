@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  console.log("[projects] Fetching user projects");
+
   try {
     const supabase = await createClient();
 
@@ -14,7 +16,10 @@ export async function GET() {
       error: authError,
     } = await supabase.auth.getUser();
 
+    console.log("[projects] Auth check:", { userId: user?.id, authError: authError?.message });
+
     if (authError || !user) {
+      console.log("[projects] Not authenticated");
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
@@ -35,8 +40,10 @@ export async function GET() {
       .eq("user_id", user.id)
       .order("updated_at", { ascending: false });
 
+    console.log("[projects] Found saved ideas:", savedIdeas?.length || 0);
+
     if (ideasError) {
-      console.error("Error fetching ideas:", ideasError);
+      console.error("[projects] Error fetching ideas:", ideasError);
       return NextResponse.json(
         { success: false, error: "Failed to load projects" },
         { status: 500 }
