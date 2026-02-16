@@ -318,7 +318,7 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
                 Researching your idea...
               </p>
               <p className="text-warmwhite-muted text-sm text-center max-w-md">
-                We're searching real market data and analyzing competitors. This takes 15-20 seconds because we're pulling live information.
+                We&apos;re searching real market data and analyzing competitors. This takes 15-20 seconds because we&apos;re pulling live information.
               </p>
             </div>
           </FadeIn>

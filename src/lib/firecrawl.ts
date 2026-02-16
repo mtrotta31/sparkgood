@@ -65,7 +65,7 @@ async function scrapeUrl(url: string): Promise<ScrapedPage> {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const _errorText = await response.text();
       console.error(`Firecrawl error for ${url}:`, response.status);
       return {
         url,

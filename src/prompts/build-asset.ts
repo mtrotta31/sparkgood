@@ -1,7 +1,7 @@
 // Prompts for "Build This For Me" asset generation
 // These create actual, usable assets — not templates or placeholders
 
-import type { AssetType, BuildAssetRequest } from "@/types/assets";
+import type { BuildAssetRequest } from "@/types/assets";
 
 // ============================================================================
 // SYSTEM PROMPTS

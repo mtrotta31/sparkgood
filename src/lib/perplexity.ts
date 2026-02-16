@@ -76,7 +76,7 @@ async function searchPerplexity(query: string): Promise<PerplexitySearchResult> 
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
+    const _errorText = await response.text();
     console.error("Perplexity API error:", response.status);
     throw new Error(`Perplexity API error: ${response.status}`);
   }
