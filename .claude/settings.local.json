@@ -20,7 +20,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
       "Bash(chmod:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(echo:*)",
+      "Bash(npx eslint:*)"
     ]
   },
   "enabledMcpjsonServers": [

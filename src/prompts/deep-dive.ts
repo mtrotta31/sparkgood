@@ -4,6 +4,8 @@
 // - Weekend Warriors → Dramatically simplified, no jargon, just "here's what to do"
 // - Steady Builders → Structured but accessible, 3-page plans
 // - All-In → Full professional frameworks
+//
+// Note: Research-enhanced prompts are in research-enhanced-prompts.ts
 
 import type { UserProfile, Idea, CauseArea, CommitmentLevel } from "@/types";
 import { CAUSE_AREAS } from "@/lib/constants";

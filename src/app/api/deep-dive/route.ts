@@ -1,8 +1,11 @@
 // API route for deep dive generation
 // Takes selected idea + user profile and generates viability, plan, marketing, and roadmap
+// NOW WITH REAL RESEARCH: Uses Perplexity for market data + Firecrawl to scrape competitors
 
 import { NextRequest, NextResponse } from "next/server";
 import { sendMessageForJSON } from "@/lib/claude";
+import { conductMarketResearch, type MarketResearchData } from "@/lib/perplexity";
+import { scrapeCompetitors, type CompetitorInsight } from "@/lib/firecrawl";
 import {
   generateViabilityPrompt,
   generateBusinessPlanPrompt,
@@ -13,6 +16,19 @@ import {
   MARKETING_SYSTEM_PROMPT,
   ROADMAP_SYSTEM_PROMPT,
 } from "@/prompts/deep-dive";
+import {
+  generateResearchEnhancedViabilityPrompt,
+  generateResearchEnhancedPlanPrompt,
+  generateResearchEnhancedMarketingPrompt,
+  generateResearchEnhancedRoadmapPrompt,
+  RESEARCH_ENHANCED_VIABILITY_SYSTEM_PROMPT,
+  RESEARCH_ENHANCED_PLAN_SYSTEM_PROMPT,
+  RESEARCH_ENHANCED_MARKETING_SYSTEM_PROMPT,
+  RESEARCH_ENHANCED_ROADMAP_SYSTEM_PROMPT,
+  type ResearchData,
+  type PerplexityResult,
+  type FirecrawlResult,
+} from "@/prompts/research-enhanced-prompts";
 import type {
   UserProfile,
   Idea,
@@ -33,13 +49,64 @@ interface DeepDiveRequest {
 
 type DeepDiveResponse = ViabilityReport | BusinessPlan | MarketingAssets | ActionRoadmap;
 
+// Cache research data per session to avoid redundant API calls
+// In production, this would be stored in Redis or similar
+const researchCache = new Map<string, {
+  marketResearch: MarketResearchData;
+  competitorInsights: CompetitorInsight[];
+  timestamp: number;
+}>();
+
+// Generate cache key from idea name and profile
+function getCacheKey(idea: Idea, profile: UserProfile): string {
+  return `${idea.name}-${profile.ventureType}-${profile.causes?.join(",") || ""}`;
+}
+
+// Check if cache is still valid (1 hour TTL)
+function isCacheValid(timestamp: number): boolean {
+  const ONE_HOUR = 60 * 60 * 1000;
+  return Date.now() - timestamp < ONE_HOUR;
+}
+
+// Quality filter: Check if research data is good enough to use
+// Returns true if research should be used, false if we should fall back to Claude-only
+function isResearchQualityGood(marketResearch: MarketResearchData): boolean {
+  // Check 1: Do we have meaningful market size info? (not just error messages or generic text)
+  const marketSizeOk = marketResearch.marketSize &&
+    marketResearch.marketSize.length > 100 &&
+    !marketResearch.marketSize.toLowerCase().includes("unavailable") &&
+    !marketResearch.marketSize.toLowerCase().includes("error");
+
+  // Check 2: Did we find any competitor names or URLs?
+  const hasCompetitors = (marketResearch.competitorNames?.length || 0) >= 2 ||
+    (marketResearch.competitorUrls?.length || 0) >= 2;
+
+  // Check 3: Do we have funding/trends info?
+  const hasFundingInfo = marketResearch.fundingLandscape &&
+    marketResearch.fundingLandscape.length > 50 &&
+    !marketResearch.fundingLandscape.toLowerCase().includes("unavailable");
+
+  // Quality threshold: need at least 2 out of 3 checks to pass
+  const passedChecks = [marketSizeOk, hasCompetitors, hasFundingInfo].filter(Boolean).length;
+
+  console.log(`Research quality check: marketSizeOk=${marketSizeOk}, hasCompetitors=${hasCompetitors}, hasFundingInfo=${hasFundingInfo}, passed=${passedChecks}/3`);
+
+  return passedChecks >= 2;
+}
+
 export async function POST(request: NextRequest) {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const perplexityKey = process.env.PERPLEXITY_API_KEY;
+  const firecrawlKey = process.env.FIRECRAWL_API_KEY;
+
   try {
     const body = await request.json();
     const { idea, profile, section } = body as DeepDiveRequest;
 
+
     // Validate required fields
     if (!idea || !profile || !section) {
+      console.log("Missing required fields, returning error");
       return NextResponse.json<ApiResponse<DeepDiveResponse>>({
         success: false,
         error: "Missing required fields: idea, profile, or section",
@@ -47,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for API key
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!anthropicKey) {
       console.warn("No ANTHROPIC_API_KEY set, returning mock data");
       return NextResponse.json<ApiResponse<DeepDiveResponse>>({
         success: true,
@@ -55,42 +122,151 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Check for research data in cache or conduct new research
+    const cacheKey = getCacheKey(idea, profile);
+    let researchData = researchCache.get(cacheKey);
+
+    // If no cache or expired, conduct fresh research
+    if (!researchData || !isCacheValid(researchData.timestamp)) {
+      const hasPerplexityKey = !!perplexityKey;
+      const hasFirecrawlKey = !!firecrawlKey;
+
+      if (hasPerplexityKey) {
+        try {
+          const primaryCause = idea.causeAreas?.[0] || profile.causes?.[0] || "social impact";
+
+          // Step 1: Market research via Perplexity
+          const marketResearch = await conductMarketResearch(
+            idea.name,
+            idea.tagline,
+            primaryCause,
+            profile.ventureType || "project",
+            profile.format || "both"
+          );
+
+          // Step 2: Scrape competitor websites via Firecrawl (if we have the key and URLs)
+          let competitorInsights: CompetitorInsight[] = [];
+          if (hasFirecrawlKey && marketResearch.competitorUrls.length > 0) {
+            try {
+              competitorInsights = await scrapeCompetitors(marketResearch.competitorUrls);
+            } catch (scrapeError) {
+              console.warn("Firecrawl scraping failed:", scrapeError);
+            }
+          }
+
+          // Cache the research data
+          researchData = {
+            marketResearch,
+            competitorInsights,
+            timestamp: Date.now(),
+          };
+          researchCache.set(cacheKey, researchData);
+
+        } catch (researchError) {
+          console.warn("Research APIs failed, using AI generation only:", researchError);
+        }
+      }
+    }
+
     // Generate the appropriate prompt and call Claude
     let data: DeepDiveResponse;
+
+    // Check if research exists AND is good quality
+    const hasResearch = researchData &&
+      researchData.marketResearch &&
+      isResearchQualityGood(researchData.marketResearch);
+
+    if (researchData && researchData.marketResearch && !hasResearch) {
+      console.log("Research data exists but quality is too low - falling back to Claude-only generation");
+    }
+
+    // Convert cached research data to ResearchData format for prompts
+    // Maps from Perplexity/Firecrawl types to research-enhanced-prompts types
+    const formattedResearch: ResearchData | undefined = hasResearch && researchData
+      ? {
+          marketResearch: {
+            query: `market research for ${idea.name}`,
+            answer: `Market Size: ${researchData.marketResearch.marketSize}\n\nTrends: ${researchData.marketResearch.trends}\n\nFunding: ${researchData.marketResearch.fundingLandscape}`,
+            sources: researchData.marketResearch.rawResponses?.flatMap(r =>
+              r.citations.map(url => ({ title: url, url, snippet: "" }))
+            ) || [],
+          } as PerplexityResult,
+          demandSignals: {
+            query: `demand signals for ${idea.name}`,
+            answer: researchData.marketResearch.demandSignals || "",
+            sources: [],
+          } as PerplexityResult,
+          existingSolutions: {
+            query: `existing solutions for ${idea.name}`,
+            answer: `Competitors: ${researchData.marketResearch.competitorNames?.join(", ") || "None identified"}`,
+            sources: researchData.marketResearch.competitorUrls?.map(url => ({
+              title: url,
+              url,
+              snippet: "",
+            })) || [],
+          } as PerplexityResult,
+          competitors: researchData.competitorInsights?.map((c) => ({
+            url: c.url,
+            title: c.name,
+            description: c.description,
+            pricing: c.pricingModel, // Map pricingModel -> pricing
+            services: c.keyMessages, // Map keyMessages -> services
+            targetAudience: c.targetAudience,
+            uniqueValue: c.differentiators?.join(", ") || c.tagline, // Map differentiators -> uniqueValue
+          } as FirecrawlResult)) || [],
+        }
+      : undefined;
 
     try {
       switch (section) {
         case "viability":
-          const viabilityPrompt = generateViabilityPrompt(idea, profile);
+          // Use research-enhanced prompt if we have research data
+          const viabilityPrompt = formattedResearch
+            ? generateResearchEnhancedViabilityPrompt(idea, profile, formattedResearch)
+            : generateViabilityPrompt(idea, profile);
           data = await sendMessageForJSON<ViabilityReport>(viabilityPrompt, {
-            systemPrompt: VIABILITY_SYSTEM_PROMPT,
+            systemPrompt: formattedResearch
+              ? RESEARCH_ENHANCED_VIABILITY_SYSTEM_PROMPT
+              : VIABILITY_SYSTEM_PROMPT,
             temperature: 0.7,
             maxTokens: 4096,
           });
           break;
 
         case "plan":
-          const planPrompt = generateBusinessPlanPrompt(idea, profile);
+          const planPrompt = formattedResearch
+            ? generateResearchEnhancedPlanPrompt(idea, profile, formattedResearch)
+            : generateBusinessPlanPrompt(idea, profile);
           data = await sendMessageForJSON<BusinessPlan>(planPrompt, {
-            systemPrompt: BUSINESS_PLAN_SYSTEM_PROMPT,
+            systemPrompt: formattedResearch
+              ? RESEARCH_ENHANCED_PLAN_SYSTEM_PROMPT
+              : BUSINESS_PLAN_SYSTEM_PROMPT,
             temperature: 0.7,
             maxTokens: 6000,
           });
           break;
 
         case "marketing":
-          const marketingPrompt = generateMarketingPrompt(idea, profile);
+          const marketingPrompt = formattedResearch
+            ? generateResearchEnhancedMarketingPrompt(idea, profile, formattedResearch)
+            : generateMarketingPrompt(idea, profile);
           data = await sendMessageForJSON<MarketingAssets>(marketingPrompt, {
-            systemPrompt: MARKETING_SYSTEM_PROMPT,
+            systemPrompt: formattedResearch
+              ? RESEARCH_ENHANCED_MARKETING_SYSTEM_PROMPT
+              : MARKETING_SYSTEM_PROMPT,
             temperature: 0.8,
             maxTokens: 4096,
           });
           break;
 
         case "roadmap":
-          const roadmapPrompt = generateRoadmapPrompt(idea, profile);
+          const roadmapPrompt = formattedResearch
+            ? generateResearchEnhancedRoadmapPrompt(idea, profile, formattedResearch)
+            : generateRoadmapPrompt(idea, profile);
           data = await sendMessageForJSON<ActionRoadmap>(roadmapPrompt, {
-            systemPrompt: ROADMAP_SYSTEM_PROMPT,
+            systemPrompt: formattedResearch
+              ? RESEARCH_ENHANCED_ROADMAP_SYSTEM_PROMPT
+              : ROADMAP_SYSTEM_PROMPT,
             temperature: 0.7,
             maxTokens: 4096,
           });
@@ -103,7 +279,7 @@ export async function POST(request: NextRequest) {
           });
       }
     } catch (apiError) {
-      // If Claude API fails (parsing, network, etc.), fall back to mock data
+      // If Claude API fails, fall back to mock data
       console.warn("Claude API failed, falling back to mock data:", apiError);
       data = getMockData(section, idea, profile);
     }

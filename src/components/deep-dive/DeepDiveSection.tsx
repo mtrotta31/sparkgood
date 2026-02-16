@@ -282,8 +282,11 @@ export default function DeepDiveSection({ idea, profile, onBack }: DeepDiveSecti
                   </defs>
                 </svg>
               </div>
-              <p className="text-warmwhite-muted">
-                Generating {tabs.find(t => t.id === activeTab)?.label}...
+              <p className="text-warmwhite font-medium mb-2">
+                Researching your idea...
+              </p>
+              <p className="text-warmwhite-muted text-sm text-center max-w-md">
+                We're searching real market data and analyzing competitors. This takes 15-20 seconds because we're pulling live information.
               </p>
             </div>
           </FadeIn>
