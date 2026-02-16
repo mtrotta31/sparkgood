@@ -4,6 +4,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import type { ViabilityReport, BusinessPlan, MarketingAssets, ActionRoadmap } from "@/types";
+import type { Database } from "@/types/database";
+
+type DeepDiveResultUpdate = Database["public"]["Tables"]["deep_dive_results"]["Update"];
 
 interface DeepDiveUpdate {
   ideaId: string;
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
       .single();
 
     // Build the update object with only provided fields
-    const updateData: Record<string, unknown> = {};
+    const updateData: DeepDiveResultUpdate = {};
     if (viability !== undefined) updateData.viability = viability;
     if (businessPlan !== undefined) updateData.business_plan = businessPlan;
     if (marketing !== undefined) updateData.marketing = marketing;
@@ -80,7 +83,10 @@ export async function POST(request: Request) {
         .insert({
           user_id: user.id,
           idea_id: ideaId,
-          ...updateData,
+          viability: updateData.viability,
+          business_plan: updateData.business_plan,
+          marketing: updateData.marketing,
+          roadmap: updateData.roadmap,
         })
         .select()
         .single();
