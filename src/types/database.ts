@@ -128,6 +128,49 @@ export interface Database {
           updated_at?: string;
         };
       };
+      user_credits: {
+        Row: {
+          id: string;
+          user_id: string;
+          subscription_tier: "free" | "spark" | "ignite";
+          subscription_status: "active" | "canceled" | "past_due" | "none";
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          deep_dive_credits_remaining: number;
+          launch_kit_credits_remaining: number;
+          one_time_purchases: string[]; // Array of idea IDs purchased
+          credits_reset_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subscription_tier?: "free" | "spark" | "ignite";
+          subscription_status?: "active" | "canceled" | "past_due" | "none";
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          deep_dive_credits_remaining?: number;
+          launch_kit_credits_remaining?: number;
+          one_time_purchases?: string[];
+          credits_reset_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          subscription_tier?: "free" | "spark" | "ignite";
+          subscription_status?: "active" | "canceled" | "past_due" | "none";
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          deep_dive_credits_remaining?: number;
+          launch_kit_credits_remaining?: number;
+          one_time_purchases?: string[];
+          credits_reset_at?: string | null;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

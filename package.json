@@ -8,16 +8,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed:directory": "npx tsx scripts/seed-directory.ts"
+    "seed:directory": "npx tsx scripts/seed-directory.ts",
+    "enrich:directory": "npx tsx scripts/enrich-listings.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
     "@react-pdf/renderer": "^4.3.2",
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "next": "14.2.35",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^20.3.1"
   },
   "devDependencies": {
     "@types/node": "^20",

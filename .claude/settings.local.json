@@ -26,7 +26,15 @@
       "Bash(npx next build)",
       "mcp__firecrawl__firecrawl_map",
       "Bash(npm run lint:*)",
-      "Bash(npx next lint:*)"
+      "Bash(npx next lint:*)",
+      "Bash(git add:*)",
+      "Bash(grants in Austin, TX\"\\)\n- Create dynamic sitemap.ts for Google indexing of 16,000+ pages\n- Add robots.txt pointing to sitemap\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate CLAUDE.md to reflect current project state\n\n- Document all implemented features \\(builder, deep dive, resources\\)\n- Add accurate tech stack \\(Next.js 14, Supabase, Claude API\\)\n- List all API routes with descriptions\n- Document database schema\n- Update file structure to match reality\n- Add development commands and environment variables\n- Change phase from \"Environment Setup\" to \"Feature Complete / Polish\"\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node --check:*)",
+      "Bash(npm run seed:directory:*)",
+      "Bash(npm run enrich:directory:*)"
     ]
   },
   "enabledMcpjsonServers": [

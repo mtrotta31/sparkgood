@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FadeIn } from "@/components/ui";
-import { useUserData } from "@/hooks";
+import { useUserData, useCredits } from "@/hooks";
+import { savePendingSession } from "@/lib/sessionState";
+import PurchaseModal from "@/components/PurchaseModal";
 import ViabilityReport from "./ViabilityReport";
 import BusinessPlanView from "./BusinessPlanView";
 import MarketingAssetsView from "./MarketingAssetsView";
@@ -68,17 +70,23 @@ const tabs: Tab[] = [
 
 interface DeepDiveSectionProps {
   idea: Idea;
+  ideas: Idea[]; // Full list of ideas for session state preservation
   profile: UserProfile;
   onBack: () => void;
   profileId?: string;
 }
 
-export default function DeepDiveSection({ idea, profile, onBack, profileId }: DeepDiveSectionProps) {
+export default function DeepDiveSection({ idea, ideas, profile, onBack, profileId }: DeepDiveSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>("viability");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+
+  // Credits and access control
+  const { hasDeepDiveAccess, refetch: refetchCredits, loading: creditsLoading } = useCredits();
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [hasUnlockedAccess, setHasUnlockedAccess] = useState(false);
 
   // Regenerate confirmation dialog state
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
@@ -140,6 +148,65 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
 
     saveIdeaToProjects();
   }, [isAuthenticated, idea, profileId]);
+
+  // Track if we're returning from a successful Stripe purchase
+  const [isReturningFromPurchase, setIsReturningFromPurchase] = useState(false);
+
+  // Check for successful purchase return IMMEDIATELY on mount (before credits load)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const purchaseParam = urlParams.get("purchase");
+    const sessionId = urlParams.get("session_id");
+
+    if (purchaseParam === "deep_dive" && sessionId) {
+      // Mark as returning from purchase to prevent modal flash
+      setIsReturningFromPurchase(true);
+      // Grant access immediately
+      setHasUnlockedAccess(true);
+      // Clean up URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Refetch credits in background to sync state
+      refetchCredits();
+    }
+  }, []); // Run once on mount
+
+  // Check credits-based access (only if not returning from purchase)
+  useEffect(() => {
+    // Skip if returning from Stripe purchase (already granted access above)
+    if (isReturningFromPurchase) return;
+
+    // Skip if still loading credits
+    if (creditsLoading) return;
+
+    // Check if user has access to this idea's deep dive
+    const hasAccess = hasDeepDiveAccess(idea.id);
+
+    if (hasAccess) {
+      setHasUnlockedAccess(true);
+    } else {
+      // Show purchase modal if no access
+      setShowPurchaseModal(true);
+    }
+  }, [creditsLoading, hasDeepDiveAccess, idea.id, isReturningFromPurchase]);
+
+  // Consume credit when accessing (for subscription users)
+  useEffect(() => {
+    if (!hasUnlockedAccess) return;
+
+    const consumeCredit = async () => {
+      try {
+        await fetch("/api/user/credits/consume", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "deep_dive", ideaId: idea.id }),
+        });
+      } catch (err) {
+        console.error("Error consuming credit:", err);
+      }
+    };
+
+    consumeCredit();
+  }, [hasUnlockedAccess, idea.id]);
 
   // Check if content exists for a tab
   const hasContent = useCallback((tabId: TabId): boolean => {
@@ -220,12 +287,13 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
     }
   }, [idea, profile]); // Note: NO content state dependencies - prevents re-fetch loops
 
-  // Fetch content when tab changes
+  // Fetch content when tab changes (only if user has access)
   useEffect(() => {
+    if (!hasUnlockedAccess) return;
     if (!hasContent(activeTab)) {
       fetchContent(activeTab);
     }
-  }, [activeTab, fetchContent, hasContent]);
+  }, [activeTab, fetchContent, hasContent, hasUnlockedAccess]);
 
   // Handle regenerate request - shows confirmation dialog
   const handleRegenerateRequest = useCallback((tabId: TabId) => {
@@ -558,31 +626,8 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
-        {error && (
-          <FadeIn duration={300}>
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-warmwhite mb-1">Error loading content</h3>
-                  <p className="text-warmwhite-muted text-sm">{error}</p>
-                  <button
-                    onClick={() => fetchContent(activeTab)}
-                    className="mt-3 text-spark hover:text-spark-400 text-sm font-medium"
-                  >
-                    Try again
-                  </button>
-                </div>
-              </div>
-            </div>
-          </FadeIn>
-        )}
-
-        {isLoading && !content && (
+        {/* Loading credits state */}
+        {creditsLoading && (
           <FadeIn duration={300}>
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative w-16 h-16 mb-6">
@@ -606,6 +651,84 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
                   </defs>
                 </svg>
               </div>
+              <p className="text-warmwhite font-medium">Checking access...</p>
+            </div>
+          </FadeIn>
+        )}
+
+        {/* Locked state - shown when purchase modal is open */}
+        {!creditsLoading && !hasUnlockedAccess && (
+          <FadeIn duration={300}>
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-20 h-20 rounded-full bg-spark/10 flex items-center justify-center mb-6">
+                <svg className="w-10 h-10 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <h2 className="font-display text-2xl font-bold text-warmwhite mb-2">
+                Unlock Deep Dive Analysis
+              </h2>
+              <p className="text-warmwhite-muted max-w-md mb-6">
+                Get comprehensive market research, business planning, and action roadmap for this idea.
+              </p>
+              <button
+                onClick={() => setShowPurchaseModal(true)}
+                className="px-6 py-3 font-medium rounded-xl bg-spark text-charcoal hover:bg-spark-light transition-colors"
+              >
+                Unlock for $4.99
+              </button>
+            </div>
+          </FadeIn>
+        )}
+
+        {error && hasUnlockedAccess && (
+          <FadeIn duration={300}>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium text-warmwhite mb-1">Error loading content</h3>
+                  <p className="text-warmwhite-muted text-sm">{error}</p>
+                  <button
+                    onClick={() => fetchContent(activeTab)}
+                    className="mt-3 text-spark hover:text-spark-400 text-sm font-medium"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        )}
+
+        {hasUnlockedAccess && isLoading && !content && (
+          <FadeIn duration={300}>
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="relative w-16 h-16 mb-6">
+                <div className="absolute inset-0 rounded-full border-4 border-charcoal-light" />
+                <svg className="absolute inset-0 w-16 h-16 -rotate-90 animate-spin">
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    fill="none"
+                    stroke="url(#spinGradient2)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray="60 200"
+                  />
+                  <defs>
+                    <linearGradient id="spinGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#F59E0B" />
+                      <stop offset="100%" stopColor="#F97316" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
               <p className="text-warmwhite font-medium mb-2">
                 Researching your idea...
               </p>
@@ -616,7 +739,7 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
           </FadeIn>
         )}
 
-        {content && !isLoading && (
+        {hasUnlockedAccess && content && !isLoading && (
           <FadeIn duration={400}>
             {/* Regenerate Button */}
             <div className="flex justify-end mb-4">
@@ -667,6 +790,30 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
         isLoading={isGeneratingLaunchKit}
         error={launchKitError}
         ideaName={idea.name}
+      />
+
+      {/* Purchase Modal for deep dive access */}
+      <PurchaseModal
+        isOpen={showPurchaseModal}
+        onClose={() => {
+          setShowPurchaseModal(false);
+          // If user closes without purchasing, go back to ideas
+          if (!hasUnlockedAccess) {
+            onBack();
+          }
+        }}
+        ideaId={idea.id}
+        ideaName={idea.name}
+        purchaseType="deep_dive"
+        onBeforeRedirect={() => {
+          // Save session state before redirecting to Stripe
+          savePendingSession({
+            profile,
+            ideas,
+            selectedIdeaId: idea.id,
+            pendingAction: "deep_dive",
+          });
+        }}
       />
     </div>
   );

@@ -190,6 +190,43 @@ export default function BuilderPage() {
     }
   }, [currentStep]);
 
+  // Restore session state after Stripe checkout completes
+  useEffect(() => {
+    // Check for purchase success URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const purchaseParam = urlParams.get("purchase");
+    const sessionId = urlParams.get("session_id");
+
+    // Only handle deep_dive purchases that return to /builder
+    if (purchaseParam === "deep_dive" && sessionId && !hasRestoredSession.current) {
+      const pendingSession = loadPendingSession();
+      if (pendingSession) {
+        // Mark as restored to prevent running again
+        hasRestoredSession.current = true;
+
+        // Restore the saved state
+        setProfile(pendingSession.profile);
+        setIdeas(pendingSession.ideas as ExtendedIdea[]);
+
+        // Find and set the selected idea
+        if (pendingSession.selectedIdeaId) {
+          const selected = pendingSession.ideas.find(
+            (idea) => idea.id === pendingSession.selectedIdeaId
+          );
+          if (selected) {
+            setSelectedIdea(selected as ExtendedIdea);
+          }
+        }
+
+        // Navigate to deep dive (the DeepDiveSection will handle the purchase verification)
+        setCurrentStep("deep_dive");
+
+        // Clear the pending session (but keep URL params for DeepDiveSection to process)
+        clearPendingSession();
+      }
+    }
+  }, []); // Run once on mount
+
   // Restore session state after auth completes
   useEffect(() => {
     // Only run when user becomes authenticated and we haven't already restored
@@ -454,6 +491,7 @@ export default function BuilderPage() {
         return (
           <DeepDiveSection
             idea={selectedIdea}
+            ideas={ideas}
             profile={profile}
             onBack={() => goToStep("ideas")}
             profileId={profileId || undefined}

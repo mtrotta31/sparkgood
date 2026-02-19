@@ -5,18 +5,25 @@ dotenv.config({ path: '.env.local' });
  * SparkGood Resource Directory Seeding Script
  *
  * Seeds the resource directory with initial data:
- * - SBA Resources (SBDC Lead Centers, SCORE chapters, WBCs)
- * - Well-known accelerators
- * - Well-known grants
+ * - SBA Resources (VBOCs, SCORE chapters, SBDCs, WBCs)
+ * - Accelerators (city-specific and cause-specific)
+ * - Grants (federal, state, private foundation, corporate)
  *
  * Usage:
  *   npx tsx scripts/seed-directory.ts
  *
  * Requirements:
  *   - SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables
+ *
+ * Deduplication:
+ *   Uses source + source_id to generate deterministic slugs, preventing duplicates
+ *   when re-running the seed script.
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { allSBAResources } from "./sba-resources-data";
+import grantListings from "./grants-data";
+import acceleratorListings from "./accelerators-data";
 
 // Initialize Supabase with service role key for seeding
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -35,7 +42,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // TYPE DEFINITIONS
 // ============================================================================
 
-interface ResourceListing {
+// Export the interface so data files can use it
+export interface ResourceListing {
   name: string;
   slug: string;
   description?: string;
@@ -84,6 +92,30 @@ function generateSlug(text: string): string {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();
+}
+
+/**
+ * Generate a deterministic slug from source_id if available, otherwise from name.
+ * This ensures re-running the seed script updates rather than duplicates.
+ */
+function generateDeterministicSlug(listing: Omit<ResourceListing, "slug">): string {
+  if (listing.source_id) {
+    // Use source_id for deterministic slugs (e.g., "vboc-new-england" -> "vboc-new-england")
+    return generateSlug(listing.source_id);
+  }
+  // Fall back to name-based slug
+  return generateSlug(listing.name);
+}
+
+/**
+ * Prepare listings by adding deterministic slugs based on source_id.
+ * This allows external data files to omit slugs.
+ */
+function prepareListings(listings: Omit<ResourceListing, "slug">[]): ResourceListing[] {
+  return listings.map((listing) => ({
+    ...listing,
+    slug: generateDeterministicSlug(listing),
+  }));
 }
 
 function stateAbbreviationToFull(abbr: string): string {
@@ -2621,14 +2653,26 @@ async function main() {
     // Seed locations first
     await seedLocations();
 
-    // Seed SBA resources
-    await seedListings(sbaResources, "SBA");
+    // Seed original SBA resources (from hardcoded data)
+    await seedListings(sbaResources, "SBA (original)");
 
-    // Seed accelerators
-    await seedListings(accelerators, "accelerators");
+    // Seed expanded SBA resources (from sba-resources-data.ts)
+    const expandedSBAResources = prepareListings(allSBAResources);
+    await seedListings(expandedSBAResources, "SBA (expanded)");
 
-    // Seed grants
-    await seedListings(grants, "grants");
+    // Seed original accelerators (from hardcoded data)
+    await seedListings(accelerators, "accelerators (original)");
+
+    // Seed expanded accelerators (from accelerators-data.ts)
+    const expandedAccelerators = prepareListings(acceleratorListings);
+    await seedListings(expandedAccelerators, "accelerators (expanded)");
+
+    // Seed original grants (from hardcoded data)
+    await seedListings(grants, "grants (original)");
+
+    // Seed expanded grants (from grants-data.ts)
+    const expandedGrants = prepareListings(grantListings);
+    await seedListings(expandedGrants, "grants (expanded)");
 
     // Build category-location mappings
     await seedCategoryLocations();
