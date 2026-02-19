@@ -4,269 +4,211 @@
 
 SparkGood is a **dual-product platform** that helps people turn their desire to make a difference into real-world action:
 
-1. **SparkGood Web App** — A guided web experience that takes users from "I want to do something good" to a complete launch package (ideas, market research, business plan, marketing assets, action roadmap). Powered by AI tools running behind the scenes (Perplexity, Firecrawl, Claude) so users never touch a terminal.
+1. **SparkGood Web App** — A guided web experience that takes users from "I want to do something good" to a complete launch package (ideas, market research, business plan, marketing assets, action roadmap). Powered by AI tools running behind the scenes (Perplexity, Claude) so users never touch a terminal.
 
-2. **SparkGood Pro Toolkit** — A downloadable package of pre-configured Claude Code skills for advanced users who want to run the same powerful frameworks in their own environment with full customization.
+2. **SparkGood Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, and coworking spaces that helps entrepreneurs find real-world support matched to their idea and location.
 
 **Brand name:** SparkGood
 **Domain:** sparkgood.io
 **Tagline:** "Spark something good."
 **Mission:** Remove the barriers between good intentions and real impact.
 
-## What Makes SparkGood Different
+## What's Been Built (Current State)
 
-Every AI business idea generator stops at "here's an idea." SparkGood is the only tool that:
-- Filters everything through a **social impact lens** — every concept must create measurable good
-- Includes a **community project** option alongside nonprofits and businesses — you don't have to start a company to make a difference
-- Goes from idea → **market research** → **business/project plan** → **marketing assets** → **action roadmap** in one guided flow
-- **Calibrates to the user** — experience level, budget, format preference, and causes they care about shape every output
-- Uses **real research tools** (Perplexity, Firecrawl, Playwright) behind the scenes — not just LLM knowledge, but live data
-- Offers a **Pro Toolkit** for advanced users who want to run these frameworks in Claude Code themselves
+### Core Web App (Fully Functional)
+- **Guided Builder Flow** (`/builder`) — Multi-step questionnaire capturing venture type, format, location, causes, experience, budget, commitment level
+- **Idea Generation** — AI generates 4 tailored social impact concepts based on user profile
+- **Deep Dive** — Premium 4-tab experience:
+  - **"Will This Work?"** — Viability analysis with scoring breakdown, competitors, market research
+  - **"Your Game Plan"** — Complete business/project plan with financials
+  - **"Spread the Word"** — Marketing assets (pitch, social posts, email templates)
+  - **"Start Here"** — Action roadmap with quick wins, phases, and matched real-world resources
+- **Launch Kit** — One-click generation of landing page HTML, social posts, email sequence
+- **PDF Export** — Download complete plan as professional PDF
+- **My Projects** (`/projects`) — Dashboard to view and continue saved projects
+- **Individual Project Pages** (`/projects/[id]`) — View saved deep dive results
 
-## Target Audience
+### Resource Directory (Fully Functional)
+- **Main Directory** (`/resources`) — Browse by category with search
+- **Category Pages** (`/resources/[category]`) — List all resources in a category with filters
+- **Location Pages** (`/resources/[category]/[location]`) — SEO-optimized local pages (e.g., "Grants in Austin, TX")
+- **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details
+- **Resource Matching API** — Matches resources to user's idea based on cause areas, location, venture type
+- **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages
 
-- Aspiring social entrepreneurs who have passion but lack knowledge or resources
-- People who want to help their community but don't know where to start
-- Early-stage founders pivoting toward purpose-driven work
-- Students, retirees, career-changers, and anyone with desire but not direction
-- **Pro tier:** Technical founders, agency owners, and consultants who work in Claude Code and want social impact frameworks
+### Authentication & User Data
+- **Supabase Auth** — Email/password authentication with magic links
+- **User Profiles** — Save intake preferences
+- **Saved Ideas** — Persist generated ideas and deep dive results
+- **Auto-save** — Deep dive results save automatically when logged in
 
-## Product Architecture
+## Tech Stack (Implemented)
 
-### Product 1: SparkGood Web App
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Styling:** Tailwind CSS with custom design tokens
+- **Fonts:** Playfair Display (headings), DM Sans (body)
+- **Components:** Custom UI library in `src/components/ui/`
 
-#### The User Journey
+### Backend
+- **API Routes:** Next.js Route Handlers in `src/app/api/`
+- **AI:** Claude API (Anthropic) for all generation
+- **Research:** Perplexity MCP for live market research
+- **Database:** Supabase (PostgreSQL)
+- **Auth:** Supabase Auth
+- **PDF Generation:** @react-pdf/renderer
 
-**Step 1: Discovery (FREE)**
-User answers intake questions that shape everything downstream:
-- **Venture type:** Community project, nonprofit, socially-conscious business, or hybrid
-- **Format:** Online-only, in-person/on the ground, or both
-- **Causes:** Select from 12 cause areas (environment, education, health, poverty, food security, equity, animals, mental health, youth, elder care, arts, tech access)
-- **Experience level:** Complete beginner → some experience → experienced founder
-- **Budget:** $0 sweat equity → under $500 → $500-5K → $5K+
-- **Depth:** "Just give me ideas" or "Help me build it"
-- **Own idea or surprise:** Bring their own seed concept or let AI generate from scratch
+### Infrastructure
+- **Hosting:** Vercel
+- **Database:** Supabase
+- **Payments:** Stripe (in progress)
 
-**Step 2: Idea Generation (FREE)**
-AI generates 4 tailored social impact concepts. Each includes:
-- Catchy name and one-liner description
-- The specific problem it solves
-- Who it serves
-- Revenue/sustainability model (unless it's a community project)
-- Why it matters / tangible impact
+## Key API Routes
 
-**Step 3: Market Research & Viability (PAID — Standard)**
-Behind the scenes, the app uses Perplexity and Firecrawl to conduct real research:
-- Market size and demand analysis using live data
-- Competitive landscape scan (actual competitors found and analyzed)
-- Target audience profiling
-- Strengths, risks, opportunities
-- Viability score (1-10) with Go / Refine / Pivot verdict
-- Strategic recommendation
+### Idea Generation & Deep Dive
+- `POST /api/generate-ideas` — Generate 4 ideas from user profile
+- `POST /api/deep-dive` — Generate viability, plan, marketing, or roadmap content
+- `POST /api/launch-kit` — Generate complete launch kit
+- `POST /api/build-asset` — Build specific assets (pitch deck, landing page, etc.)
+- `POST /api/export-pdf` — Generate downloadable PDF
 
-**Step 4: Business/Project Plan (PAID — Standard)**
-- Executive summary
-- Mission and impact thesis
-- Revenue streams OR resource/volunteer plan (for projects)
-- Financial projections OR budget plan
-- Partnerships and operations
-- Impact measurement framework
+### User Data
+- `GET/POST /api/user/profile` — User preferences
+- `GET/POST /api/user/ideas` — Saved ideas
+- `POST /api/user/ideas/save` — Save idea to projects
+- `GET/POST /api/user/deep-dive` — Deep dive results
+- `GET /api/user/projects` — List user's projects
+- `GET /api/user/projects/[id]` — Single project details
 
-**Step 5: Marketing / Outreach Assets (PAID — Standard)**
-- Elevator pitch and tagline
-- Landing page headline and subheadline
-- Social media posts (Twitter/X, LinkedIn, Instagram)
-- Email outreach template
-- Primary call to action
+### Resource Directory
+- `GET /api/resources/search` — Full-text search with filters
+- `GET /api/resources/[slug]` — Single resource details
+- `GET /api/resources/categories` — Category stats
+- `POST /api/resources/match` — Match resources to user's idea
 
-**Step 6: Action Roadmap (PAID — Standard)**
-- Quick wins (do this week)
-- Phased plan with tasks, priorities, and cost indicators
-- Skip list (what NOT to waste time on yet)
+### Research
+- `POST /api/research` — Perplexity-powered market research
+- `POST /api/analyze-competitors` — Competitor analysis
 
-### Product 2: SparkGood Pro Toolkit
+## Database Schema
 
-A downloadable package of Claude Code skills that advanced users install in their own environment. Includes:
+### Core Tables
+- `profiles` — User preferences (venture_type, format, location, causes, etc.)
+- `saved_ideas` — Generated ideas linked to profiles
+- `deep_dive_results` — Viability, plan, marketing, roadmap content
 
-#### Research Skills
-- **social-impact-research** — Uses Perplexity MCP to conduct deep research on social issues, market gaps, and opportunities within a cause area
-- **competitor-analysis** — Uses Firecrawl and Playwright MCPs to find, scrape, and analyze competing organizations, tools, and services
-- **audience-profiling** — Builds detailed profiles of beneficiaries, customers, donors, or community members
+### Resource Directory Tables
+- `resource_listings` — All resources (grants, accelerators, SBA, coworking)
+- `resource_locations` — Cities with listing counts
+- `resource_category_locations` — Category counts per location
+- `resource_saves` — User saved resources
 
-#### Strategy Skills
-- **social-impact-positioning** — Finds unique positioning angles for social ventures using frameworks adapted for impact-driven organizations
-- **viability-scoring** — Evaluates a social venture idea across market demand, feasibility, impact potential, and sustainability
-- **revenue-model-design** — Generates sustainable revenue/funding models for nonprofits, social enterprises, and community projects
+## Design System
 
-#### Execution Skills
-- **business-plan-generator** — Creates complete business plans or project plans calibrated to venture type and experience level
-- **impact-measurement** — Designs impact measurement frameworks with specific KPIs and tracking methods
-- **grant-writing-assistant** — Helps draft grant applications for nonprofit and social enterprise funding
-
-#### Marketing Skills
-- **social-impact-copywriting** — Direct response copy adapted for cause-driven organizations (not corporate, not charity-voice — authentic and compelling)
-- **launch-assets** — Generates landing pages, pitch decks, social posts, and email templates
-- **community-outreach** — Creates volunteer recruitment materials, partnership proposals, and community engagement plans
-
-#### Orchestration
-- **sparkgood-orchestrator** — Master skill that analyzes what skills are available, what the user has done so far, and recommends the next step
-
-## Monetization Model
-
-### Free Tier
-- Full guided questionnaire
-- AI-generated idea concepts (4 per session)
-- Ability to regenerate ideas
-- No sign-up required
-
-### Standard Tier (Subscription — pricing TBD)
-- Everything in Free
-- Market research and viability analysis (powered by Perplexity + Firecrawl behind the scenes)
-- Complete business/project plan generation
-- Marketing and outreach asset generation
-- Personalized action roadmap
-- Save, export, and revisit plans
-
-### Pro Tier (Subscription or one-time — pricing TBD)
-- Everything in Standard
-- Downloadable SparkGood Pro Toolkit (all Claude Code skills)
-- Setup guide and documentation for installing skills and MCPs
-- Access to skill updates as we improve them
-- Priority support
-
-## Design Direction
-
-### Aesthetic
-- Warm, empowering, grounded — "campfire energy"
-- Warm amber/gold (#F59E0B) as the primary spark color against deep charcoal/brown tones (#1C1412)
-- NOT corporate blue, NOT charity-pink, NOT purple AI gradients
-- Should feel like sitting down with a mentor who believes in you
+### Colors
+- **Spark (Primary):** `#F59E0B` (amber)
+- **Accent:** `#F97316` (orange)
+- **Charcoal Dark:** `#1C1412` (background)
+- **Charcoal:** `#2A2220` (cards)
+- **Warmwhite:** `#FBF7F4` (text)
 
 ### Typography
-- Display/headings: Playfair Display (serif, distinctive, human)
-- Body/UI: DM Sans (clean, friendly, readable)
-- NEVER use generic fonts: Inter, Roboto, Arial, system fonts
+- **Display:** Playfair Display (serif)
+- **Body:** DM Sans (sans-serif)
 
-### Tone of Voice
-- Conversational, not formal. Every question should feel like a natural next question, not a survey.
-- Encouraging without being cheesy. More like a smart friend who takes you seriously.
-- Direct and clear. Respect the user's intelligence.
+### Components
+Located in `src/components/`:
+- `ui/` — Reusable primitives (FadeIn, Header, etc.)
+- `steps/` — Builder flow step components
+- `results/` — Idea cards, result displays
+- `deep-dive/` — Deep dive section components
+- `resources/` — Resource directory components
+- `auth/` — Authentication modals
 
-### UI Principles
-- Progress bar showing where users are in the flow
-- Smooth fade-in animations on step transitions
-- Cards with hover states for selection
-- Pill-shaped tags for cause selection
-- No form-like layouts — this should feel like a conversation
-- Mobile-first responsive design
-
-## Tech Stack
-
-### Web App
-- **Frontend:** React (Next.js App Router)
-- **AI Backend:** Claude API (Sonnet for speed, Opus for deep analysis if needed)
-- **Research Backend:** Perplexity API, Firecrawl API (called from server-side API routes)
-- **Deployment:** Vercel (free tier initially)
-- **Styling:** Tailwind CSS or CSS-in-JS (must match design direction)
-- **Future:** Supabase (auth + database), Stripe (payments)
-
-### Pro Toolkit
-- Claude Code skills (.claude/skills/ directory structure)
-- SKILL.md files following the Agent Skills open standard
-- MCP configuration guides for Perplexity, Playwright, Firecrawl
-- README with installation instructions
-
-## MCP Tools (for development AND powering the web app)
-
-- **Perplexity MCP** — Deep market research, competitive analysis, trend identification
-- **Playwright MCP** — Browser automation, screenshot competitor sites, design inspiration
-- **Firecrawl MCP** — Web scraping, data extraction from competitor tools
-
-## Skills (for development)
-
-- **frontend-design** — Anthropic's skill for distinctive, production-grade UI
-- **Custom SparkGood skills** — These become the Pro Toolkit AND power the web app. DRY principle.
-
-## Code Conventions
-
-- Clean, readable code with comments explaining business logic
-- Component-based architecture — one component per concern
-- All AI prompts stored in a separate prompts/ directory for easy iteration
-- Error handling on all API calls with user-friendly fallback messages
-- Responsive design — test at 375px (mobile), 768px (tablet), 1280px (desktop)
-
-## File Structure (Target)
+## File Structure
 
 ```
 sparkgood/
-├── CLAUDE.md
-├── PROJECT_BRIEF.md
-├── ARCHITECTURE.md
-├── package.json
+├── CLAUDE.md                    # This file
 ├── src/
 │   ├── app/
-│   │   └── api/                  # Server-side API routes
+│   │   ├── api/                 # All API routes
+│   │   │   ├── generate-ideas/
+│   │   │   ├── deep-dive/
+│   │   │   ├── launch-kit/
+│   │   │   ├── resources/
+│   │   │   ├── user/
+│   │   │   └── ...
+│   │   ├── builder/             # Main builder flow
+│   │   ├── projects/            # User projects
+│   │   ├── resources/           # Resource directory
+│   │   ├── sitemap.ts           # Dynamic sitemap
+│   │   └── robots.ts            # Robots.txt
 │   ├── components/
-│   │   ├── ui/
-│   │   ├── steps/
-│   │   └── results/
-│   ├── lib/
-│   ├── prompts/
-│   ├── styles/
-│   └── types/
-├── public/
-├── pro-toolkit/
-│   ├── README.md
-│   ├── setup/
-│   │   ├── install-mcps.sh
-│   │   └── mcp-config-example.json
-│   └── skills/
-│       ├── social-impact-research/
-│       ├── competitor-analysis/
-│       ├── audience-profiling/
-│       ├── social-impact-positioning/
-│       ├── viability-scoring/
-│       ├── revenue-model-design/
-│       ├── business-plan-generator/
-│       ├── impact-measurement/
-│       ├── grant-writing-assistant/
-│       ├── social-impact-copywriting/
-│       ├── launch-assets/
-│       ├── community-outreach/
-│       └── sparkgood-orchestrator/
-└── .claude/
-    └── skills/
+│   │   ├── ui/                  # Shared UI components
+│   │   ├── steps/               # Builder step components
+│   │   ├── deep-dive/           # Deep dive components
+│   │   ├── resources/           # Directory components
+│   │   └── auth/                # Auth components
+│   ├── contexts/                # React contexts (Auth)
+│   ├── hooks/                   # Custom hooks
+│   ├── lib/                     # Utilities (Supabase, etc.)
+│   ├── prompts/                 # AI prompt templates
+│   └── types/                   # TypeScript types
+├── supabase/
+│   └── migrations/              # Database migrations
+└── public/                      # Static assets
 ```
 
-## Important Context
+## Development Commands
 
-- The founder is a beginner technically but can follow instructions. Explain decisions in plain language.
-- Budget is $200-1000/month. Favor free/low-cost tools.
-- Side project (evenings/weekends) but moving fast.
-- **Dual product:** Web app AND Pro Toolkit are both core products, not afterthoughts.
-- **Skills we build for the Pro Toolkit also power the web app.** Same frameworks, both places. DRY.
-- The sparkgood.jsx artifact from initial planning can be referenced for UI patterns and flow design.
+```bash
+npm run dev          # Start development server
+npm run build        # Production build
+npm run lint         # ESLint check
+npx tsc --noEmit     # TypeScript check
+```
 
-## Development Workflow: Multi-Terminal Strategy
+## Environment Variables
 
-Running Claude Code in multiple terminals simultaneously is encouraged for this project. Each terminal maintains its own context window, so splitting work prevents context overload and produces better results.
-
-**Recommended terminal split:**
-
-- **Terminal 1 — Research & Data Collection:** Run Perplexity MCP queries, Firecrawl scraping, Playwright screenshots. Save all findings to files in a `/research` directory. This terminal's context will fill up with raw data — that's expected. Its job is to gather and export, not to build.
-
-- **Terminal 2 — Building & Execution:** Read saved research files, invoke skills, write code, create components. This terminal stays focused on production work with clean context. Reference research files created by Terminal 1 rather than re-running research queries.
-
-- **Terminal 3 (optional) — Review & QA:** Spin up a fresh context to review what the other terminals produced. Use task-based agents with specialized roles (e.g., "You are a conversion rate optimization expert — review this landing page and suggest improvements"). Fresh context = better critique.
-
-**Key rules:**
-- Research terminals should always save outputs to files before context gets compacted
-- Building terminals should read those files rather than re-running expensive MCP calls
-- When stuck or confused, spin up a fresh terminal with a focused role rather than continuing in a cluttered context
-- The orchestrator skill can help decide what to do next from any terminal
+Required in `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+ANTHROPIC_API_KEY=
+PERPLEXITY_API_KEY=
+```
 
 ## Current Phase
 
-**Phase A: Environment Setup** — Installing MCPs (Perplexity, Playwright, Firecrawl) and skills (frontend-design, custom skills)
+**Phase: Feature Complete / Polish**
 
-**Next:** Deep market research using Perplexity MCP, then competitive analysis, then build.
+The core product is fully functional:
+- ✅ Guided builder flow
+- ✅ Idea generation
+- ✅ Deep dive (all 4 tabs)
+- ✅ Launch kit generation
+- ✅ PDF export
+- ✅ User auth & saved projects
+- ✅ Resource directory with SEO
+- ✅ Matched resources in deep dive
+- ✅ Dynamic sitemap
+
+**In Progress:**
+- Stripe payments / credits system
+- Pricing page
+
+**Future:**
+- Pro Toolkit (Claude Code skills package)
+- More resource data (currently ~70 listings, targeting 16,000+)
+- Email notifications
+- Team collaboration features
+
+## Important Context
+
+- The founder is a beginner technically but can follow instructions
+- Budget is $200-1000/month — favor free/low-cost tools
+- Side project (evenings/weekends) but moving fast
+- The resource directory is a key SEO play — location pages drive organic traffic
+- Deep dive "Start Here" tab now shows REAL matched resources, not placeholders
