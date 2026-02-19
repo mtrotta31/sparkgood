@@ -26,6 +26,21 @@ export const metadata: Metadata = {
     "minority business grants",
     "coworking spaces",
   ],
+  openGraph: {
+    title: "Business Resources Directory | SparkGood",
+    description: "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your social venture. Free directory for entrepreneurs.",
+    type: "website",
+    siteName: "SparkGood",
+    url: "https://sparkgood.io/resources",
+  },
+  twitter: {
+    card: "summary",
+    title: "Business Resources Directory | SparkGood",
+    description: "Find grants, accelerators, SBA resources, and more for entrepreneurs.",
+  },
+  alternates: {
+    canonical: "https://sparkgood.io/resources",
+  },
 };
 
 // Category card component

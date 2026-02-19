@@ -28,9 +28,45 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
+  const supabase = await createClient();
+
+  // Get count of listings in this category
+  const { count } = await supabase
+    .from("resource_listings")
+    .select("*", { count: "exact", head: true })
+    .eq("is_active", true)
+    .eq("category", category);
+
+  const listingCount = count || 0;
+
+  const title = `${info.plural} for Entrepreneurs | SparkGood Resources`;
+  const description = `Browse ${listingCount} ${info.plural.toLowerCase()} to launch your social venture. ${info.description}. Compare options, eligibility, and apply.`;
+
   return {
-    title: `${info.plural} for Entrepreneurs | SparkGood Resources`,
-    description: `Find the best ${info.plural.toLowerCase()} to launch your social venture. Browse ${info.description.toLowerCase()} with our free directory.`,
+    title,
+    description,
+    keywords: [
+      info.plural.toLowerCase(),
+      `${info.name.toLowerCase()} for small business`,
+      "entrepreneur resources",
+      "social venture support",
+      "business funding",
+    ],
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "SparkGood",
+      url: `https://sparkgood.io/resources/${category}`,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `https://sparkgood.io/resources/${category}`,
+    },
   };
 }
 

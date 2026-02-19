@@ -27,6 +27,8 @@ export async function generateMetadata({
   }
 
   const supabase = await createClient();
+
+  // Get location details
   const { data: locationData } = await supabase
     .from("resource_locations")
     .select("city, state, state_full, seo_title, seo_description")
@@ -37,13 +39,51 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
+  // Get count of listings in this location
+  const { count } = await supabase
+    .from("resource_listings")
+    .select("*", { count: "exact", head: true })
+    .eq("is_active", true)
+    .eq("category", category)
+    .or(`and(city.eq.${locationData.city},state.eq.${locationData.state}),is_nationwide.eq.true,is_remote.eq.true`);
+
+  const listingCount = count || 0;
+  const cityState = `${locationData.city}, ${locationData.state}`;
+  const cityStateFull = `${locationData.city}, ${locationData.state_full || locationData.state}`;
+
+  // Generate SEO-optimized title
+  const title = locationData.seo_title ||
+    `${categoryInfo.name === "Grant" ? "Small Business Grants" : categoryInfo.plural} in ${cityState} | SparkGood`;
+
+  // Generate SEO-optimized description with count
+  const description = locationData.seo_description ||
+    `Find ${listingCount} ${categoryInfo.plural.toLowerCase()} for ${category === "grant" ? "small businesses" : "entrepreneurs"} in ${cityStateFull}. ${categoryInfo.description}. Compare options and apply today.`;
+
   return {
-    title:
-      locationData.seo_title ||
-      `${categoryInfo.plural} in ${locationData.city}, ${locationData.state_full || locationData.state} | SparkGood`,
-    description:
-      locationData.seo_description ||
-      `Find ${categoryInfo.plural.toLowerCase()} in ${locationData.city}, ${locationData.state_full || locationData.state}. Browse local ${categoryInfo.description.toLowerCase()}.`,
+    title,
+    description,
+    keywords: [
+      `${categoryInfo.plural.toLowerCase()} ${locationData.city}`,
+      `${categoryInfo.name.toLowerCase()} ${locationData.state}`,
+      `small business ${categoryInfo.plural.toLowerCase()}`,
+      `${locationData.city} business resources`,
+      categoryInfo.plural.toLowerCase(),
+    ],
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "SparkGood",
+      url: `https://sparkgood.io/resources/${category}/${location}`,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `https://sparkgood.io/resources/${category}/${location}`,
+    },
   };
 }
 

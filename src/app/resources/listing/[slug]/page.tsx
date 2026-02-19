@@ -27,7 +27,7 @@ export async function generateMetadata({
 
   const { data: listing } = await supabase
     .from("resource_listings")
-    .select("name, short_description, category")
+    .select("name, short_description, category, city, state, is_nationwide, logo_url")
     .eq("slug", slug)
     .single();
 
@@ -36,12 +36,57 @@ export async function generateMetadata({
   }
 
   const categoryInfo = CATEGORY_INFO[listing.category as ResourceCategory];
+  const categoryName = categoryInfo?.name.toLowerCase() || "resource";
+
+  // Build location string
+  const location = listing.is_nationwide
+    ? "nationwide"
+    : listing.city && listing.state
+    ? `in ${listing.city}, ${listing.state}`
+    : "";
+
+  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs | SparkGood`;
+
+  const description = listing.short_description ||
+    `${listing.name} is a ${categoryName} ${location} for entrepreneurs. Learn about eligibility, how to apply, and more.`;
 
   return {
-    title: `${listing.name} | SparkGood Resources`,
-    description:
-      listing.short_description ||
-      `Learn more about ${listing.name}, a ${categoryInfo?.name.toLowerCase() || "resource"} for entrepreneurs.`,
+    title,
+    description,
+    keywords: [
+      listing.name,
+      categoryInfo?.plural.toLowerCase() || "",
+      listing.city || "",
+      listing.state || "",
+      "small business resources",
+      "entrepreneur support",
+    ].filter(Boolean),
+    openGraph: {
+      title: listing.name,
+      description,
+      type: "website",
+      siteName: "SparkGood",
+      url: `https://sparkgood.io/resources/listing/${slug}`,
+      ...(listing.logo_url && {
+        images: [
+          {
+            url: listing.logo_url,
+            width: 200,
+            height: 200,
+            alt: listing.name,
+          },
+        ],
+      }),
+    },
+    twitter: {
+      card: listing.logo_url ? "summary" : "summary",
+      title: listing.name,
+      description,
+      ...(listing.logo_url && { images: [listing.logo_url] }),
+    },
+    alternates: {
+      canonical: `https://sparkgood.io/resources/listing/${slug}`,
+    },
   };
 }
 
