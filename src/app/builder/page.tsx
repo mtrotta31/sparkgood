@@ -197,8 +197,8 @@ export default function BuilderPage() {
     const purchaseParam = urlParams.get("purchase");
     const sessionId = urlParams.get("session_id");
 
-    // Only handle deep_dive purchases that return to /builder
-    if (purchaseParam === "deep_dive" && sessionId && !hasRestoredSession.current) {
+    // Handle deep_dive or launch_kit purchases that return to /builder
+    if ((purchaseParam === "deep_dive" || purchaseParam === "launch_kit") && sessionId && !hasRestoredSession.current) {
       const pendingSession = loadPendingSession();
       if (pendingSession) {
         // Mark as restored to prevent running again
@@ -219,6 +219,7 @@ export default function BuilderPage() {
         }
 
         // Navigate to deep dive (the DeepDiveSection will handle the purchase verification)
+        // For launch_kit, the URL params will tell DeepDiveSection to auto-open the Launch Kit modal
         setCurrentStep("deep_dive");
 
         // Clear the pending session (but keep URL params for DeepDiveSection to process)

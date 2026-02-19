@@ -123,6 +123,9 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 
 ### Resource Directory Tables
 - `resource_listings` — All resources (grants, accelerators, SBA, coworking)
+  - `enrichment_status`: 'raw' | 'enriched' | 'verified'
+  - `enrichment_data`: JSONB with additional info from Perplexity
+  - `details`: JSONB with category-specific data (amounts, deadlines, etc.)
 - `resource_locations` — Cities with listing counts
 - `resource_category_locations` — Category counts per location
 - `resource_saves` — User saved resources
@@ -207,6 +210,12 @@ sparkgood/
 │   ├── lib/                     # Utilities (Supabase, Stripe, etc.)
 │   ├── prompts/                 # AI prompt templates
 │   └── types/                   # TypeScript types
+├── scripts/
+│   ├── seed-directory.ts        # Seeds resource listings from data files
+│   ├── enrich-listings.ts       # Enriches listings via Perplexity API
+│   ├── sba-resources-data.ts    # VBOCs, SCORE chapters data
+│   ├── grants-data.ts           # Grant programs data
+│   └── accelerators-data.ts     # Accelerator programs data
 ├── supabase/
 │   └── migrations/              # Database migrations
 └── public/                      # Static assets
@@ -215,10 +224,14 @@ sparkgood/
 ## Development Commands
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Production build
-npm run lint         # ESLint check
-npx tsc --noEmit     # TypeScript check
+npm run dev              # Start development server
+npm run build            # Production build
+npm run lint             # ESLint check
+npx tsc --noEmit         # TypeScript check
+
+# Resource Directory
+npm run seed:directory   # Seed/update resource listings from data files
+npm run enrich:directory # Enrich listings with Perplexity API (adds descriptions, stats)
 ```
 
 ## Environment Variables
@@ -259,9 +272,12 @@ The core product is fully functional with payments:
 - ✅ Credits system with server-side verification
 - ✅ Session state preservation through Stripe checkout flow
 
+**In Progress:**
+- Resource directory enrichment (216 listings loaded, enrichment script ready)
+
 **Future:**
 - Pro Toolkit (Claude Code skills package)
-- More resource data (currently ~70 listings, targeting 16,000+)
+- More resource data (currently 216 listings, targeting 16,000+)
 - Email notifications
 - Team collaboration features
 - Usage analytics dashboard

@@ -152,6 +152,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
 
   // Track if we're returning from a successful Stripe purchase
   const [isReturningFromPurchase, setIsReturningFromPurchase] = useState(false);
+  const [isReturningFromLaunchKitPurchase, setIsReturningFromLaunchKitPurchase] = useState(false);
 
   // Check for successful purchase return IMMEDIATELY on mount (before credits load)
   useEffect(() => {
@@ -163,6 +164,16 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
       // Mark as returning from purchase to prevent modal flash
       setIsReturningFromPurchase(true);
       // Grant access immediately
+      setHasUnlockedAccess(true);
+      // Clean up URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Refetch credits in background to sync state
+      refetchCredits();
+    } else if (purchaseParam === "launch_kit" && sessionId) {
+      // Mark as returning from launch kit purchase
+      setIsReturningFromPurchase(true);
+      setIsReturningFromLaunchKitPurchase(true);
+      // Grant deep dive access (they already have it if buying launch kit add-on)
       setHasUnlockedAccess(true);
       // Clean up URL
       window.history.replaceState({}, "", window.location.pathname);
@@ -189,6 +200,43 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
       setShowPurchaseModal(true);
     }
   }, [creditsLoading, hasDeepDiveAccess, idea.id, isReturningFromPurchase]);
+
+  // Auto-trigger Launch Kit generation when returning from launch_kit purchase
+  useEffect(() => {
+    if (isReturningFromLaunchKitPurchase && hasUnlockedAccess) {
+      // Small delay to ensure UI is ready
+      const timer = setTimeout(() => {
+        setShowLaunchKit(true);
+        setIsGeneratingLaunchKit(true);
+        setLaunchKitError(null);
+
+        // Generate the launch kit
+        fetch("/api/launch-kit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea, profile }),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success && result.data) {
+              setLaunchKit(result.data);
+            } else {
+              setLaunchKitError(result.error || "Failed to generate launch kit");
+            }
+          })
+          .catch((err) => {
+            console.error("Error generating launch kit:", err);
+            setLaunchKitError("Something went wrong. Please try again.");
+          })
+          .finally(() => {
+            setIsGeneratingLaunchKit(false);
+            setIsReturningFromLaunchKitPurchase(false);
+          });
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile]);
 
   // Consume credit when accessing (for subscription users)
   useEffect(() => {
