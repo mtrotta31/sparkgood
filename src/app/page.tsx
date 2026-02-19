@@ -2,8 +2,38 @@
 // "Campfire energy" - warm, grounded, mentorship-feeling
 
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import Footer from "@/components/ui/Footer";
 
-export default function Home() {
+// Fetch category counts from database
+async function getCategoryCounts() {
+  try {
+    const supabase = await createClient();
+
+    // Get counts for the 4 main categories
+    const categories = ["grant", "accelerator", "coworking", "sba"] as const;
+    const counts: Record<string, number> = {};
+
+    for (const category of categories) {
+      const { count } = await supabase
+        .from("resource_listings")
+        .select("*", { count: "exact", head: true })
+        .eq("category", category)
+        .eq("is_active", true);
+
+      counts[category] = count || 0;
+    }
+
+    return counts;
+  } catch (error) {
+    console.error("Error fetching category counts:", error);
+    return { grant: 0, accelerator: 0, coworking: 0, sba: 0 };
+  }
+}
+
+export default async function Home() {
+  const categoryCounts = await getCategoryCounts();
+
   return (
     <main className="min-h-screen bg-charcoal-dark">
       {/* Navigation */}
@@ -206,6 +236,122 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Business Resources */}
+      <section className="py-24 px-4 bg-charcoal border-t border-warmwhite/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-spark/10 text-spark rounded-full mb-4">
+              Free Resource
+            </span>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
+              Business Resources Directory
+            </h2>
+            <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto">
+              Grants, accelerators, and support programs to fuel your venture.
+              Searchable by location. Always free.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {/* Grants */}
+            <Link
+              href="/resources/grant"
+              className="group p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10 hover:border-green-400/30 transition-all hover:shadow-lg hover:shadow-green-400/5"
+            >
+              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center mb-4 text-green-400">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg font-bold text-warmwhite mb-1 group-hover:text-green-400 transition-colors">
+                Grants
+              </h3>
+              <p className="text-warmwhite-muted text-sm mb-3">
+                Funding that doesn&apos;t need to be repaid
+              </p>
+              <span className="text-warmwhite-dim text-xs">
+                {categoryCounts.grant} listings
+              </span>
+            </Link>
+
+            {/* Accelerators */}
+            <Link
+              href="/resources/accelerator"
+              className="group p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10 hover:border-spark/30 transition-all hover:shadow-lg hover:shadow-spark/5"
+            >
+              <div className="w-12 h-12 rounded-xl bg-spark/10 flex items-center justify-center mb-4 text-spark">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg font-bold text-warmwhite mb-1 group-hover:text-spark transition-colors">
+                Accelerators
+              </h3>
+              <p className="text-warmwhite-muted text-sm mb-3">
+                Intensive programs to fast-track your startup
+              </p>
+              <span className="text-warmwhite-dim text-xs">
+                {categoryCounts.accelerator} listings
+              </span>
+            </Link>
+
+            {/* Coworking */}
+            <Link
+              href="/resources/coworking"
+              className="group p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10 hover:border-blue-400/30 transition-all hover:shadow-lg hover:shadow-blue-400/5"
+            >
+              <div className="w-12 h-12 rounded-xl bg-blue-400/10 flex items-center justify-center mb-4 text-blue-400">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg font-bold text-warmwhite mb-1 group-hover:text-blue-400 transition-colors">
+                Coworking
+              </h3>
+              <p className="text-warmwhite-muted text-sm mb-3">
+                Flexible workspace for entrepreneurs
+              </p>
+              <span className="text-warmwhite-dim text-xs">
+                {categoryCounts.coworking} listings
+              </span>
+            </Link>
+
+            {/* SBA Resources */}
+            <Link
+              href="/resources/sba"
+              className="group p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10 hover:border-red-400/30 transition-all hover:shadow-lg hover:shadow-red-400/5"
+            >
+              <div className="w-12 h-12 rounded-xl bg-red-400/10 flex items-center justify-center mb-4 text-red-400">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg font-bold text-warmwhite mb-1 group-hover:text-red-400 transition-colors">
+                SBA Resources
+              </h3>
+              <p className="text-warmwhite-muted text-sm mb-3">
+                Free government business assistance
+              </p>
+              <span className="text-warmwhite-dim text-xs">
+                {categoryCounts.sba} listings
+              </span>
+            </Link>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/resources"
+              className="inline-flex items-center gap-2 text-spark hover:text-spark-400 font-medium transition-colors"
+            >
+              Browse all resources
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
@@ -489,27 +635,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-warmwhite/10 bg-charcoal-dark">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkGood
-              </span>
-            </div>
-
-            <p className="text-warmwhite-dim text-sm text-center md:text-right">
-              Helping people turn good intentions into real impact.
-              <br className="md:hidden" />
-              <span className="hidden md:inline"> • </span>© 2026 SparkGood
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

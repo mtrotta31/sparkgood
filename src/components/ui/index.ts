@@ -4,3 +4,4 @@ export { default as CauseTag } from "./CauseTag";
 export { default as ProgressBar } from "./ProgressBar";
 export { default as FadeIn } from "./FadeIn";
 export { default as Header } from "./Header";
+export { default as Footer } from "./Footer";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Header, FadeIn } from "@/components/ui";
+import { Header, FadeIn, Footer } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import ProjectCard from "@/components/projects/ProjectCard";
 import type { Idea } from "@/types";
@@ -175,6 +175,8 @@ export default function ProjectsPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </main>
   );
 }

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
 import ResourceSearch from "@/components/resources/ResourceSearch";
 import SearchResults from "@/components/resources/SearchResults";
+import Footer from "@/components/ui/Footer";
 
 interface PageProps {
   searchParams: Promise<{ search?: string }>;
@@ -477,26 +478,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-warmwhite/10 bg-charcoal-dark">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkGood
-              </span>
-            </Link>
-            <p className="text-warmwhite-dim text-sm text-center md:text-right">
-              Free resources for entrepreneurs making a difference.
-              <br className="md:hidden" />
-              <span className="hidden md:inline"> • </span>© 2026 SparkGood
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

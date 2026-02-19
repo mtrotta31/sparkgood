@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { PRICING } from "@/lib/stripe";
+import Footer from "@/components/ui/Footer";
 
 export default function PricingPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -361,12 +362,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-warmwhite/10 py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-warmwhite-dim text-sm">
-          <p>&copy; 2024 SparkGood. Spark something good.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
