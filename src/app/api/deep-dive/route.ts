@@ -3,6 +3,8 @@
 // NOW WITH REAL RESEARCH: Uses Perplexity for market data + Firecrawl to scrape competitors
 
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { hasDeepDiveAccess, type SubscriptionTier } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import { conductMarketResearch, type MarketResearchData } from "@/lib/perplexity";
 import { scrapeCompetitors, type CompetitorInsight } from "@/lib/firecrawl";
@@ -211,6 +213,49 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Missing required fields: idea, profile, or section",
       });
+    }
+
+    // ========================================================================
+    // CREDIT/ACCESS CHECK: Verify user has paid for this deep dive
+    // ========================================================================
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json<ApiResponse<DeepDiveResponse>>({
+        success: false,
+        error: "Authentication required",
+      }, { status: 401 });
+    }
+
+    // Get user's credits and purchases
+    const { data: credits } = await supabase
+      .from("user_credits")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    // Check access using the stripe helper function
+    const tier = (credits?.subscription_tier || "free") as SubscriptionTier;
+    const isActive = credits?.subscription_status === "active";
+    const deepDiveCredits = credits?.deep_dive_credits_remaining || 0;
+    const purchases = credits?.one_time_purchases || [];
+
+    // For subscriptions, must be active
+    const effectiveTier = isActive ? tier : "free";
+
+    const canAccess = hasDeepDiveAccess(
+      effectiveTier,
+      deepDiveCredits,
+      purchases,
+      idea.id
+    );
+
+    if (!canAccess) {
+      return NextResponse.json<ApiResponse<DeepDiveResponse>>({
+        success: false,
+        error: "Payment required. Please purchase this deep dive or subscribe to access.",
+      }, { status: 403 });
     }
 
     // Check for API key

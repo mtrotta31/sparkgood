@@ -34,7 +34,8 @@
       "Bash(npx tsx:*)",
       "Bash(node --check:*)",
       "Bash(npm run seed:directory:*)",
-      "Bash(npm run enrich:directory:*)"
+      "Bash(npm run enrich:directory:*)",
+      "Bash(git commit:*)"
     ]
   },
   "enabledMcpjsonServers": [

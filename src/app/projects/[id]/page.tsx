@@ -5,6 +5,9 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { FadeIn } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCredits } from "@/hooks";
+import PurchaseModal from "@/components/PurchaseModal";
+import LaunchKitModal from "@/components/deep-dive/LaunchKitModal";
 import ViabilityReport from "@/components/deep-dive/ViabilityReport";
 import BusinessPlanView from "@/components/deep-dive/BusinessPlanView";
 import MarketingAssetsView from "@/components/deep-dive/MarketingAssetsView";
@@ -16,6 +19,7 @@ import type {
   BusinessPlan,
   MarketingAssets,
   ActionRoadmap,
+  LaunchKit,
 } from "@/types";
 
 type TabId = "viability" | "plan" | "marketing" | "roadmap";
@@ -81,6 +85,7 @@ interface Project {
 
 export default function ProjectPage() {
   const { user, isLoading: authLoading } = useAuth();
+  const { hasDeepDiveAccess, hasLaunchKitAccess, loading: creditsLoading, refetch: refetchCredits } = useCredits();
   const router = useRouter();
   const params = useParams();
   const projectId = params.id as string;
@@ -93,6 +98,18 @@ export default function ProjectPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+
+  // Payment gate state
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessChecked, setAccessChecked] = useState(false);
+
+  // Launch Kit state
+  const [showLaunchKit, setShowLaunchKit] = useState(false);
+  const [launchKit, setLaunchKit] = useState<LaunchKit | null>(null);
+  const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
+  const [launchKitError, setLaunchKitError] = useState<string | null>(null);
+  const [showLaunchKitPurchaseModal, setShowLaunchKitPurchaseModal] = useState(false);
 
   // Local state for generated content (for tabs generated in this session)
   const [viability, setViability] = useState<ViabilityReportType | null>(null);
@@ -157,6 +174,47 @@ export default function ProjectPage() {
       fetchProject();
     }
   }, [user, projectId]);
+
+  // Check for successful purchase return from Stripe
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const purchaseParam = urlParams.get("purchase");
+    const sessionId = urlParams.get("session_id");
+
+    if (purchaseParam === "deep_dive" && sessionId) {
+      // Clean up URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Refetch credits and grant access
+      refetchCredits();
+      setHasAccess(true);
+      setAccessChecked(true);
+    }
+
+    if (purchaseParam === "launch_kit" && sessionId) {
+      // Clean up URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Refetch credits
+      refetchCredits();
+    }
+  }, [refetchCredits]);
+
+  // Check access after project and credits are loaded
+  useEffect(() => {
+    // Skip if already checked or returning from purchase
+    if (accessChecked) return;
+    // Skip if still loading
+    if (creditsLoading || isLoading || !project) return;
+
+    const ideaId = project.idea.id;
+    const canAccess = hasDeepDiveAccess(ideaId);
+
+    setHasAccess(canAccess);
+    setAccessChecked(true);
+
+    if (!canAccess) {
+      setShowPurchaseModal(true);
+    }
+  }, [creditsLoading, isLoading, project, hasDeepDiveAccess, accessChecked]);
 
   // Check if content exists for a tab
   const hasContent = useCallback((tabId: TabId): boolean => {
@@ -332,6 +390,72 @@ export default function ProjectPage() {
     }
   };
 
+  // Generate Launch Kit
+  const handleGenerateLaunchKit = useCallback(async () => {
+    if (!project) return;
+
+    setShowLaunchKit(true);
+    setLaunchKitError(null);
+
+    // If we already have a launch kit, just show it
+    if (launchKit) {
+      return;
+    }
+
+    setIsGeneratingLaunchKit(true);
+
+    // Build profile from project data or use defaults
+    const projectProfile: UserProfile = project.profile || {
+      ventureType: null,
+      format: null,
+      location: null,
+      causes: [],
+      experience: null,
+      budget: null,
+      commitment: null,
+      depth: "full",
+      hasIdea: true,
+      ownIdea: "",
+    };
+
+    try {
+      const response = await fetch("/api/launch-kit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idea: project.idea, profile: projectProfile }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setLaunchKit(result.data);
+      } else {
+        setLaunchKitError(result.error || "Failed to generate launch kit");
+      }
+    } catch (err) {
+      console.error("Error generating launch kit:", err);
+      setLaunchKitError("Something went wrong. Please try again.");
+    } finally {
+      setIsGeneratingLaunchKit(false);
+    }
+  }, [project, launchKit]);
+
+  // Handle Launch Kit button click
+  const handleLaunchKitClick = useCallback(() => {
+    if (!project) return;
+
+    // Check if user has access to launch kit for this idea
+    const canAccess = hasLaunchKitAccess(project.idea.id);
+
+    if (canAccess) {
+      // User has access - generate or show launch kit
+      handleGenerateLaunchKit();
+    } else {
+      // User needs to purchase - show purchase modal
+      setShowLaunchKitPurchaseModal(true);
+    }
+  }, [project, hasLaunchKitAccess, handleGenerateLaunchKit]);
+
   // Get content for current tab
   const getCurrentContent = () => {
     switch (activeTab) {
@@ -367,6 +491,18 @@ export default function ProjectPage() {
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-3 border-spark border-t-transparent rounded-full animate-spin mb-4" />
           <p className="text-warmwhite-muted">Loading project...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking credits
+  if (creditsLoading || !accessChecked) {
+    return (
+      <div className="min-h-screen bg-charcoal-dark flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-3 border-spark border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-warmwhite-muted">Checking access...</p>
         </div>
       </div>
     );
@@ -457,6 +593,20 @@ export default function ProjectPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Launch Kit Button */}
+              {hasAccess && (
+                <button
+                  onClick={handleLaunchKitClick}
+                  className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium
+                    bg-gradient-to-r from-spark to-accent text-charcoal-dark hover:opacity-90 transition-all duration-200 hover:scale-105"
+                  title="Generate complete marketing package"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">Launch Kit</span>
+                </button>
+              )}
               {/* Download PDF Button */}
               <button
                 onClick={downloadPDF}
@@ -550,7 +700,32 @@ export default function ProjectPage() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
-        {error && (
+        {/* Locked state - no access */}
+        {!hasAccess && (
+          <FadeIn duration={300}>
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-20 h-20 rounded-full bg-spark/10 flex items-center justify-center mb-6">
+                <svg className="w-10 h-10 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <h2 className="font-display text-2xl font-bold text-warmwhite mb-2">
+                Unlock Deep Dive Analysis
+              </h2>
+              <p className="text-warmwhite-muted max-w-md mb-6">
+                Get comprehensive market research, business planning, and action roadmap for this idea.
+              </p>
+              <button
+                onClick={() => setShowPurchaseModal(true)}
+                className="px-6 py-3 font-medium rounded-xl bg-spark text-charcoal hover:bg-spark-light transition-colors"
+              >
+                Unlock for $4.99
+              </button>
+            </div>
+          </FadeIn>
+        )}
+
+        {hasAccess && error && (
           <FadeIn duration={300}>
             <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 mb-8">
               <div className="flex items-start gap-4">
@@ -575,7 +750,7 @@ export default function ProjectPage() {
         )}
 
         {/* Loading state for generation */}
-        {isTabLoading && !content && (
+        {hasAccess && isTabLoading && !content && (
           <FadeIn duration={300}>
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative w-16 h-16 mb-6">
@@ -610,7 +785,7 @@ export default function ProjectPage() {
         )}
 
         {/* Show content or generate button */}
-        {!isTabLoading && content && (
+        {hasAccess && !isTabLoading && content && (
           <FadeIn duration={400}>
             {activeTab === "viability" && viability && (
               <ViabilityReport report={viability} />
@@ -628,7 +803,7 @@ export default function ProjectPage() {
         )}
 
         {/* Generate button for empty tabs */}
-        {!isTabLoading && !content && (
+        {hasAccess && !isTabLoading && !content && (
           <FadeIn duration={400}>
             <div className="text-center py-16">
               <div className="w-20 h-20 rounded-full bg-charcoal-light flex items-center justify-center mx-auto mb-6">
@@ -700,6 +875,41 @@ export default function ProjectPage() {
           </FadeIn>
         </div>
       )}
+
+      {/* Purchase Modal for deep dive access */}
+      <PurchaseModal
+        isOpen={showPurchaseModal}
+        onClose={() => {
+          setShowPurchaseModal(false);
+          // If user closes without purchasing, go back to projects
+          if (!hasAccess) {
+            router.push("/projects");
+          }
+        }}
+        ideaId={project.idea.id}
+        ideaName={project.idea.name}
+        purchaseType="deep_dive"
+      />
+
+      {/* Launch Kit Modal */}
+      <LaunchKitModal
+        isOpen={showLaunchKit}
+        onClose={() => setShowLaunchKit(false)}
+        launchKit={launchKit}
+        isLoading={isGeneratingLaunchKit}
+        error={launchKitError}
+        ideaName={project.idea.name}
+      />
+
+      {/* Purchase Modal for launch kit */}
+      <PurchaseModal
+        isOpen={showLaunchKitPurchaseModal}
+        onClose={() => setShowLaunchKitPurchaseModal(false)}
+        ideaId={project.idea.id}
+        ideaName={project.idea.name}
+        purchaseType="launch_kit"
+        hasDeepDive={hasAccess}
+      />
     </div>
   );
 }
