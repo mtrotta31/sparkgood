@@ -8,6 +8,8 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 
 2. **SparkGood Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, and coworking spaces that helps entrepreneurs find real-world support matched to their idea and location.
 
+3. **SparkGood Pro Toolkit** (Future) — A downloadable package of pre-configured Claude Code skills for advanced users who want to run the same powerful frameworks in their own environment.
+
 **Brand name:** SparkGood
 **Domain:** sparkgood.io
 **Tagline:** "Spark something good."
@@ -42,6 +44,14 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 - **Saved Ideas** — Persist generated ideas and deep dive results
 - **Auto-save** — Deep dive results save automatically when logged in
 
+### Payments & Credits (Fully Functional)
+- **Stripe Integration** — Checkout sessions, webhooks, subscription management
+- **Pricing Page** (`/pricing`) — Three tiers: Free, Spark ($14.99/mo), Ignite ($29.99/mo)
+- **Credits System** — Subscription credits + one-time purchases
+- **One-Time Purchases** — Deep Dive ($4.99), Launch Kit ($2.99)
+- **Payment Gates** — Server-side verification on `/api/deep-dive`, client-side gates on project pages
+- **Purchase Modals** — In-app purchase flow with Stripe Checkout redirect
+
 ## Tech Stack (Implemented)
 
 ### Frontend
@@ -61,7 +71,7 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 ### Infrastructure
 - **Hosting:** Vercel
 - **Database:** Supabase
-- **Payments:** Stripe (in progress)
+- **Payments:** Stripe (checkout, webhooks, subscriptions, one-time purchases)
 
 ## Key API Routes
 
@@ -78,7 +88,13 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 - `POST /api/user/ideas/save` — Save idea to projects
 - `GET/POST /api/user/deep-dive` — Deep dive results
 - `GET /api/user/projects` — List user's projects
-- `GET /api/user/projects/[id]` — Single project details
+- `GET/DELETE /api/user/projects/[id]` — Single project details / delete
+- `GET /api/user/credits` — User subscription & credits info
+- `POST /api/user/credits/consume` — Consume a credit for deep dive/launch kit
+
+### Payments
+- `POST /api/stripe/checkout` — Create Stripe checkout session
+- `POST /api/stripe/webhook` — Handle Stripe webhook events (subscription lifecycle)
 
 ### Resource Directory
 - `GET /api/resources/search` — Full-text search with filters
@@ -97,11 +113,44 @@ SparkGood is a **dual-product platform** that helps people turn their desire to 
 - `saved_ideas` — Generated ideas linked to profiles
 - `deep_dive_results` — Viability, plan, marketing, roadmap content
 
+### Payments Tables
+- `user_credits` — Subscription tier, status, credits remaining, one-time purchases
+  - `subscription_tier`: 'free' | 'spark' | 'ignite'
+  - `subscription_status`: 'active' | 'canceled' | 'past_due' | null
+  - `deep_dive_credits_remaining`: number (Spark gets 5/mo, Ignite unlimited)
+  - `launch_kit_credits_remaining`: number (Spark gets 3/mo, Ignite unlimited)
+  - `one_time_purchases`: array of idea IDs for purchased deep dives/launch kits
+
 ### Resource Directory Tables
 - `resource_listings` — All resources (grants, accelerators, SBA, coworking)
 - `resource_locations` — Cities with listing counts
 - `resource_category_locations` — Category counts per location
 - `resource_saves` — User saved resources
+
+## Monetization Model
+
+### Free Tier
+- Full guided questionnaire
+- AI-generated idea concepts (4 per session)
+- Ability to regenerate ideas
+- No sign-up required
+
+### Spark Tier ($14.99/month)
+- Everything in Free
+- 5 Deep Dive credits/month
+- 3 Launch Kit credits/month
+- Save unlimited projects
+- PDF export
+
+### Ignite Tier ($29.99/month)
+- Everything in Spark
+- Unlimited Deep Dives
+- Unlimited Launch Kits
+- Priority support
+
+### One-Time Purchases
+- Deep Dive: $4.99 per idea
+- Launch Kit: $2.99 per idea (requires Deep Dive first)
 
 ## Design System
 
@@ -136,10 +185,12 @@ sparkgood/
 │   │   │   ├── generate-ideas/
 │   │   │   ├── deep-dive/
 │   │   │   ├── launch-kit/
+│   │   │   ├── stripe/          # Checkout & webhook
 │   │   │   ├── resources/
-│   │   │   ├── user/
+│   │   │   ├── user/            # Profile, ideas, credits
 │   │   │   └── ...
 │   │   ├── builder/             # Main builder flow
+│   │   ├── pricing/             # Pricing page
 │   │   ├── projects/            # User projects
 │   │   ├── resources/           # Resource directory
 │   │   ├── sitemap.ts           # Dynamic sitemap
@@ -147,12 +198,13 @@ sparkgood/
 │   ├── components/
 │   │   ├── ui/                  # Shared UI components
 │   │   ├── steps/               # Builder step components
-│   │   ├── deep-dive/           # Deep dive components
+│   │   ├── deep-dive/           # Deep dive & launch kit components
 │   │   ├── resources/           # Directory components
-│   │   └── auth/                # Auth components
+│   │   ├── auth/                # Auth components
+│   │   └── PurchaseModal.tsx    # Stripe checkout modal
 │   ├── contexts/                # React contexts (Auth)
-│   ├── hooks/                   # Custom hooks
-│   ├── lib/                     # Utilities (Supabase, etc.)
+│   ├── hooks/                   # Custom hooks (useCredits, useUserData)
+│   ├── lib/                     # Utilities (Supabase, Stripe, etc.)
 │   ├── prompts/                 # AI prompt templates
 │   └── types/                   # TypeScript types
 ├── supabase/
@@ -173,37 +225,46 @@ npx tsc --noEmit     # TypeScript check
 
 Required in `.env.local`:
 ```
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# AI
 ANTHROPIC_API_KEY=
 PERPLEXITY_API_KEY=
+
+# Stripe
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 ```
 
 ## Current Phase
 
-**Phase: Feature Complete / Polish**
+**Phase: MVP Complete — Ready for Launch**
 
-The core product is fully functional:
+The core product is fully functional with payments:
 - ✅ Guided builder flow
 - ✅ Idea generation
-- ✅ Deep dive (all 4 tabs)
-- ✅ Launch kit generation
+- ✅ Deep dive (all 4 tabs) with payment gates
+- ✅ Launch kit generation with payment gates
 - ✅ PDF export
 - ✅ User auth & saved projects
 - ✅ Resource directory with SEO
 - ✅ Matched resources in deep dive
 - ✅ Dynamic sitemap
-
-**In Progress:**
-- Stripe payments / credits system
-- Pricing page
+- ✅ Stripe payments (subscriptions + one-time purchases)
+- ✅ Pricing page with 3 tiers
+- ✅ Credits system with server-side verification
+- ✅ Session state preservation through Stripe checkout flow
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
 - More resource data (currently ~70 listings, targeting 16,000+)
 - Email notifications
 - Team collaboration features
+- Usage analytics dashboard
 
 ## Important Context
 
