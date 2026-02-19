@@ -3,8 +3,12 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ResourceSearch() {
-  const [query, setQuery] = useState("");
+interface ResourceSearchProps {
+  initialQuery?: string;
+}
+
+export default function ResourceSearch({ initialQuery = "" }: ResourceSearchProps) {
+  const [query, setQuery] = useState(initialQuery);
   const router = useRouter();
 
   const handleSubmit = useCallback(

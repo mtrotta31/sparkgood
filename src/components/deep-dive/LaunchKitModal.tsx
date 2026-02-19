@@ -70,6 +70,14 @@ export default function LaunchKitModal({
     window.URL.revokeObjectURL(url);
   };
 
+  const previewInNewTab = (htmlContent: string) => {
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    // Clean up the URL after a delay to allow the new tab to load
+    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+  };
+
   const CopyButton = ({ text, field }: { text: string; field: string }) => (
     <button
       onClick={() => copyToClipboard(text, field)}
@@ -245,6 +253,17 @@ export default function LaunchKitModal({
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-warmwhite">Landing Page HTML</h3>
                     <div className="flex gap-2">
+                      <button
+                        onClick={() => previewInNewTab(launchKit.landingPage.html)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg
+                          bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Preview
+                      </button>
                       <CopyButton text={launchKit.landingPage.html} field="landing-html" />
                       <DownloadButton
                         content={launchKit.landingPage.html}

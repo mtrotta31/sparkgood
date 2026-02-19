@@ -3,6 +3,80 @@
 
 import type { BuildAssetRequest } from "@/types/assets";
 
+// Get color scheme based on cause area
+function getColorScheme(causeAreas: string[]): { name: string; colors: string; description: string } {
+  const primaryCause = causeAreas?.[0] || "";
+
+  const colorSchemes: Record<string, { name: string; colors: string; description: string }> = {
+    environment: {
+      name: "Nature",
+      colors: "Primary: Forest green (#228B22), Accent: Earth brown (#8B4513), Background: Soft cream (#FFFEF7), Text: Dark forest (#1a3a1a)",
+      description: "Earthy greens and warm browns on a light cream background"
+    },
+    health: {
+      name: "Wellness",
+      colors: "Primary: Calming teal (#008B8B), Accent: Soft coral (#FF7F7F), Background: Clean white (#FFFFFF), Text: Deep teal (#004D4D)",
+      description: "Calming teals and soft corals on a clean white background"
+    },
+    mental_health: {
+      name: "Calm",
+      colors: "Primary: Peaceful lavender (#9370DB), Accent: Soft sage (#98D8AA), Background: Warm white (#FAFAFA), Text: Deep purple (#4B0082)",
+      description: "Soothing lavenders and sage greens on a warm white background"
+    },
+    education: {
+      name: "Learning",
+      colors: "Primary: Warm orange (#E67E22), Accent: Sky blue (#5DADE2), Background: Cream (#FFF8E7), Text: Rich brown (#5D4037)",
+      description: "Warm oranges and friendly blues on a cream background"
+    },
+    poverty: {
+      name: "Hope",
+      colors: "Primary: Hopeful gold (#DAA520), Accent: Warm terracotta (#CD5C5C), Background: Soft ivory (#FFFFF0), Text: Warm charcoal (#3D3D3D)",
+      description: "Warm golds and terracotta on an ivory background"
+    },
+    food_security: {
+      name: "Harvest",
+      colors: "Primary: Fresh green (#32CD32), Accent: Harvest orange (#FF8C00), Background: Natural cream (#FFFEF5), Text: Earth brown (#4A3C31)",
+      description: "Fresh greens and harvest oranges on a natural cream background"
+    },
+    equity: {
+      name: "Unity",
+      colors: "Primary: Vibrant purple (#8E44AD), Accent: Teal (#1ABC9C), Background: Light lavender (#F8F4FF), Text: Deep purple (#2C1654)",
+      description: "Vibrant purples and teals on a soft lavender background"
+    },
+    animals: {
+      name: "Nature Friend",
+      colors: "Primary: Warm brown (#8B4513), Accent: Leaf green (#6B8E23), Background: Soft tan (#FFF8DC), Text: Dark brown (#3E2723)",
+      description: "Warm browns and natural greens on a soft tan background"
+    },
+    youth: {
+      name: "Bright Future",
+      colors: "Primary: Bright blue (#3498DB), Accent: Sunny yellow (#F1C40F), Background: Soft white (#FEFEFE), Text: Navy (#1A237E)",
+      description: "Bright blues and sunny yellows on a clean white background"
+    },
+    elder_care: {
+      name: "Comfort",
+      colors: "Primary: Warm rose (#C08081), Accent: Soft sage (#9DC183), Background: Warm cream (#FDF5E6), Text: Warm gray (#5D5D5D)",
+      description: "Warm roses and soft sages on a comforting cream background"
+    },
+    arts: {
+      name: "Creative",
+      colors: "Primary: Creative magenta (#C71585), Accent: Artistic teal (#20B2AA), Background: Gallery white (#FDFDFD), Text: Deep charcoal (#2D2D2D)",
+      description: "Bold magentas and artistic teals on a gallery white background"
+    },
+    tech_access: {
+      name: "Digital",
+      colors: "Primary: Tech blue (#0066CC), Accent: Innovation green (#00C853), Background: Clean white (#FFFFFF), Text: Digital gray (#333333)",
+      description: "Modern blues and innovation greens on a clean white background"
+    }
+  };
+
+  return colorSchemes[primaryCause] || {
+    name: "Community",
+    colors: "Primary: Friendly teal (#26A69A), Accent: Warm coral (#FF8A65), Background: Soft white (#FAFAFA), Text: Warm charcoal (#424242)",
+    description: "Friendly teals and warm corals on a soft white background"
+  };
+}
+
 // ============================================================================
 // SYSTEM PROMPTS
 // ============================================================================
@@ -24,6 +98,10 @@ CRITICAL: Return ONLY a valid JSON object. No explanation text. No markdown code
 export function generateLandingPagePrompt(request: BuildAssetRequest): string {
   const { idea, profile, taskDescription } = request;
 
+  // Get cause-appropriate color scheme
+  const colorScheme = getColorScheme(idea.causeAreas || []);
+  const primaryCause = idea.causeAreas?.[0] || "community";
+
   return `Create a complete, standalone landing page for this social impact project.
 
 ## The Project
@@ -32,6 +110,7 @@ export function generateLandingPagePrompt(request: BuildAssetRequest): string {
 **Problem:** ${idea.problem}
 **Who it helps:** ${idea.audience}
 **Impact:** ${idea.impact}
+**Cause Area:** ${primaryCause}
 ${idea.revenueModel ? `**How it sustains:** ${idea.revenueModel}` : ""}
 
 ## Context
@@ -44,10 +123,18 @@ ${idea.revenueModel ? `**How it sustains:** ${idea.revenueModel}` : ""}
 Create a COMPLETE standalone HTML file with:
 1. Inline CSS (no external stylesheets)
 2. Mobile-responsive design
-3. Warm, inviting colors (use amber/gold #F59E0B as accent, dark backgrounds #1C1412)
+3. **IMPORTANT - Color Scheme:** Use a ${colorScheme.description}.
+   Specific colors: ${colorScheme.colors}
+   DO NOT use dark backgrounds or amber/charcoal colors. Use a LIGHT/WHITE background that feels warm and inviting.
 4. Clear sections: Hero, Problem, Solution, How It Works, Call to Action
 5. A signup form (can be a mailto: link or placeholder form)
 6. Professional typography (use system fonts: -apple-system, BlinkMacSystemFont, 'Segoe UI', etc.)
+
+The page should feel appropriate for a ${primaryCause}-focused ${profile.ventureType}. For example:
+- A community seed library should look warm, green, and inviting
+- A youth tutoring program should feel bright and optimistic
+- A mental health initiative should feel calm and soothing
+- NOT like a tech startup or crypto project
 
 The page should be immediately usable — someone could save this HTML file and host it.
 

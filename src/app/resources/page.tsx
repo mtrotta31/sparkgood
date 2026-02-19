@@ -6,6 +6,11 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
 import ResourceSearch from "@/components/resources/ResourceSearch";
+import SearchResults from "@/components/resources/SearchResults";
+
+interface PageProps {
+  searchParams: Promise<{ search?: string }>;
+}
 
 export const metadata: Metadata = {
   title: "Business Resources Directory | SparkGood",
@@ -300,7 +305,8 @@ function FeaturedListing({
   );
 }
 
-export default async function ResourcesPage() {
+export default async function ResourcesPage({ searchParams }: PageProps) {
+  const { search: searchQuery } = await searchParams;
   const supabase = await createClient();
 
   // Get category counts
@@ -366,9 +372,12 @@ export default async function ResourcesPage() {
 
         {/* Search */}
         <div className="max-w-2xl mx-auto">
-          <ResourceSearch />
+          <ResourceSearch initialQuery={searchQuery} />
         </div>
       </section>
+
+      {/* Search Results */}
+      {searchQuery && <SearchResults initialQuery={searchQuery} />}
 
       {/* Categories Grid */}
       <section className="pb-16 px-4">

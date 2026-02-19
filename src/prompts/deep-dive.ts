@@ -133,6 +133,7 @@ Return a JSON object with this structure:
 ## Important
 - verdict should almost always be "go" for simple community projects — the bar is "will people show up?" not "will this scale?"
 - viabilityScore should be 7-9 for most valid weekend projects
+- scoreBreakdown: CRITICAL - each dimension MUST have a DIFFERENT score (vary by at least 0.5-2 points between dimensions). Never use the same score for all dimensions.
 - scoreBreakdown explanations should be simple, friendly, jargon-free (one sentence each)
 - recommendation should focus on HOW TO GET PEOPLE TO SHOW UP, not strategy
 - Keep everything short and jargon-free
@@ -221,6 +222,7 @@ Score these 5 factors from 1-10 with a one-sentence explanation:
 
 ## Notes
 - viabilityScore: 8+ = GO, 6-7.9 = WORK ON IT (refine), below 6 = RETHINK (pivot)
+- scoreBreakdown: CRITICAL - each dimension MUST have a DIFFERENT score (vary by at least 0.5-2 points between dimensions). Never use the same score for all dimensions.
 - Each scoreBreakdown explanation should be one clear, jargon-free sentence
 - Keep language accessible, no MBA jargon
 - Focus on practical next steps
@@ -316,7 +318,7 @@ Return a JSON object with this structure:
 ## Notes
 - Include 2-4 competitors (can be similar initiatives, not just direct competitors)
 - viabilityScore should be weighted average of the 5 dimension scores
-- scoreBreakdown: each explanation should be one clear, specific sentence
+- scoreBreakdown: CRITICAL - each dimension MUST have a DIFFERENT score (vary by at least 0.5-2 points between dimensions). Never use the same score for all dimensions. Each explanation should be one clear, specific sentence.
 - verdict must be one of: "go" (score 8+), "refine" (score 6-7.9), or "pivot" (score below 6)
 - Be honest but encouraging — a "refine" verdict with clear steps is valuable
 - Return ONLY valid JSON, no markdown formatting`;

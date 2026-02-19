@@ -131,45 +131,47 @@ function getMockAsset(assetType: AssetType, ideaName: string, taskDescription: s
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1C1412;
-      color: #FAF5F0;
+      background: #FAFAFA;
+      color: #424242;
       line-height: 1.6;
     }
     .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
     .hero {
       text-align: center;
       padding: 4rem 2rem;
-      background: linear-gradient(135deg, #1C1412 0%, #2D1F1A 100%);
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
     h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
-      color: #F59E0B;
+      color: #26A69A;
     }
     .tagline {
       font-size: 1.25rem;
-      opacity: 0.9;
+      color: #666;
       margin-bottom: 2rem;
     }
     .cta-button {
       display: inline-block;
-      background: #F59E0B;
-      color: #1C1412;
+      background: #26A69A;
+      color: white;
       padding: 1rem 2rem;
-      border-radius: 0.5rem;
+      border-radius: 9999px;
       text-decoration: none;
       font-weight: 600;
       font-size: 1.1rem;
+      box-shadow: 0 4px 14px rgba(38, 166, 154, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .cta-button:hover { background: #D97706; }
+    .cta-button:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(38, 166, 154, 0.4); }
     .section {
       padding: 3rem 2rem;
-      border-bottom: 1px solid rgba(250, 245, 240, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
     h2 {
       font-size: 1.75rem;
       margin-bottom: 1rem;
-      color: #F59E0B;
+      color: #26A69A;
     }
     .features {
       display: grid;
@@ -177,15 +179,16 @@ function getMockAsset(assetType: AssetType, ideaName: string, taskDescription: s
       margin-top: 1.5rem;
     }
     .feature {
-      background: rgba(250, 245, 240, 0.05);
+      background: white;
       padding: 1.5rem;
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    .feature h3 { color: #F59E0B; margin-bottom: 0.5rem; }
+    .feature h3 { color: #FF8A65; margin-bottom: 0.5rem; }
     footer {
       text-align: center;
       padding: 2rem;
-      opacity: 0.7;
+      color: #888;
     }
   </style>
 </head>

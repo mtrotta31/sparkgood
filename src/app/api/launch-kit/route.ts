@@ -25,11 +25,88 @@ Your copy is:
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
+// Get color scheme based on cause area
+function getColorScheme(causeAreas: string[]): { name: string; colors: string; description: string } {
+  const primaryCause = causeAreas?.[0] || "";
+
+  const colorSchemes: Record<string, { name: string; colors: string; description: string }> = {
+    environment: {
+      name: "Nature",
+      colors: "Primary: Forest green (#228B22), Accent: Earth brown (#8B4513), Background: Soft cream (#FFFEF7), Text: Dark forest (#1a3a1a)",
+      description: "Earthy greens and warm browns on a light cream background"
+    },
+    health: {
+      name: "Wellness",
+      colors: "Primary: Calming teal (#008B8B), Accent: Soft coral (#FF7F7F), Background: Clean white (#FFFFFF), Text: Deep teal (#004D4D)",
+      description: "Calming teals and soft corals on a clean white background"
+    },
+    mental_health: {
+      name: "Calm",
+      colors: "Primary: Peaceful lavender (#9370DB), Accent: Soft sage (#98D8AA), Background: Warm white (#FAFAFA), Text: Deep purple (#4B0082)",
+      description: "Soothing lavenders and sage greens on a warm white background"
+    },
+    education: {
+      name: "Learning",
+      colors: "Primary: Warm orange (#E67E22), Accent: Sky blue (#5DADE2), Background: Cream (#FFF8E7), Text: Rich brown (#5D4037)",
+      description: "Warm oranges and friendly blues on a cream background"
+    },
+    poverty: {
+      name: "Hope",
+      colors: "Primary: Hopeful gold (#DAA520), Accent: Warm terracotta (#CD5C5C), Background: Soft ivory (#FFFFF0), Text: Warm charcoal (#3D3D3D)",
+      description: "Warm golds and terracotta on an ivory background"
+    },
+    food_security: {
+      name: "Harvest",
+      colors: "Primary: Fresh green (#32CD32), Accent: Harvest orange (#FF8C00), Background: Natural cream (#FFFEF5), Text: Earth brown (#4A3C31)",
+      description: "Fresh greens and harvest oranges on a natural cream background"
+    },
+    equity: {
+      name: "Unity",
+      colors: "Primary: Vibrant purple (#8E44AD), Accent: Teal (#1ABC9C), Background: Light lavender (#F8F4FF), Text: Deep purple (#2C1654)",
+      description: "Vibrant purples and teals on a soft lavender background"
+    },
+    animals: {
+      name: "Nature Friend",
+      colors: "Primary: Warm brown (#8B4513), Accent: Leaf green (#6B8E23), Background: Soft tan (#FFF8DC), Text: Dark brown (#3E2723)",
+      description: "Warm browns and natural greens on a soft tan background"
+    },
+    youth: {
+      name: "Bright Future",
+      colors: "Primary: Bright blue (#3498DB), Accent: Sunny yellow (#F1C40F), Background: Soft white (#FEFEFE), Text: Navy (#1A237E)",
+      description: "Bright blues and sunny yellows on a clean white background"
+    },
+    elder_care: {
+      name: "Comfort",
+      colors: "Primary: Warm rose (#C08081), Accent: Soft sage (#9DC183), Background: Warm cream (#FDF5E6), Text: Warm gray (#5D5D5D)",
+      description: "Warm roses and soft sages on a comforting cream background"
+    },
+    arts: {
+      name: "Creative",
+      colors: "Primary: Creative magenta (#C71585), Accent: Artistic teal (#20B2AA), Background: Gallery white (#FDFDFD), Text: Deep charcoal (#2D2D2D)",
+      description: "Bold magentas and artistic teals on a gallery white background"
+    },
+    tech_access: {
+      name: "Digital",
+      colors: "Primary: Tech blue (#0066CC), Accent: Innovation green (#00C853), Background: Clean white (#FFFFFF), Text: Digital gray (#333333)",
+      description: "Modern blues and innovation greens on a clean white background"
+    }
+  };
+
+  return colorSchemes[primaryCause] || {
+    name: "Community",
+    colors: "Primary: Friendly teal (#26A69A), Accent: Warm coral (#FF8A65), Background: Soft white (#FAFAFA), Text: Warm charcoal (#424242)",
+    description: "Friendly teals and warm corals on a soft white background"
+  };
+}
+
 function generateLaunchKitPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
   const locationContext = profile.location
     ? `\n**Location:** ${profile.location.city}, ${profile.location.state} (include local references where appropriate)`
     : "";
+
+  // Get cause-appropriate color scheme
+  const colorScheme = getColorScheme(idea.causeAreas || []);
 
   return `Create a complete Launch Kit for this social impact venture.
 
@@ -41,6 +118,7 @@ function generateLaunchKitPrompt(idea: Idea, profile: UserProfile): string {
 **Audience:** ${idea.audience}
 **Impact:** ${idea.impact}
 **Sustainability Model:** ${idea.revenueModel || "Volunteer-driven community project"}
+**Cause Areas:** ${idea.causeAreas?.join(", ") || "community"}
 
 ## User Context
 
@@ -55,7 +133,10 @@ Create a simple, standalone HTML page that works without external dependencies. 
 - Problem/solution section
 - Benefits (3-4 bullet points)
 - Call to action button
-- Use a warm color scheme (amber/orange accents on dark background)
+
+**IMPORTANT - Color Scheme:** Use a ${colorScheme.description}.
+Specific colors: ${colorScheme.colors}
+DO NOT use dark backgrounds or the default amber/charcoal SparkGood brand colors. The landing page should feel appropriate for a ${idea.causeAreas?.[0] || "community"}-focused venture.
 
 ### 2. Social Media Posts (4 platforms)
 Create launch announcement posts for:
@@ -179,6 +260,21 @@ export async function POST(request: NextRequest) {
 
 // Mock data for development
 function getMockLaunchKit(idea: Idea): LaunchKit {
+  // Get colors based on cause area
+  const colorScheme = getColorScheme(idea.causeAreas || []);
+  const colors = colorScheme.colors;
+
+  // Parse some basic colors from the scheme (simple extraction)
+  const primaryMatch = colors.match(/Primary: [^(]+\(([^)]+)\)/);
+  const accentMatch = colors.match(/Accent: [^(]+\(([^)]+)\)/);
+  const bgMatch = colors.match(/Background: [^(]+\(([^)]+)\)/);
+  const textMatch = colors.match(/Text: [^(]+\(([^)]+)\)/);
+
+  const primary = primaryMatch?.[1] || "#26A69A";
+  const accent = accentMatch?.[1] || "#FF8A65";
+  const bg = bgMatch?.[1] || "#FAFAFA";
+  const text = textMatch?.[1] || "#424242";
+
   return {
     landingPage: {
       html: `<!DOCTYPE html>
@@ -189,18 +285,18 @@ function getMockLaunchKit(idea: Idea): LaunchKit {
   <title>${idea.name}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1C1412; color: #f5f5f5; line-height: 1.6; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: ${bg}; color: ${text}; line-height: 1.6; }
     .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
     .hero { text-align: center; padding: 4rem 0; }
-    h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, #F59E0B, #F97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 1.25rem; color: #a3a3a3; margin-bottom: 2rem; }
-    .cta { display: inline-block; background: #F59E0B; color: #1C1412; padding: 1rem 2rem; border-radius: 9999px; text-decoration: none; font-weight: 600; transition: transform 0.2s; }
-    .cta:hover { transform: scale(1.05); }
-    .section { padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.1); }
-    .section h2 { font-size: 1.5rem; margin-bottom: 1rem; color: #F59E0B; }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; color: ${primary}; }
+    .subtitle { font-size: 1.25rem; color: ${text}; opacity: 0.8; margin-bottom: 2rem; }
+    .cta { display: inline-block; background: ${primary}; color: white; padding: 1rem 2rem; border-radius: 9999px; text-decoration: none; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+    .cta:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .section { padding: 3rem 0; border-top: 1px solid rgba(0,0,0,0.1); }
+    .section h2 { font-size: 1.5rem; margin-bottom: 1rem; color: ${primary}; }
     ul { list-style: none; }
     li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; }
-    li::before { content: "✓"; position: absolute; left: 0; color: #F59E0B; }
+    li::before { content: "✓"; position: absolute; left: 0; color: ${accent}; font-weight: bold; }
   </style>
 </head>
 <body>

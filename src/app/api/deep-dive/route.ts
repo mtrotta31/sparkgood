@@ -61,6 +61,102 @@ interface CachedResearch {
 
 const researchCache = new Map<string, CachedResearch>();
 
+// Helper to ensure viability scores are properly populated with varied scores
+function processViabilityScores(report: ViabilityReport): ViabilityReport {
+  // If scoreBreakdown exists and has valid, varied scores, use it
+  if (report.scoreBreakdown) {
+    const scores = [
+      report.scoreBreakdown.marketOpportunity?.score,
+      report.scoreBreakdown.competitionLevel?.score,
+      report.scoreBreakdown.feasibility?.score,
+      report.scoreBreakdown.revenuePotential?.score,
+      report.scoreBreakdown.impactPotential?.score,
+    ].filter((s): s is number => typeof s === "number");
+
+    // Check if we have all 5 scores and they're not all the same
+    const uniqueScores = new Set(scores.map(s => s.toFixed(1)));
+    const hasVariedScores = scores.length === 5 && uniqueScores.size >= 3;
+
+    if (hasVariedScores) {
+      console.log("ScoreBreakdown valid with varied scores:", scores);
+      return report;
+    } else {
+      console.log("ScoreBreakdown invalid or uniform scores:", scores);
+    }
+  }
+
+  // Generate intelligent fallback scores based on the overall viability score
+  // and analysis of the report's content
+  const baseScore = report.viabilityScore;
+  console.log("Generating intelligent fallback scores from base:", baseScore);
+
+  // Analyze report content to adjust scores intelligently
+  const hasStrongMarket = report.marketSize?.toLowerCase().includes("billion") ||
+    report.demandAnalysis?.toLowerCase().includes("strong") ||
+    report.demandAnalysis?.toLowerCase().includes("high demand");
+
+  const hasLowCompetition = report.competitors?.length <= 2 ||
+    report.strengths?.some(s => s.toLowerCase().includes("unique") || s.toLowerCase().includes("no direct"));
+
+  const hasFeasibilityRisks = report.risks?.some(r =>
+    r.toLowerCase().includes("complex") || r.toLowerCase().includes("difficult") || r.toLowerCase().includes("technical")
+  );
+
+  const hasRevenueClarity = !!report.targetAudience?.demographics &&
+    report.opportunities?.some(o => o.toLowerCase().includes("revenue") || o.toLowerCase().includes("monetiz"));
+
+  const hasHighImpact = report.strengths?.some(s =>
+    s.toLowerCase().includes("impact") || s.toLowerCase().includes("community") || s.toLowerCase().includes("social")
+  );
+
+  // Generate varied scores (±0.5 to ±2.0 from base)
+  const fallbackScores = {
+    marketOpportunity: {
+      score: Math.min(10, Math.max(1, baseScore + (hasStrongMarket ? 0.8 : -0.5))),
+      explanation: hasStrongMarket
+        ? "Growing market with clear demand signals"
+        : "Market exists but size needs validation"
+    },
+    competitionLevel: {
+      score: Math.min(10, Math.max(1, baseScore + (hasLowCompetition ? 1.0 : -1.0))),
+      explanation: hasLowCompetition
+        ? "Limited direct competition, room for differentiation"
+        : "Established players exist, requiring clear positioning"
+    },
+    feasibility: {
+      score: Math.min(10, Math.max(1, baseScore + (hasFeasibilityRisks ? -1.5 : 0.3))),
+      explanation: hasFeasibilityRisks
+        ? "Execution requires careful planning and resources"
+        : "Achievable with available resources and skills"
+    },
+    revenuePotential: {
+      score: Math.min(10, Math.max(1, baseScore + (hasRevenueClarity ? 0.5 : -1.5))),
+      explanation: hasRevenueClarity
+        ? "Multiple revenue streams possible with clear paths"
+        : "Revenue model needs further development"
+    },
+    impactPotential: {
+      score: Math.min(10, Math.max(1, baseScore + (hasHighImpact ? 1.5 : 0.5))),
+      explanation: hasHighImpact
+        ? "Strong potential for meaningful community impact"
+        : "Impact achievable with focused execution"
+    },
+  };
+
+  console.log("Generated fallback scores:", {
+    marketOpportunity: fallbackScores.marketOpportunity.score,
+    competitionLevel: fallbackScores.competitionLevel.score,
+    feasibility: fallbackScores.feasibility.score,
+    revenuePotential: fallbackScores.revenuePotential.score,
+    impactPotential: fallbackScores.impactPotential.score,
+  });
+
+  return {
+    ...report,
+    scoreBreakdown: fallbackScores,
+  };
+}
+
 // Generate cache key from idea name and profile
 function getCacheKey(idea: Idea, profile: UserProfile): string {
   return `${idea.name}-${profile.ventureType}-${profile.causes?.join(",") || ""}`;
@@ -254,13 +350,21 @@ export async function POST(request: NextRequest) {
           const viabilityPrompt = formattedResearch
             ? generateResearchEnhancedViabilityPrompt(idea, profile, formattedResearch)
             : generateViabilityPrompt(idea, profile);
-          data = await sendMessageForJSON<ViabilityReport>(viabilityPrompt, {
+          const rawViabilityData = await sendMessageForJSON<ViabilityReport>(viabilityPrompt, {
             systemPrompt: formattedResearch
               ? RESEARCH_ENHANCED_VIABILITY_SYSTEM_PROMPT
               : VIABILITY_SYSTEM_PROMPT,
             temperature: 0.7,
             maxTokens: 4096,
           });
+
+          // Debug logging to see what Claude returned
+          console.log("=== VIABILITY RESPONSE DEBUG ===");
+          console.log("Has scoreBreakdown:", !!rawViabilityData.scoreBreakdown);
+          console.log("Raw scoreBreakdown:", JSON.stringify(rawViabilityData.scoreBreakdown, null, 2));
+
+          // Post-process to ensure scoreBreakdown exists with valid, varied scores
+          data = processViabilityScores(rawViabilityData);
           break;
 
         case "plan":
