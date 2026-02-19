@@ -1,9 +1,50 @@
 "use client";
 
-import type { ViabilityReport as ViabilityReportType } from "@/types";
+import type { ViabilityReport as ViabilityReportType, DimensionScore } from "@/types";
 
 interface ViabilityReportProps {
   report: ViabilityReportType;
+}
+
+// Score bar component for individual dimensions
+function ScoreBar({ label, score, icon }: { label: string; score: DimensionScore; icon: React.ReactNode }) {
+  const percentage = (score.score / 10) * 100;
+
+  // Color based on score
+  const getBarColor = (score: number) => {
+    if (score >= 8) return "bg-green-500";
+    if (score >= 6) return "bg-spark";
+    if (score >= 4) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  const getTextColor = (score: number) => {
+    if (score >= 8) return "text-green-400";
+    if (score >= 6) return "text-spark";
+    if (score >= 4) return "text-yellow-400";
+    return "text-red-400";
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-warmwhite-dim">{icon}</span>
+          <span className="text-sm font-medium text-warmwhite">{label}</span>
+        </div>
+        <span className={`text-sm font-bold ${getTextColor(score.score)}`}>
+          {score.score.toFixed(1)}
+        </span>
+      </div>
+      <div className="h-2 bg-charcoal-dark rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${getBarColor(score.score)}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <p className="text-xs text-warmwhite-dim">{score.explanation}</p>
+    </div>
+  );
 }
 
 export default function ViabilityReport({ report }: ViabilityReportProps) {
@@ -38,6 +79,16 @@ export default function ViabilityReport({ report }: ViabilityReportProps) {
 
   const verdict = getVerdictStyles();
 
+  // Default scores if not provided (for backwards compatibility)
+  const defaultScore: DimensionScore = { score: report.viabilityScore, explanation: "Score based on overall analysis" };
+  const scoreBreakdown = report.scoreBreakdown || {
+    marketOpportunity: defaultScore,
+    competitionLevel: defaultScore,
+    feasibility: defaultScore,
+    revenuePotential: defaultScore,
+    impactPotential: defaultScore,
+  };
+
   return (
     <div className="space-y-8">
       {/* Viability Score Card */}
@@ -57,6 +108,63 @@ export default function ViabilityReport({ report }: ViabilityReportProps) {
           <div className="flex-1 max-w-md">
             <p className="text-warmwhite-muted">{verdict.description}</p>
           </div>
+        </div>
+      </div>
+
+      {/* Score Breakdown */}
+      <div className="bg-charcoal-light rounded-2xl p-6">
+        <h2 className="font-display text-xl font-bold text-warmwhite mb-6 flex items-center gap-2">
+          <svg className="w-5 h-5 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Score Breakdown
+        </h2>
+        <div className="space-y-5">
+          <ScoreBar
+            label="Market Opportunity"
+            score={scoreBreakdown.marketOpportunity}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            }
+          />
+          <ScoreBar
+            label="Competition Level"
+            score={scoreBreakdown.competitionLevel}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            }
+          />
+          <ScoreBar
+            label="Feasibility"
+            score={scoreBreakdown.feasibility}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            }
+          />
+          <ScoreBar
+            label="Revenue Potential"
+            score={scoreBreakdown.revenuePotential}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            }
+          />
+          <ScoreBar
+            label="Impact Potential"
+            score={scoreBreakdown.impactPotential}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            }
+          />
         </div>
       </div>
 

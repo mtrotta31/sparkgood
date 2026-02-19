@@ -50,6 +50,14 @@ export default function Header({
 
           {/* Right side */}
           <div className="flex items-center gap-4">
+            {/* Resources link - always visible */}
+            <Link
+              href="/resources"
+              className="text-sm text-warmwhite-muted hover:text-warmwhite transition-colors"
+            >
+              Resources
+            </Link>
+
             {/* Back to Home link */}
             {showBackToHome && !user && (
               <Link
@@ -133,6 +141,14 @@ export default function Header({
                             >
                               Start New Project
                             </Link>
+                            <Link
+                              href="/resources"
+                              className="block px-4 py-2 text-sm text-warmwhite-muted hover:text-warmwhite hover:bg-warmwhite/5 transition-colors"
+                              onClick={() => setShowUserMenu(false)}
+                            >
+                              Resources
+                            </Link>
+                            <div className="border-t border-warmwhite/10 my-1" />
                             <button
                               onClick={handleSignOut}
                               className="w-full text-left px-4 py-2 text-sm text-warmwhite-muted hover:text-warmwhite hover:bg-warmwhite/5 transition-colors"

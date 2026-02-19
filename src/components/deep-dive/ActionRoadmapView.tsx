@@ -301,6 +301,118 @@ export default function ActionRoadmapView({ roadmap, idea, profile }: ActionRoad
         </ol>
       </div>
 
+      {/* Resources Section - Coming Soon */}
+      <div className="bg-charcoal-light rounded-2xl p-6 md:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+            <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="font-display text-2xl font-bold text-warmwhite">Resources That Can Help</h2>
+            <p className="text-warmwhite-dim text-sm">Support matched to your idea and location</p>
+          </div>
+        </div>
+
+        {/* Coming Soon Banner */}
+        <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 mb-6">
+          <div className="flex items-center gap-2 text-accent text-sm font-medium">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Coming Soon
+          </div>
+          <p className="text-warmwhite-muted text-sm mt-1">
+            We&apos;re building a directory of resources matched to your idea. Check back soon!
+          </p>
+        </div>
+
+        {/* Resource Category Cards (Placeholder) */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Grants */}
+          <div className="bg-charcoal-dark rounded-xl p-5 opacity-60">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium text-warmwhite">Grants & Funding</h3>
+                <p className="text-xs text-warmwhite-dim">Foundation and government grants</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-warmwhite-dim text-sm">
+              <div className="w-2 h-2 rounded-full bg-warmwhite/20 animate-pulse" />
+              Matching resources...
+            </div>
+          </div>
+
+          {/* Accelerators */}
+          <div className="bg-charcoal-dark rounded-xl p-5 opacity-60">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-spark/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium text-warmwhite">Accelerators</h3>
+                <p className="text-xs text-warmwhite-dim">Programs to help you grow faster</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-warmwhite-dim text-sm">
+              <div className="w-2 h-2 rounded-full bg-warmwhite/20 animate-pulse" />
+              Matching resources...
+            </div>
+          </div>
+
+          {/* Coworking Spaces */}
+          <div className="bg-charcoal-dark rounded-xl p-5 opacity-60">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium text-warmwhite">Coworking Spaces</h3>
+                <p className="text-xs text-warmwhite-dim">Work and meeting spaces near you</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-warmwhite-dim text-sm">
+              <div className="w-2 h-2 rounded-full bg-warmwhite/20 animate-pulse" />
+              Matching resources...
+            </div>
+          </div>
+
+          {/* Mentorship */}
+          <div className="bg-charcoal-dark rounded-xl p-5 opacity-60">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium text-warmwhite">Mentorship Programs</h3>
+                <p className="text-xs text-warmwhite-dim">Learn from experienced founders</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-warmwhite-dim text-sm">
+              <div className="w-2 h-2 rounded-full bg-warmwhite/20 animate-pulse" />
+              Matching resources...
+            </div>
+          </div>
+        </div>
+
+        {/* Footer note */}
+        <p className="text-center text-warmwhite-dim text-xs mt-6">
+          Resources will be personalized based on your cause area, location, and venture type
+        </p>
+      </div>
+
       {/* Build Asset Modal */}
       <BuildAssetModal
         isOpen={isModalOpen}

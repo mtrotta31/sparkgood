@@ -1,6 +1,7 @@
 export { default as Welcome } from "./Welcome";
 export { default as VentureType } from "./VentureType";
 export { default as Format } from "./Format";
+export { default as Location } from "./Location";
 export { default as CauseSelect } from "./CauseSelect";
 export { default as Experience } from "./Experience";
 export { default as Budget } from "./Budget";

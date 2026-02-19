@@ -25,6 +25,7 @@ export type CauseArea =
 export interface UserProfile {
   ventureType: VentureType | null;
   format: Format | null;
+  location: UserLocation | null;
   causes: CauseArea[];
   experience: ExperienceLevel | null;
   budget: BudgetLevel | null;
@@ -32,6 +33,11 @@ export interface UserProfile {
   depth: Depth | null;
   hasIdea: boolean | null;
   ownIdea: string;
+}
+
+export interface UserLocation {
+  city: string;
+  state: string;
 }
 
 // Idea types
@@ -60,8 +66,23 @@ export interface ViabilityReport {
   risks: string[];
   opportunities: string[];
   viabilityScore: number; // 1-10
+  scoreBreakdown: ScoreBreakdown; // Individual dimension scores
   verdict: "go" | "refine" | "pivot";
   recommendation: string;
+}
+
+// Individual scoring dimensions for viability analysis
+export interface ScoreBreakdown {
+  marketOpportunity: DimensionScore;
+  competitionLevel: DimensionScore;
+  feasibility: DimensionScore;
+  revenuePotential: DimensionScore;
+  impactPotential: DimensionScore;
+}
+
+export interface DimensionScore {
+  score: number; // 1-10
+  explanation: string; // One-line explanation
 }
 
 export interface Competitor {
@@ -145,7 +166,7 @@ export interface MarketingAssets {
 }
 
 export interface SocialPost {
-  platform: "twitter" | "linkedin" | "instagram";
+  platform: "twitter" | "linkedin" | "instagram" | "nextdoor";
   content: string;
   hashtags: string[];
 }
@@ -191,11 +212,39 @@ export interface GeneratedContent {
   roadmap: ActionRoadmap | null;
 }
 
+// Launch Kit types
+export interface LaunchKit {
+  landingPage: LandingPageAsset;
+  socialPosts: LaunchKitSocialPosts;
+  emailSequence: EmailSequence;
+  elevatorPitch: string;
+}
+
+export interface LandingPageAsset {
+  html: string;
+  headline: string;
+  subheadline: string;
+}
+
+export interface LaunchKitSocialPosts {
+  linkedin: SocialPost;
+  twitter: SocialPost;
+  instagram: SocialPost;
+  nextdoor: SocialPost;
+}
+
+export interface EmailSequence {
+  email1: EmailTemplate;
+  email2: EmailTemplate;
+  email3: EmailTemplate;
+}
+
 // Step state for the guided flow
 export type StepName =
   | "welcome"
   | "venture_type"
   | "format"
+  | "location"
   | "causes"
   | "experience"
   | "budget"
@@ -222,3 +271,6 @@ export interface ApiResponse<T> {
 
 // Re-export asset types
 export * from "./assets";
+
+// Re-export resource types
+export * from "./resources";

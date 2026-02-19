@@ -20,6 +20,8 @@ export interface Database {
           user_id: string;
           venture_type: string | null;
           format: string | null;
+          location_city: string | null;
+          location_state: string | null;
           causes: string[];
           experience: string | null;
           budget: string | null;
@@ -35,6 +37,8 @@ export interface Database {
           user_id: string;
           venture_type?: string | null;
           format?: string | null;
+          location_city?: string | null;
+          location_state?: string | null;
           causes?: string[];
           experience?: string | null;
           budget?: string | null;
@@ -50,6 +54,8 @@ export interface Database {
           user_id?: string;
           venture_type?: string | null;
           format?: string | null;
+          location_city?: string | null;
+          location_state?: string | null;
           causes?: string[];
           experience?: string | null;
           budget?: string | null;
@@ -136,6 +142,10 @@ export function dbProfileToUserProfile(
   return {
     ventureType: row.venture_type as UserProfile["ventureType"],
     format: row.format as UserProfile["format"],
+    location:
+      row.location_city && row.location_state
+        ? { city: row.location_city, state: row.location_state }
+        : null,
     causes: row.causes as UserProfile["causes"],
     experience: row.experience as UserProfile["experience"],
     budget: row.budget as UserProfile["budget"],
@@ -154,6 +164,8 @@ export function userProfileToDbProfile(
     user_id: userId,
     venture_type: profile.ventureType,
     format: profile.format,
+    location_city: profile.location?.city || null,
+    location_state: profile.location?.state || null,
     causes: profile.causes,
     experience: profile.experience,
     budget: profile.budget,

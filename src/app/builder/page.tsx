@@ -6,6 +6,7 @@ import {
   Welcome,
   VentureType,
   Format,
+  Location,
   CauseSelect,
   Experience,
   Budget,
@@ -23,6 +24,7 @@ import { STEP_PROGRESS } from "@/lib/constants";
 import { loadPendingSession, clearPendingSession } from "@/lib/sessionState";
 import type {
   UserProfile,
+  UserLocation,
   VentureType as VentureTypeValue,
   Format as FormatValue,
   ExperienceLevel,
@@ -38,6 +40,7 @@ import type {
 const initialProfile: UserProfile = {
   ventureType: null,
   format: null,
+  location: null,
   causes: [],
   experience: null,
   budget: null,
@@ -231,6 +234,7 @@ export default function BuilderPage() {
       "welcome",
       "venture_type",
       "format",
+      "location",
       "causes",
       "experience",
       "budget",
@@ -260,6 +264,7 @@ export default function BuilderPage() {
       "welcome",
       "venture_type",
       "format",
+      "location",
       "causes",
       "experience",
       "budget",
@@ -304,6 +309,15 @@ export default function BuilderPage() {
           <Format
             value={profile.format}
             onChange={(v: FormatValue) => updateProfile("format", v)}
+            {...stepProps}
+          />
+        );
+
+      case "location":
+        return (
+          <Location
+            value={profile.location}
+            onChange={(v: UserLocation | null) => updateProfile("location", v)}
             {...stepProps}
           />
         );

@@ -22,6 +22,19 @@ const getCommitment = (profile: UserProfile): CommitmentLevel => {
   return profile.commitment || "steady";
 };
 
+// Helper to format location string
+const getLocationString = (profile: UserProfile): string => {
+  if (!profile.location) return "";
+  return `${profile.location.city}, ${profile.location.state}`;
+};
+
+// Helper to get location context for prompts
+const getLocationContext = (profile: UserProfile): string => {
+  const location = getLocationString(profile);
+  if (!location) return "";
+  return `\n**Location:** ${location} (provide locally relevant advice, competitors, and resources when applicable)`;
+};
+
 // ============================================================================
 // VIABILITY REPORT PROMPT (from viability-scoring skill)
 // Calibrated by commitment level:
@@ -90,6 +103,28 @@ Return a JSON object with this structure:
   "risks": ["Watch out for this — here's how to handle it", "Another thing to watch for — solution"],
   "opportunities": ["Could grow into this"],
   "viabilityScore": 8.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 8,
+      "explanation": "People love community events — easy to get neighbors interested"
+    },
+    "competitionLevel": {
+      "score": 9,
+      "explanation": "No one else is doing this in your area right now"
+    },
+    "feasibility": {
+      "score": 8,
+      "explanation": "You can pull this off with just a few hours of planning"
+    },
+    "revenuePotential": {
+      "score": 7,
+      "explanation": "Not about money — but could get sponsors later if you wanted"
+    },
+    "impactPotential": {
+      "score": 9,
+      "explanation": "Real connections between neighbors = real community building"
+    }
+  },
   "verdict": "go",
   "recommendation": "YES — do it! Here's how to get people to show up: [specific practical advice like 'text 10 friends personally, post on Nextdoor, pick a specific date']"
 }
@@ -98,12 +133,15 @@ Return a JSON object with this structure:
 ## Important
 - verdict should almost always be "go" for simple community projects — the bar is "will people show up?" not "will this scale?"
 - viabilityScore should be 7-9 for most valid weekend projects
+- scoreBreakdown explanations should be simple, friendly, jargon-free (one sentence each)
 - recommendation should focus on HOW TO GET PEOPLE TO SHOW UP, not strategy
 - Keep everything short and jargon-free
 - Return ONLY valid JSON`;
 }
 
 function generateSteadyViabilityPrompt(idea: Idea, profile: UserProfile, causes: string): string {
+  const locationContext = getLocationContext(profile);
+
   return `You help people evaluate ongoing volunteer projects. Give them a simple scorecard — green/yellow/red — with clear next steps.
 
 ## The Project
@@ -118,15 +156,16 @@ function generateSteadyViabilityPrompt(idea: Idea, profile: UserProfile, causes:
 
 **Experience:** ${profile.experience || "beginner"}
 **Budget:** ${profile.budget || "zero"}
-**Causes:** ${causes}
+**Causes:** ${causes}${locationContext}
 
 ## Evaluation (Simplified)
 
-Score these 4 factors as green (strong), yellow (needs work), or red (problem):
-1. **People need this** — Is there real demand?
-2. **You can deliver** — Do you have the skills/resources?
-3. **It can keep going** — Is it sustainable without burnout?
-4. **You're right for this** — Do you have the connections/experience?
+Score these 5 factors from 1-10 with a one-sentence explanation:
+1. **Market Opportunity** — Is there real demand for this?
+2. **Competition Level** — How crowded is this space? (higher = less competition = better)
+3. **Feasibility** — Can you realistically pull this off?
+4. **Revenue Potential** — Can this sustain itself financially?
+5. **Impact Potential** — Will this create meaningful change?
 
 ## Output Format (JSON)
 
@@ -153,6 +192,28 @@ Score these 4 factors as green (strong), yellow (needs work), or red (problem):
   "risks": ["Risk — how to mitigate it"],
   "opportunities": ["Growth opportunity"],
   "viabilityScore": 7.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 7,
+      "explanation": "Clear need exists, but awareness is still building"
+    },
+    "competitionLevel": {
+      "score": 8,
+      "explanation": "Few organizations doing this well in your area"
+    },
+    "feasibility": {
+      "score": 7,
+      "explanation": "Achievable with your current skills and resources"
+    },
+    "revenuePotential": {
+      "score": 6,
+      "explanation": "Will need creative funding strategies"
+    },
+    "impactPotential": {
+      "score": 8,
+      "explanation": "Direct, measurable improvement for beneficiaries"
+    }
+  },
   "verdict": "refine",
   "recommendation": "Overall verdict with 2-3 specific things to do before launching. Be direct: 'GO' means proceed, 'WORK ON IT' means fix these specific things first, 'RETHINK' means major issues."
 }
@@ -160,12 +221,15 @@ Score these 4 factors as green (strong), yellow (needs work), or red (problem):
 
 ## Notes
 - viabilityScore: 8+ = GO, 6-7.9 = WORK ON IT (refine), below 6 = RETHINK (pivot)
+- Each scoreBreakdown explanation should be one clear, jargon-free sentence
 - Keep language accessible, no MBA jargon
 - Focus on practical next steps
 - Return ONLY valid JSON`;
 }
 
 function generateAllInViabilityPrompt(idea: Idea, profile: UserProfile, ventureType: string, causes: string): string {
+  const locationContext = getLocationContext(profile);
+
   return `You are a social venture analyst specializing in early-stage viability assessment. Evaluate this social impact idea and deliver an honest, actionable verdict.
 
 ## The Idea to Evaluate
@@ -183,7 +247,7 @@ function generateAllInViabilityPrompt(idea: Idea, profile: UserProfile, ventureT
 **Causes:** ${causes}
 **Experience Level:** ${profile.experience || "beginner"}
 **Budget:** ${profile.budget || "zero"}
-**Format:** ${profile.format || "both"}
+**Format:** ${profile.format || "both"}${locationContext}
 
 ## Evaluation Framework
 
@@ -222,6 +286,28 @@ Return a JSON object with this structure:
   "risks": ["Risk 1", "Risk 2", "Risk 3"],
   "opportunities": ["Opportunity 1", "Opportunity 2", "Opportunity 3"],
   "viabilityScore": 7.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 7.5,
+      "explanation": "Growing market with increasing awareness and policy support"
+    },
+    "competitionLevel": {
+      "score": 6.5,
+      "explanation": "Moderate competition exists but differentiation opportunities remain"
+    },
+    "feasibility": {
+      "score": 7.0,
+      "explanation": "Achievable with current resources; some skill gaps to address"
+    },
+    "revenuePotential": {
+      "score": 6.0,
+      "explanation": "Multiple revenue streams possible but require validation"
+    },
+    "impactPotential": {
+      "score": 8.5,
+      "explanation": "Strong potential for measurable, meaningful change"
+    }
+  },
   "verdict": "go",
   "recommendation": "Strategic recommendation and critical next steps (3-4 sentences)"
 }
@@ -229,7 +315,8 @@ Return a JSON object with this structure:
 
 ## Notes
 - Include 2-4 competitors (can be similar initiatives, not just direct competitors)
-- viabilityScore should be weighted: (Demand × 0.25) + (Impact × 0.25) + (Fit × 0.20) + (Feasibility × 0.15) + (Sustainability × 0.15)
+- viabilityScore should be weighted average of the 5 dimension scores
+- scoreBreakdown: each explanation should be one clear, specific sentence
 - verdict must be one of: "go" (score 8+), "refine" (score 6-7.9), or "pivot" (score below 6)
 - Be honest but encouraging — a "refine" verdict with clear steps is valuable
 - Return ONLY valid JSON, no markdown formatting`;
@@ -328,6 +415,7 @@ Return the same structure but with DRAMATICALLY simplified content:
 
 function generateSteadyPlanPrompt(idea: Idea, profile: UserProfile): string {
   const causes = getCauseLabels(idea.causeAreas);
+  const locationContext = getLocationContext(profile);
 
   return `You create 3-page starter plans for ongoing volunteer projects. Structured but accessible.
 
@@ -343,7 +431,7 @@ function generateSteadyPlanPrompt(idea: Idea, profile: UserProfile): string {
 
 **Experience:** ${profile.experience || "beginner"}
 **Budget:** ${profile.budget || "zero"}
-**Causes:** ${causes}
+**Causes:** ${causes}${locationContext}
 
 ## Your Job
 
@@ -403,6 +491,7 @@ function generateAllInPlanPrompt(idea: Idea, profile: UserProfile): string {
   const isProject = ventureType === "project";
   const isNonprofit = ventureType === "nonprofit";
   const isBusiness = ventureType === "business";
+  const locationContext = getLocationContext(profile);
 
   return `You are a social venture planning expert. Create a comprehensive, actionable business plan tailored to this specific venture.
 
@@ -421,7 +510,7 @@ function generateAllInPlanPrompt(idea: Idea, profile: UserProfile): string {
 **Causes:** ${causes}
 **Experience Level:** ${profile.experience || "beginner"} ${profile.experience === "beginner" ? "(Include more explanation, simpler projections, focus on Year 1)" : ""}
 **Budget:** ${profile.budget || "zero"} ${profile.budget === "zero" ? "(Volunteer-based model, in-kind resources, lean operations)" : ""}
-**Format:** ${profile.format || "both"}
+**Format:** ${profile.format || "both"}${locationContext}
 
 ## Output Format (JSON)
 
@@ -621,6 +710,7 @@ Write the core messages they need to recruit volunteers and participants for an 
 function generateAllInMarketingPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
   const causes = getCauseLabels(idea.causeAreas);
+  const locationContext = getLocationContext(profile);
 
   return `You are a direct response copywriter specialized in cause-driven organizations. Create compelling marketing assets that convert interest into action.
 
@@ -636,7 +726,7 @@ function generateAllInMarketingPrompt(idea: Idea, profile: UserProfile): string 
 ## User Context
 
 **Venture Type:** ${ventureType}
-**Causes:** ${causes}
+**Causes:** ${causes}${locationContext}
 
 ## Copy Philosophy
 
@@ -810,6 +900,8 @@ Create a simple day-by-day checklist leading up to the event/project. This shoul
 }
 
 function generateSteadyRoadmapPrompt(idea: Idea, profile: UserProfile): string {
+  const locationContext = getLocationContext(profile);
+
   return `You create 4-week launch plans for ongoing community projects. Realistic for someone with a few hours a week.
 
 ## The Project
@@ -821,7 +913,7 @@ function generateSteadyRoadmapPrompt(idea: Idea, profile: UserProfile): string {
 ## User Context
 
 **Experience:** ${profile.experience || "beginner"}
-**Budget:** ${profile.budget || "zero"}
+**Budget:** ${profile.budget || "zero"}${locationContext}
 
 ## Your Job
 
@@ -918,6 +1010,7 @@ function generateAllInRoadmapPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
   const causes = getCauseLabels(idea.causeAreas);
   const budget = profile.budget || "zero";
+  const locationContext = getLocationContext(profile);
 
   return `You are a launch strategist for social impact ventures. Create a clear, actionable roadmap that removes "now what?" paralysis.
 
@@ -936,7 +1029,7 @@ function generateAllInRoadmapPrompt(idea: Idea, profile: UserProfile): string {
 **Causes:** ${causes}
 **Experience Level:** ${profile.experience || "beginner"}
 **Budget:** ${budget}
-**Format:** ${profile.format || "both"}
+**Format:** ${profile.format || "both"}${locationContext}
 
 ## Budget Calibration
 ${budget === "zero" ? "- Personal outreach heavy, focus on friends/family/network, free tools only" : ""}

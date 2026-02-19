@@ -180,6 +180,7 @@ export default function ProjectPage() {
     const profile: UserProfile = project.profile || {
       ventureType: null,
       format: null,
+      location: null,
       causes: [],
       experience: null,
       budget: null,
@@ -282,6 +283,7 @@ export default function ProjectPage() {
       const profile: UserProfile = project.profile || {
         ventureType: null,
         format: null,
+        location: null,
         causes: [],
         experience: null,
         budget: null,
@@ -411,6 +413,7 @@ export default function ProjectPage() {
   const profile: UserProfile = project.profile || {
     ventureType: null,
     format: null,
+    location: null,
     causes: [],
     experience: null,
     budget: null,

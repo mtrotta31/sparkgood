@@ -153,13 +153,19 @@ export async function POST(request: NextRequest) {
         try {
           const primaryCause = idea.causeAreas?.[0] || profile.causes?.[0] || "social impact";
 
+          // Format location string if provided
+          const locationString = profile.location
+            ? `${profile.location.city}, ${profile.location.state}`
+            : undefined;
+
           // Step 1: Market research via Perplexity (BLOCKING)
           const marketResearch = await conductMarketResearch(
             idea.name,
             idea.tagline,
             primaryCause,
             profile.ventureType || "project",
-            profile.format || "both"
+            profile.format || "both",
+            locationString
           );
 
           cachedData.marketResearch = marketResearch;
@@ -433,6 +439,28 @@ function getMockViability(_idea: Idea, _profile: UserProfile): ViabilityReport {
       "Municipal support for community resilience",
     ],
     viabilityScore: 7.8,
+    scoreBreakdown: {
+      marketOpportunity: {
+        score: 8.0,
+        explanation: "Growing demand for sharing economy solutions, especially post-pandemic"
+      },
+      competitionLevel: {
+        score: 7.5,
+        explanation: "Existing players focus on specific niches, leaving room for differentiation"
+      },
+      feasibility: {
+        score: 7.0,
+        explanation: "Achievable with low-tech approach, but requires community organizing skills"
+      },
+      revenuePotential: {
+        score: 6.5,
+        explanation: "Multiple revenue streams possible but will need validation"
+      },
+      impactPotential: {
+        score: 9.0,
+        explanation: "Strong environmental and community-building impact potential"
+      }
+    },
     verdict: "refine",
     recommendation:
       "Strong concept with clear demand. Before building any technology, validate with a manual pilot: create a shared Google Sheet for one apartment building or block, recruit 10 founding members, and facilitate 20 successful shares. This will reveal trust mechanisms and operational needs. The 7.8 score reflects solid fundamentals with execution risks that can be mitigated through careful piloting.",
@@ -880,6 +908,28 @@ function getMockWeekendViability(_idea: Idea): ViabilityReport {
     ],
     opportunities: ["Could become a monthly thing", "Might inspire others to start their own"],
     viabilityScore: 9.0,
+    scoreBreakdown: {
+      marketOpportunity: {
+        score: 9.0,
+        explanation: "Everyone wants cleaner parks — easy to get people interested"
+      },
+      competitionLevel: {
+        score: 9.5,
+        explanation: "No one else is doing this in your neighborhood"
+      },
+      feasibility: {
+        score: 9.0,
+        explanation: "Just show up with trash bags — couldn't be simpler"
+      },
+      revenuePotential: {
+        score: 7.0,
+        explanation: "Not about money, but sponsors might chip in for supplies"
+      },
+      impactPotential: {
+        score: 9.0,
+        explanation: "Visible before/after impact plus community connections"
+      }
+    },
     verdict: "go",
     recommendation:
       "YES — do it! Here's how to get 10 people: Text 15 friends personally ('Hey, doing a park cleanup Saturday 9am, want to come? Coffee after.'). Post on Nextdoor with specific date/time/location. That's it. You'll get 5-10 people.",
@@ -940,6 +990,28 @@ function getMockSteadyViability(_idea: Idea, _profile: UserProfile): ViabilityRe
       "Could become a registered nonprofit eventually",
     ],
     viabilityScore: 7.5,
+    scoreBreakdown: {
+      marketOpportunity: {
+        score: 8.5,
+        explanation: "High demand for free tutoring in most communities"
+      },
+      competitionLevel: {
+        score: 8.0,
+        explanation: "Paid options exist but free programs are rare"
+      },
+      feasibility: {
+        score: 7.0,
+        explanation: "Doable but requires consistent tutor recruitment"
+      },
+      revenuePotential: {
+        score: 6.0,
+        explanation: "Grant funding possible once established"
+      },
+      impactPotential: {
+        score: 8.5,
+        explanation: "Direct, measurable improvement in student outcomes"
+      }
+    },
     verdict: "refine",
     recommendation:
       "WORK ON IT — Solid foundation, but secure these before launching: (1) Reserve a consistent weekly time slot at the library, (2) Recruit 2 committed tutors besides yourself, (3) Connect with one school counselor who can refer students. Once those three things are done, you're ready to start.",

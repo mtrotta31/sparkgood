@@ -183,6 +183,7 @@ function extractCompetitorNames(text: string): string[] {
 /**
  * Conduct comprehensive market research for a social impact idea
  * Uses SIMPLE search queries like a user would type into Google
+ * Location parameter adds geographic context when provided
  */
 export async function conductMarketResearch(
   ideaName: string,
@@ -190,22 +191,27 @@ export async function conductMarketResearch(
   causeArea: string,
   ventureType: string,
   format: string,
-  _location: string = "United States"
+  location?: string
 ): Promise<MarketResearchData> {
   // Extract key terms from the idea for simple searches
   const keyTerms = extractKeyTerms(ideaDescription, causeArea);
   const businessType = ventureType === 'business' ? 'companies' :
     ventureType === 'nonprofit' ? 'nonprofits' : 'organizations';
 
+  // Add location context if provided and format is local/in-person
+  const locationContext = location && format !== 'online' ? ` ${location}` : '';
+  const localPrefix = location && format !== 'online' ? `${location} ` : '';
+
   // SIMPLE queries - like what a user would actually Google
+  // Add location to queries when relevant
   const queries = [
-    // Query 1: Search the idea description directly
-    ideaDescription,
+    // Query 1: Search the idea description directly (with location if local)
+    `${ideaDescription}${locationContext}`,
 
-    // Query 2: Find actual competitors/similar companies
-    `${keyTerms} ${businessType}`,
+    // Query 2: Find actual competitors/similar companies (local if relevant)
+    `${localPrefix}${keyTerms} ${businessType}`,
 
-    // Query 3: Simple market query
+    // Query 3: Simple market query (national context is usually better for trends)
     `${keyTerms} market size trends`,
   ];
 

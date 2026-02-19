@@ -7,6 +7,8 @@ import ViabilityReport from "./ViabilityReport";
 import BusinessPlanView from "./BusinessPlanView";
 import MarketingAssetsView from "./MarketingAssetsView";
 import ActionRoadmapView from "./ActionRoadmapView";
+import ConfirmDialog from "./ConfirmDialog";
+import LaunchKitModal from "./LaunchKitModal";
 import type {
   Idea,
   UserProfile,
@@ -14,6 +16,7 @@ import type {
   BusinessPlan,
   MarketingAssets,
   ActionRoadmap,
+  LaunchKit,
 } from "@/types";
 
 type TabId = "viability" | "plan" | "marketing" | "roadmap";
@@ -76,6 +79,16 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+
+  // Regenerate confirmation dialog state
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+  const [tabToRegenerate, setTabToRegenerate] = useState<TabId | null>(null);
+
+  // Launch Kit modal state
+  const [showLaunchKit, setShowLaunchKit] = useState(false);
+  const [launchKit, setLaunchKit] = useState<LaunchKit | null>(null);
+  const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
+  const [launchKitError, setLaunchKitError] = useState<string | null>(null);
 
   // Content state for each section
   const [viability, setViability] = useState<ViabilityReportType | null>(null);
@@ -213,6 +226,99 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
       fetchContent(activeTab);
     }
   }, [activeTab, fetchContent, hasContent]);
+
+  // Handle regenerate request - shows confirmation dialog
+  const handleRegenerateRequest = useCallback((tabId: TabId) => {
+    setTabToRegenerate(tabId);
+    setShowRegenerateConfirm(true);
+  }, []);
+
+  // Confirm regeneration - clears content and refetches
+  const handleRegenerateConfirm = useCallback(async () => {
+    if (!tabToRegenerate) return;
+
+    // Close dialog
+    setShowRegenerateConfirm(false);
+
+    // Clear the content for this tab
+    switch (tabToRegenerate) {
+      case "viability":
+        setViability(null);
+        break;
+      case "plan":
+        setPlan(null);
+        break;
+      case "marketing":
+        setMarketing(null);
+        break;
+      case "roadmap":
+        setRoadmap(null);
+        break;
+    }
+
+    // Remove from fetched and saved tracking so it will re-fetch
+    fetchedTabs.current.delete(tabToRegenerate);
+    savedTabs.current.delete(tabToRegenerate);
+
+    // Fetch new content
+    await fetchContent(tabToRegenerate);
+
+    setTabToRegenerate(null);
+  }, [tabToRegenerate, fetchContent]);
+
+  // Cancel regeneration
+  const handleRegenerateCancel = useCallback(() => {
+    setShowRegenerateConfirm(false);
+    setTabToRegenerate(null);
+  }, []);
+
+  // Get tab label for dialog
+  const getTabLabel = (tabId: TabId): string => {
+    switch (tabId) {
+      case "viability":
+        return "viability analysis";
+      case "plan":
+        return "business plan";
+      case "marketing":
+        return "marketing assets";
+      case "roadmap":
+        return "action roadmap";
+    }
+  };
+
+  // Generate Launch Kit
+  const handleGenerateLaunchKit = useCallback(async () => {
+    setShowLaunchKit(true);
+    setLaunchKitError(null);
+
+    // If we already have a launch kit, just show it
+    if (launchKit) {
+      return;
+    }
+
+    setIsGeneratingLaunchKit(true);
+
+    try {
+      const response = await fetch("/api/launch-kit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idea, profile }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setLaunchKit(result.data);
+      } else {
+        setLaunchKitError(result.error || "Failed to generate launch kit");
+      }
+    } catch (err) {
+      console.error("Error generating launch kit:", err);
+      setLaunchKitError("Something went wrong. Please try again.");
+    } finally {
+      setIsGeneratingLaunchKit(false);
+    }
+  }, [idea, profile, launchKit]);
 
   // Auto-save results when logged in and content is loaded
   useEffect(() => {
@@ -362,6 +468,18 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
                   Saved
                 </span>
               )}
+              {/* Generate Launch Kit Button */}
+              <button
+                onClick={handleGenerateLaunchKit}
+                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium
+                  bg-gradient-to-r from-spark to-accent text-charcoal-dark hover:opacity-90 transition-all duration-200 hover:scale-105"
+                title="Generate complete marketing package"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="hidden sm:inline">Launch Kit</span>
+              </button>
               {/* Download PDF Button */}
               <button
                 onClick={downloadPDF}
@@ -500,6 +618,20 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
 
         {content && !isLoading && (
           <FadeIn duration={400}>
+            {/* Regenerate Button */}
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => handleRegenerateRequest(activeTab)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-warmwhite-muted hover:text-warmwhite
+                  bg-charcoal-light hover:bg-charcoal-light/80 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Regenerate
+              </button>
+            </div>
+
             {activeTab === "viability" && viability && (
               <ViabilityReport report={viability} />
             )}
@@ -515,6 +647,27 @@ export default function DeepDiveSection({ idea, profile, onBack, profileId }: De
           </FadeIn>
         )}
       </div>
+
+      {/* Regenerate Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showRegenerateConfirm}
+        title="Regenerate content?"
+        message={`This will replace your current ${tabToRegenerate ? getTabLabel(tabToRegenerate) : "content"} with fresh AI-generated content. This cannot be undone.`}
+        confirmText="Regenerate"
+        cancelText="Keep Current"
+        onConfirm={handleRegenerateConfirm}
+        onCancel={handleRegenerateCancel}
+      />
+
+      {/* Launch Kit Modal */}
+      <LaunchKitModal
+        isOpen={showLaunchKit}
+        onClose={() => setShowLaunchKit(false)}
+        launchKit={launchKit}
+        isLoading={isGeneratingLaunchKit}
+        error={launchKitError}
+        ideaName={idea.name}
+      />
     </div>
   );
 }
