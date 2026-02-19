@@ -9,7 +9,7 @@ export interface PendingSessionState {
   profile: UserProfile;
   ideas: Idea[];
   selectedIdeaId: string | null;
-  pendingAction: "deep_dive" | "save_ideas" | null;
+  pendingAction: "deep_dive" | "launch_kit" | "save_ideas" | null;
   timestamp: number;
 }
 

@@ -2,6 +2,8 @@
 // Generates landing page HTML, 4 social posts, 3-email sequence, and elevator pitch
 
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { hasDeepDiveAccess, hasLaunchKitAccess, type SubscriptionTier } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import type {
   UserProfile,
@@ -223,6 +225,60 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Missing required fields: idea or profile",
       });
+    }
+
+    // ========================================================================
+    // CREDIT/ACCESS CHECK: Verify user has paid for this Launch Kit
+    // ========================================================================
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json<ApiResponse<LaunchKit>>({
+        success: false,
+        error: "Authentication required",
+      }, { status: 401 });
+    }
+
+    // Get user's credits and purchases
+    const { data: credits } = await supabase
+      .from("user_credits")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    // Check access using the stripe helper functions
+    const tier = (credits?.subscription_tier || "free") as SubscriptionTier;
+    const isActive = credits?.subscription_status === "active";
+    const deepDiveCredits = credits?.deep_dive_credits_remaining || 0;
+    const launchKitCredits = credits?.launch_kit_credits_remaining || 0;
+    const purchases = credits?.one_time_purchases || [];
+
+    // For subscriptions, must be active
+    const effectiveTier = isActive ? tier : "free";
+
+    // First check if they have deep dive access (required for launch kit)
+    const canAccessDeepDive = hasDeepDiveAccess(
+      effectiveTier,
+      deepDiveCredits,
+      purchases,
+      idea.id
+    );
+
+    // Then check launch kit access
+    const canAccessLaunchKit = hasLaunchKitAccess(
+      effectiveTier,
+      launchKitCredits,
+      purchases,
+      idea.id,
+      canAccessDeepDive
+    );
+
+    if (!canAccessLaunchKit) {
+      return NextResponse.json<ApiResponse<LaunchKit>>({
+        success: false,
+        error: "Payment required. Please purchase the Launch Kit add-on or subscribe to access.",
+      }, { status: 403 });
     }
 
     // Check for API key

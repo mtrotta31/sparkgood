@@ -84,8 +84,9 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   // Credits and access control
-  const { hasDeepDiveAccess, refetch: refetchCredits, loading: creditsLoading } = useCredits();
+  const { hasDeepDiveAccess, hasLaunchKitAccess, refetch: refetchCredits, loading: creditsLoading } = useCredits();
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showLaunchKitPurchaseModal, setShowLaunchKitPurchaseModal] = useState(false);
   const [hasUnlockedAccess, setHasUnlockedAccess] = useState(false);
 
   // Regenerate confirmation dialog state
@@ -354,7 +355,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
     }
   };
 
-  // Generate Launch Kit
+  // Generate Launch Kit (called after access is verified)
   const handleGenerateLaunchKit = useCallback(async () => {
     setShowLaunchKit(true);
     setLaunchKitError(null);
@@ -387,6 +388,20 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
       setIsGeneratingLaunchKit(false);
     }
   }, [idea, profile, launchKit]);
+
+  // Handle Launch Kit button click - checks payment first
+  const handleLaunchKitClick = useCallback(() => {
+    // Check if user has access to launch kit for this idea
+    const canAccess = hasLaunchKitAccess(idea.id);
+
+    if (canAccess) {
+      // User has access - generate or show launch kit
+      handleGenerateLaunchKit();
+    } else {
+      // User needs to purchase - show purchase modal
+      setShowLaunchKitPurchaseModal(true);
+    }
+  }, [idea.id, hasLaunchKitAccess, handleGenerateLaunchKit]);
 
   // Auto-save results when logged in and content is loaded
   useEffect(() => {
@@ -538,7 +553,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
               )}
               {/* Generate Launch Kit Button */}
               <button
-                onClick={handleGenerateLaunchKit}
+                onClick={handleLaunchKitClick}
                 className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium
                   bg-gradient-to-r from-spark to-accent text-charcoal-dark hover:opacity-90 transition-all duration-200 hover:scale-105"
                 title="Generate complete marketing package"
@@ -812,6 +827,25 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
             ideas,
             selectedIdeaId: idea.id,
             pendingAction: "deep_dive",
+          });
+        }}
+      />
+
+      {/* Purchase Modal for Launch Kit */}
+      <PurchaseModal
+        isOpen={showLaunchKitPurchaseModal}
+        onClose={() => setShowLaunchKitPurchaseModal(false)}
+        ideaId={idea.id}
+        ideaName={idea.name}
+        purchaseType="launch_kit"
+        hasDeepDive={hasUnlockedAccess}
+        onBeforeRedirect={() => {
+          // Save session state before redirecting to Stripe
+          savePendingSession({
+            profile,
+            ideas,
+            selectedIdeaId: idea.id,
+            pendingAction: "launch_kit",
           });
         }}
       />
