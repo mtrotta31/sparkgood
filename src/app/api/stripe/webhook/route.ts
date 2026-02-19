@@ -111,64 +111,88 @@ async function handleCheckoutComplete(
   const purchaseType = session.metadata?.purchase_type;
   const ideaId = session.metadata?.idea_id;
 
+  console.log(`[webhook] checkout.session.completed - metadata:`, {
+    userId,
+    purchaseType,
+    ideaId,
+  });
+
   if (!userId) {
-    console.error("No user_id in session metadata");
+    console.error("[webhook] No user_id in session metadata");
     return;
   }
 
-  console.log(`Processing checkout: ${purchaseType} for user ${userId}`);
+  // For one-time purchases, record the purchase
+  if (purchaseType === "deep_dive" || purchaseType === "launch_kit") {
+    if (!ideaId) {
+      console.error(`[webhook] No idea_id for ${purchaseType} purchase`);
+      return;
+    }
 
-  // Get current credits
-  const { data: credits, error: creditsError } = await supabase
-    .from("user_credits")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
+    // Determine the purchase key to add
+    const purchaseKey = purchaseType === "launch_kit" ? `launch_kit_${ideaId}` : ideaId;
 
-  if (creditsError && creditsError.code !== "PGRST116") {
-    console.error("Error fetching credits:", creditsError);
+    console.log(`[webhook] Recording purchase: ${purchaseKey} for user ${userId}`);
+
+    // First, ensure the user_credits row exists
+    const { data: existingCredits, error: fetchError } = await supabase
+      .from("user_credits")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      console.error("[webhook] Error fetching credits:", fetchError);
+      return;
+    }
+
+    if (!existingCredits) {
+      // Create new row with the purchase
+      const { error: insertError } = await supabase.from("user_credits").insert({
+        user_id: userId,
+        subscription_tier: "free",
+        subscription_status: "none",
+        deep_dive_credits_remaining: 0,
+        launch_kit_credits_remaining: 0,
+        one_time_purchases: [purchaseKey],
+      });
+
+      if (insertError) {
+        console.error("[webhook] Error inserting credits:", insertError);
+        return;
+      }
+
+      console.log(`[webhook] Created new credits row with purchase: ${purchaseKey}`);
+    } else {
+      // Update existing row - append to array if not already present
+      const currentPurchases: string[] = existingCredits.one_time_purchases || [];
+
+      if (currentPurchases.includes(purchaseKey)) {
+        console.log(`[webhook] Purchase ${purchaseKey} already recorded, skipping`);
+        return;
+      }
+
+      const updatedPurchases = [...currentPurchases, purchaseKey];
+
+      const { error: updateError } = await supabase
+        .from("user_credits")
+        .update({ one_time_purchases: updatedPurchases })
+        .eq("user_id", userId);
+
+      if (updateError) {
+        console.error("[webhook] Error updating purchases:", updateError);
+        return;
+      }
+
+      console.log(`[webhook] Updated purchases to:`, updatedPurchases);
+    }
+
     return;
   }
 
-  const currentPurchases = credits?.one_time_purchases || [];
-
-  switch (purchaseType) {
-    case "deep_dive":
-      if (ideaId && !currentPurchases.includes(ideaId)) {
-        await supabase.from("user_credits").upsert({
-          user_id: userId,
-          one_time_purchases: [...currentPurchases, ideaId],
-          subscription_tier: credits?.subscription_tier || "free",
-          subscription_status: credits?.subscription_status || "none",
-          deep_dive_credits_remaining: credits?.deep_dive_credits_remaining || 0,
-          launch_kit_credits_remaining: credits?.launch_kit_credits_remaining || 0,
-        });
-        console.log(`Added deep dive purchase for idea ${ideaId}`);
-      }
-      break;
-
-    case "launch_kit":
-      if (ideaId) {
-        const launchKitKey = `launch_kit_${ideaId}`;
-        if (!currentPurchases.includes(launchKitKey)) {
-          await supabase.from("user_credits").upsert({
-            user_id: userId,
-            one_time_purchases: [...currentPurchases, launchKitKey],
-            subscription_tier: credits?.subscription_tier || "free",
-            subscription_status: credits?.subscription_status || "none",
-            deep_dive_credits_remaining: credits?.deep_dive_credits_remaining || 0,
-            launch_kit_credits_remaining: credits?.launch_kit_credits_remaining || 0,
-          });
-          console.log(`Added launch kit purchase for idea ${ideaId}`);
-        }
-      }
-      break;
-
-    // Subscriptions are handled by subscription.created event
-    case "spark_subscription":
-    case "ignite_subscription":
-      console.log(`Subscription checkout complete: ${purchaseType}`);
-      break;
+  // Subscriptions are handled by subscription.created event
+  if (purchaseType === "spark_subscription" || purchaseType === "ignite_subscription") {
+    console.log(`[webhook] Subscription checkout complete: ${purchaseType}`);
   }
 }
 
