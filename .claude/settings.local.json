@@ -35,7 +35,8 @@
       "Bash(node --check:*)",
       "Bash(npm run seed:directory:*)",
       "Bash(npm run enrich:directory:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node -e:*)"
     ]
   },
   "enabledMcpjsonServers": [
