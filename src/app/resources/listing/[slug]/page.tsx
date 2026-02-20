@@ -14,6 +14,9 @@ import {
   type SBADetails,
 } from "@/types/resources";
 import ResourceListingCard from "@/components/resources/ResourceListingCard";
+import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
+import NewsletterSignup from "@/components/newsletter/NewsletterSignup";
+import Footer from "@/components/ui/Footer";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -130,6 +133,9 @@ export default async function ListingPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-charcoal-dark">
+      {/* Schema.org Structured Data */}
+      <ResourceStructuredData listing={listing as ResourceListing} />
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal-dark/90 backdrop-blur-sm border-b border-warmwhite/5">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -568,6 +574,13 @@ export default async function ListingPage({ params }: PageProps) {
                     </svg>
                   </Link>
                 </div>
+
+                {/* Newsletter Signup */}
+                <NewsletterSignup
+                  city={listing.city || undefined}
+                  state={listing.state || undefined}
+                  category={categoryInfo?.name.toLowerCase()}
+                />
               </div>
             </aside>
           </div>
@@ -601,22 +614,7 @@ export default async function ListingPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-warmwhite/10 bg-charcoal-dark">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkGood
-              </span>
-            </Link>
-            <p className="text-warmwhite-dim text-sm">© 2026 SparkGood</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

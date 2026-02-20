@@ -12,6 +12,8 @@ import {
 } from "@/types/resources";
 import ResourceListingCard from "@/components/resources/ResourceListingCard";
 import CategoryFilters from "@/components/resources/CategoryFilters";
+import NewsletterSignup from "@/components/newsletter/NewsletterSignup";
+import Footer from "@/components/ui/Footer";
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -255,6 +257,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                     </svg>
                   </Link>
                 </div>
+
+                {/* Newsletter Signup */}
+                <div className="mt-6">
+                  <NewsletterSignup category={categoryInfo.name.toLowerCase()} />
+                </div>
               </div>
             </aside>
 
@@ -288,22 +295,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-warmwhite/10 bg-charcoal-dark">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkGood
-              </span>
-            </Link>
-            <p className="text-warmwhite-dim text-sm">© 2026 SparkGood</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
