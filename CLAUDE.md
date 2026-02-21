@@ -33,12 +33,15 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Individual Project Pages** (`/projects/[id]`) — View saved deep dive results
 
 ### Resource Directory (Fully Functional)
-- **Main Directory** (`/resources`) — Browse by category with search
-- **Category Pages** (`/resources/[category]`) — List all resources in a category with filters
-- **Location Pages** (`/resources/[category]/[location]`) — SEO-optimized local pages (e.g., "Grants in Austin, TX")
-- **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details
+- **Main Directory** (`/resources`) — Homepage with hero, city search, animated stats, top cities grid, category cards
+- **Category Pages** (`/resources/[category]`) — List all resources with filters, location sidebar with accurate local counts
+- **City Hub Pages** (`/resources/[city-slug]`) — SEO-optimized city pages (e.g., `/resources/austin-tx`) showing all resources grouped by category
+- **Location Pages** (`/resources/[category]/[location]`) — Category + location pages (e.g., "Grants in Austin, TX")
+- **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details with structured data
+- **URL Slug Aliases** — Supports common variations (`/resources/grants` → `/resources/grant`, etc.)
 - **Resource Matching API** — Matches resources to user's idea based on category, location, business type
-- **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages
+- **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages (includes city hub pages)
+- **Light Theme** — Directory uses warm cream/white theme (separate from dark builder theme)
 - **Stats:** 2,400+ listings across 275 cities
 
 ### Authentication & User Data
@@ -211,12 +214,23 @@ welcome → business_category → venture_type → format → location → cause
 
 ## Design System
 
-### Colors
+### Dark Theme (Builder, Main App)
 - **Spark (Primary):** `#F59E0B` (amber)
 - **Accent:** `#F97316` (orange)
 - **Charcoal Dark:** `#1C1412` (background)
 - **Charcoal:** `#2A2220` (cards)
 - **Warmwhite:** `#FBF7F4` (text)
+
+### Light Theme (Resource Directory)
+- **Cream:** `#FAFAF8` (background)
+- **Cream Dark:** `#F5F5F3` (secondary background)
+- **Slate Dark:** `#1E293B` (text)
+- **Warm Shadows:** Custom shadow utilities (`shadow-warm`, `shadow-warm-md`, etc.)
+- **Category Accent Colors:**
+  - Grant: Forest green (`#16A34A`)
+  - Coworking: Warm blue (`#2563EB`)
+  - Accelerator: Burnt orange (`#EA580C`)
+  - SBA: Brick red (`#DC2626`)
 
 ### Typography
 - **Display:** Playfair Display (serif)
@@ -228,8 +242,19 @@ Located in `src/components/`:
 - `steps/` — Builder flow step components
 - `results/` — Idea cards, result displays
 - `deep-dive/` — Deep dive section components
-- `resources/` — Resource directory components
+- `resources/` — Resource directory components (see below)
 - `auth/` — Authentication modals
+
+### Resource Directory Components (`src/components/resources/`)
+- `DirectoryNav.tsx` — Light-themed navigation bar
+- `DirectoryFooter.tsx` — Light-themed footer
+- `ResourceCard.tsx` — Main resource card (category-aware styling)
+- `ResourceListingCardLight.tsx` — Compact resource card for lists
+- `CityHubContent.tsx` — City hub page content (grouped by category)
+- `CitySearch.tsx` — City autocomplete search component
+- `AnimatedCounter.tsx` — Animated stats counter
+- `NewsletterSignupLight.tsx` — Light-themed newsletter signup
+- `CategoryFiltersLight.tsx` — Filter bar for category pages
 
 ## File Structure
 
@@ -249,7 +274,13 @@ sparklocal/
 │   │   ├── builder/             # Main builder flow
 │   │   ├── pricing/             # Pricing page
 │   │   ├── projects/            # User projects
-│   │   ├── resources/           # Resource directory
+│   │   ├── resources/           # Resource directory (light theme via layout.tsx)
+│   │   │   ├── layout.tsx       # Light theme wrapper
+│   │   │   ├── page.tsx         # Main directory homepage
+│   │   │   ├── [category]/      # Category OR city hub pages
+│   │   │   │   ├── page.tsx     # Handles both category and city-slug routes
+│   │   │   │   └── [location]/  # Category + location pages
+│   │   │   └── listing/[slug]/  # Individual listing pages
 │   │   ├── sitemap.ts           # Dynamic sitemap
 │   │   └── robots.ts            # Robots.txt
 │   ├── components/
@@ -263,7 +294,8 @@ sparklocal/
 │   │   │   ├── CauseSelect.tsx       # Social enterprise path
 │   │   │   └── ...                   # Common steps
 │   │   ├── deep-dive/           # Deep dive & launch kit components
-│   │   ├── resources/           # Directory components
+│   │   ├── resources/           # Directory components (see Design System)
+│   │   ├── seo/                 # SEO components (structured data)
 │   │   ├── auth/                # Auth components
 │   │   └── PurchaseModal.tsx    # Stripe checkout modal
 │   ├── contexts/                # React contexts (Auth)
@@ -273,6 +305,9 @@ sparklocal/
 │   │   ├── sessionState.ts      # Session persistence with migration
 │   │   ├── supabase.ts          # Supabase client
 │   │   ├── stripe.ts            # Stripe utilities
+│   │   ├── format-amount.ts     # Currency formatting ($5M, $25K, etc.)
+│   │   ├── format-description.ts # Clean up listing descriptions
+│   │   ├── formatHours.ts       # Parse hours JSONB to readable format
 │   │   └── ...
 │   ├── prompts/                 # AI prompt templates
 │   │   ├── idea-generation.ts   # Supports both business paths
@@ -293,6 +328,26 @@ sparklocal/
 │       └── 20240222_add_business_category_fields.sql  # Business category support
 └── public/                      # Static assets
 ```
+
+## Utility Functions (`src/lib/`)
+
+### `format-amount.ts`
+Currency formatting for grant/accelerator amounts:
+- `formatAmount(5000000)` → `"$5M"`
+- `formatAmount(25000)` → `"$25K"`
+- `formatAmount(500)` → `"$500"`
+- `formatAmount(0)` → `null` (hides $0 values)
+- `formatAmountRange(10000, 50000)` → `"$10K - $50K"`
+- `formatAmountRange(null, 100000)` → `"Up to $100K"`
+
+### `formatHours.ts`
+Parse hours JSONB from database into readable format:
+- `formatHours({ "Monday": ["9AM-5PM"], "Tuesday": ["9AM-5PM"], ... })` → `"Mon-Fri: 9AM-5PM"`
+- Groups consecutive days with same hours
+- Also includes `getOpenStatus()` to check if currently open
+
+### `format-description.ts`
+Clean up listing descriptions by removing boilerplate text.
 
 ## Development Commands
 
@@ -343,8 +398,14 @@ The core product is fully functional with payments:
 - ✅ PDF export
 - ✅ User auth & saved projects
 - ✅ Resource directory with SEO (2,400+ listings)
+- ✅ Directory redesign with light theme (premium feel)
+- ✅ City hub pages for SEO (`/resources/austin-tx`)
+- ✅ City search with autocomplete
+- ✅ Animated stats counters
+- ✅ Location sidebar with accurate local-only counts
+- ✅ URL slug aliases for categories
 - ✅ Matched resources in deep dive
-- ✅ Dynamic sitemap
+- ✅ Dynamic sitemap (includes city hub pages)
 - ✅ Stripe payments (subscriptions + one-time purchases)
 - ✅ Pricing page with 3 tiers
 - ✅ Credits system with server-side verification
