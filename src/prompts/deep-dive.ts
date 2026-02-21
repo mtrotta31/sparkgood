@@ -2362,7 +2362,7 @@ export function generateChecklistPrompt(
 
 ## Business Overview
 - **Idea:** ${idea.name}
-- **Description:** ${idea.description}
+- **Description:** ${idea.tagline}
 - **Category:** ${category}
 - **Location:** ${location || "Not specified"}
 - **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
@@ -2446,15 +2446,23 @@ export function generateFoundationPrompt(
   // Format research data if available
   let researchContext = "";
   if (researchData) {
+    const marketAnalysis = researchData.marketResearch?.answer || "No market analysis available.";
+    const competitorList = researchData.competitors?.map(c =>
+      `- ${c.title}: ${c.url} — ${c.description || "No description"}`
+    ).join("\n") || "No competitors scraped.";
+    const sourceList = researchData.marketResearch?.sources?.map(s =>
+      `- [${s.title}](${s.url})`
+    ).join("\n") || "No sources available.";
+
     researchContext = `
 ## Live Market Research (Perplexity-Powered)
-${researchData.marketAnalysis || "No market analysis available."}
+${marketAnalysis}
 
 ### Competitor Data (Firecrawl-Scraped)
-${researchData.competitors?.map(c => `- ${c.name}: ${c.url} — ${c.description || "No description"}`).join("\n") || "No competitors scraped."}
+${competitorList}
 
 ### Sources
-${researchData.sources?.map(s => `- ${s}`).join("\n") || "No sources available."}
+${sourceList}
 `;
   }
 
@@ -2462,7 +2470,7 @@ ${researchData.sources?.map(s => `- ${s}`).join("\n") || "No sources available."
 
 ## Business Overview
 - **Idea:** ${idea.name}
-- **Description:** ${idea.description}
+- **Description:** ${idea.tagline}
 - **Category:** ${category}
 - **Location:** ${location || "Not specified"}
 - **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
@@ -2602,7 +2610,7 @@ export function generateGrowthPrompt(
 
 ## Business Overview
 - **Idea:** ${idea.name}
-- **Description:** ${idea.description}
+- **Description:** ${idea.tagline}
 - **Category:** ${category}
 - **Location:** ${location || "Not specified"}
 - **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
@@ -2748,7 +2756,7 @@ export function generateFinancialPrompt(
 
 ## Business Overview
 - **Idea:** ${idea.name}
-- **Description:** ${idea.description}
+- **Description:** ${idea.tagline}
 - **Category:** ${category}
 - **Location:** ${location || "Not specified"}
 - **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
