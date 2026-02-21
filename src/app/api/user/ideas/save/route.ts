@@ -80,9 +80,22 @@ export async function POST(request: Request) {
 
     if (existingIdea) {
       console.log("[save-idea] Idea already saved:", { savedId: existingIdea.id });
+
+      // Fetch existing checklist progress from deep_dive_results
+      const { data: deepDiveData } = await supabase
+        .from("deep_dive_results")
+        .select("checklist_progress")
+        .eq("idea_id", existingIdea.id)
+        .eq("user_id", user.id)
+        .single();
+
       return NextResponse.json({
         success: true,
-        data: { savedId: existingIdea.id, alreadySaved: true },
+        data: {
+          savedId: existingIdea.id,
+          alreadySaved: true,
+          checklistProgress: deepDiveData?.checklist_progress || null,
+        },
       });
     }
 
