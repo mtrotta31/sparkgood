@@ -64,7 +64,7 @@ export async function generateMetadata({
     ? `in ${listing.city}, ${listing.state}`
     : "";
 
-  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs | SparkLocal`;
+  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs`;
 
   const description = listing.short_description ||
     `${listing.name} is a ${categoryName} ${location} for entrepreneurs. Learn about eligibility, how to apply, and more.`;

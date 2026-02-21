@@ -1,0 +1,880 @@
+[    6933ms] [WARNING] Skipping auto-scroll behavior due to `position: sticky` or `position: fixed` on element: JSHandle@node @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/layout-router.js:109
+[   60085ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 |   // Count by category per city
+ 334 |   localListings?.forEach((listing) => {
+     `----
+
+Import trace for requested module:
+./src/app/resources/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[   60728ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 |   // Count by category per city
+ 334 |   localListings?.forEach((listing) => {
+     `----
+
+Import trace for requested module:
+./src/app/resources/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[   60755ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/resources/new-york-ny?_rsc=lpy26:0
+[   60777ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/resources/new-york-ny:0
+[   60932ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 |   // Count by category per city
+ 334 |   localListings?.forEach((listing) => {
+     `----
+
+    at processResult (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:400590)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:402302)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   60931ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 |   // Count by category per city
+ 334 |   localListings?.forEach((listing) => {
+     `---- @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   67061ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `----
+
+Import trace for requested module:
+./src/app/resources/page.tsx @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   67070ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/webpack/8748c6fadbe96e16.webpack.hot-update.json:0
+[   67071ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/pages/hot-reloader-client.js:347
+[   67098ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/resources/new-york-ny:0
+[   67176ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `----
+
+    at processResult (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:400590)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:402302)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   67177ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `---- @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   67220ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `----
+
+Import trace for requested module:
+./src/app/resources/page.tsx @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   67268ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `----
+
+Import trace for requested module:
+./src/app/resources/page.tsx @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   67276ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/webpack/8748c6fadbe96e16.webpack.hot-update.json:0
+[   67276ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/pages/hot-reloader-client.js:347
+[   67276ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/favicon.ico:0
+[   67296ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/resources/new-york-ny:0
+[   67368ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `----
+
+    at processResult (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:400590)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/webpack/bundle5.js:28:402302)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Users/matthewtrotta/sparkgood/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[   67369ms] [ERROR] ./src/app/resources/page.tsx
+Error: 
+  x the name `cityCategoryCounts` is defined multiple times
+     ,-[/Users/matthewtrotta/sparkgood/src/app/resources/page.tsx:270:1]
+ 270 | 
+ 271 |   // Get LOCAL resource counts per city (exclude nationwide resources)
+ 272 |   // Query resource_listings directly to ensure we only count local resources
+ 273 |   const cityCategoryCounts: Record<
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- previous definition of `cityCategoryCounts` here
+ 274 |     string,
+ 275 |     { grant: number; coworking: number; accelerator: number; sba: number }
+ 276 |   > = {};
+ 277 | 
+ 278 |   // Initialize all cities with zero counts
+ 279 |   topCities.forEach((city) => {
+ 280 |     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 281 |   });
+ 282 | 
+ 283 |   // Build a map of city+state to location ID for lookup
+ 284 |   const cityStateToId = new Map<string, string>();
+ 285 |   topCities.forEach((c) => {
+ 286 |     cityStateToId.set(`${c.city}|${c.state}`, c.id);
+ 287 |   });
+ 288 | 
+ 289 |   // Fetch LOCAL listings for all top cities
+ 290 |   // We query each city individually to ensure accurate counts matching city hub pages
+ 291 |   const localListingCounts: Record<string, Record<string, number>> = {};
+ 292 | 
+ 293 |   // Initialize counts for all cities
+ 294 |   topCities.forEach((city) => {
+ 295 |     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+ 296 |   });
+ 297 | 
+ 298 |   // Query listings for each city to get accurate counts
+ 299 |   // This matches the exact query used by city hub pages
+ 300 |   await Promise.all(
+ 301 |     topCities.map(async (city) => {
+ 302 |       const { count } = await supabase
+ 303 |         .from("resource_listings")
+ 304 |         .select("*", { count: "exact", head: true })
+ 305 |         .eq("is_active", true)
+ 306 |         .eq("city", city.city)
+ 307 |         .eq("state", city.state)
+ 308 |         .eq("is_remote", false)
+ 309 |         .or("is_nationwide.eq.false,is_nationwide.is.null");
+ 310 | 
+ 311 |       // Also get counts per category
+ 312 |       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+ 313 |       await Promise.all(
+ 314 |         categories.map(async (cat) => {
+ 315 |           const { count: catCount } = await supabase
+ 316 |             .from("resource_listings")
+ 317 |             .select("*", { count: "exact", head: true })
+ 318 |             .eq("is_active", true)
+ 319 |             .eq("city", city.city)
+ 320 |             .eq("state", city.state)
+ 321 |             .eq("is_remote", false)
+ 322 |             .or("is_nationwide.eq.false,is_nationwide.is.null")
+ 323 |             .eq("category", cat);
+ 324 |           localListingCounts[city.id][cat] = catCount || 0;
+ 325 |         })
+ 326 |       );
+ 327 |     })
+ 328 |   );
+ 329 | 
+ 330 |   // Use the accurate counts
+ 331 |   const cityCategoryCounts = localListingCounts;
+     :         ^^^^^^^^^|^^^^^^^^
+     :                  `-- `cityCategoryCounts` redefined here
+ 332 | 
+ 333 | 
+ 334 |   // Calculate totals
+     `---- @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/internal/helpers/hydration-error-info.js:62
+[   73267ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/webpack/8748c6fadbe96e16.webpack.hot-update.json:0
+[   73267ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///./node_modules/next/dist/client/components/react-dev-overlay/pages/hot-reloader-client.js:347

@@ -195,17 +195,21 @@ const CATEGORY_STYLES: Record<
 export default async function CityHubContent({ location }: CityHubContentProps) {
   const supabase = await createClient();
 
-  // Get all listings for this city
-  const { data: allListings } = await supabase
+  // Get LOCAL listings for this city only (is_remote=false, is_nationwide=false or null)
+  // This matches the homepage query logic for consistent counts
+  const { data: localListings } = await supabase
     .from("resource_listings")
     .select("*")
     .eq("is_active", true)
     .eq("city", location.city)
     .eq("state", location.state)
+    .eq("is_remote", false)
+    .or("is_nationwide.eq.false,is_nationwide.is.null")
     .order("is_featured", { ascending: false })
-    .order("name");
+    .order("name")
+    .limit(2000);
 
-  // Get nationwide/remote listings too
+  // Get nationwide/remote listings separately (shown in a different section)
   const { data: nationwideListings } = await supabase
     .from("resource_listings")
     .select("*")
@@ -217,7 +221,7 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
 
   // Group listings by category
   const listingsByCategory: Record<string, ResourceListing[]> = {};
-  allListings?.forEach((listing) => {
+  localListings?.forEach((listing) => {
     if (!listingsByCategory[listing.category]) {
       listingsByCategory[listing.category] = [];
     }
@@ -244,7 +248,7 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
     .sort((a, b) => b.count - a.count);
 
   // Calculate totals
-  const totalListings = allListings?.length || 0;
+  const totalListings = localListings?.length || 0;
 
   // Build category summary string
   const categorySummary = categorySections

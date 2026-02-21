@@ -148,7 +148,7 @@ export async function generateMetadata({
     .single();
 
   if (location) {
-    const title = `Business Resources in ${location.city}, ${location.state} | Grants, Coworking & More | SparkLocal`;
+    const title = `Business Resources in ${location.city}, ${location.state} | Grants, Coworking & More`;
     const description = `Find ${location.listing_count} business resources in ${location.city}, ${location.state}. Browse coworking spaces, grants, accelerators, and free SBA mentorship to help launch your business.`;
 
     return {

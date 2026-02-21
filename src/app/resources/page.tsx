@@ -13,7 +13,7 @@ import AnimatedCounter from "@/components/resources/AnimatedCounter";
 import NewsletterSignupLight from "@/components/resources/NewsletterSignupLight";
 
 export const metadata: Metadata = {
-  title: "Business Resources Directory | Find Grants, Coworking & More | SparkLocal",
+  title: "Business Resources Directory | Find Grants, Coworking & More",
   description:
     "Find 2,400+ business resources across 275 cities. Browse grants, coworking spaces, accelerators, and free SBA mentorship to launch your business.",
   keywords: [
@@ -151,15 +151,16 @@ function CityCard({
   city,
   state,
   slug,
-  listingCount,
   categoryCounts,
 }: {
   city: string;
   state: string;
   slug: string;
-  listingCount: number;
   categoryCounts: { grant: number; coworking: number; accelerator: number; sba: number };
 }) {
+  // Calculate total from local category counts for consistency
+  const localTotal = categoryCounts.grant + categoryCounts.coworking + categoryCounts.accelerator + categoryCounts.sba;
+
   return (
     <Link
       href={`/resources/${slug}`}
@@ -172,7 +173,7 @@ function CityCard({
           </h3>
           <p className="text-slate-500 text-sm">{state}</p>
         </div>
-        <span className="text-2xl font-bold text-spark">{listingCount}</span>
+        <span className="text-2xl font-bold text-spark">{localTotal}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {categoryCounts.grant > 0 && (
@@ -267,45 +268,51 @@ export default async function ResourcesPage() {
     categoryCounts[result.slug] = result.count;
   });
 
-  // Get LOCAL resource counts per city (exclude nationwide resources)
-  // Query resource_listings directly to ensure we only count local resources
-  const cityCategoryCounts: Record<
-    string,
-    { grant: number; coworking: number; accelerator: number; sba: number }
-  > = {};
 
-  // Initialize all cities with zero counts
+  // Fetch LOCAL listings for all top cities
+  // We query each city individually to ensure accurate counts matching city hub pages
+  const localListingCounts: Record<string, Record<string, number>> = {};
+
+  // Initialize counts for all cities
   topCities.forEach((city) => {
-    cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+    localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
   });
 
-  // Build a map of city+state to location ID for lookup
-  const cityStateToId = new Map<string, string>();
-  topCities.forEach((c) => {
-    cityStateToId.set(`${c.city}|${c.state}`, c.id);
-  });
+  // Query listings for each city to get accurate counts
+  // This matches the exact query used by city hub pages
+  await Promise.all(
+    topCities.map(async (city) => {
+      const { count } = await supabase
+        .from("resource_listings")
+        .select("*", { count: "exact", head: true })
+        .eq("is_active", true)
+        .eq("city", city.city)
+        .eq("state", city.state)
+        .eq("is_remote", false)
+        .or("is_nationwide.eq.false,is_nationwide.is.null");
 
-  // Fetch local listings for all top cities in one query
-  // Include resources that have a matching city, regardless of is_nationwide flag
-  // (some local SBA resources like "SCORE Denver" have is_nationwide=true incorrectly)
-  const { data: localListings } = await supabase
-    .from("resource_listings")
-    .select("category, city, state")
-    .eq("is_active", true)
-    .eq("is_remote", false)
-    .in("city", topCities.map((c) => c.city));
+      // Also get counts per category
+      const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+      await Promise.all(
+        categories.map(async (cat) => {
+          const { count: catCount } = await supabase
+            .from("resource_listings")
+            .select("*", { count: "exact", head: true })
+            .eq("is_active", true)
+            .eq("city", city.city)
+            .eq("state", city.state)
+            .eq("is_remote", false)
+            .or("is_nationwide.eq.false,is_nationwide.is.null")
+            .eq("category", cat);
+          localListingCounts[city.id][cat] = catCount || 0;
+        })
+      );
+    })
+  );
 
-  // Count by category per city
-  localListings?.forEach((listing) => {
-    if (!listing.city || !listing.state) return;
-    const locationId = cityStateToId.get(`${listing.city}|${listing.state}`);
-    if (locationId && cityCategoryCounts[locationId]) {
-      const cat = listing.category as keyof typeof cityCategoryCounts[string];
-      if (cat in cityCategoryCounts[locationId]) {
-        cityCategoryCounts[locationId][cat]++;
-      }
-    }
-  });
+  // Use the accurate counts
+  const cityCategoryCounts = localListingCounts;
+
 
   // Calculate totals
   const totalListings = totalListingCount || 0;
@@ -395,7 +402,6 @@ export default async function ResourcesPage() {
                   city={city.city}
                   state={city.state}
                   slug={city.slug}
-                  listingCount={city.listing_count}
                   categoryCounts={cityCategoryCounts[city.id]}
                 />
               ))}
