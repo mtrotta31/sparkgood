@@ -22,12 +22,13 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
   - **General Business Path:** Business category → Target customer → Business model → Key skills → Location → Experience → Budget → Commitment → Depth → Ideas
   - **Social Enterprise Path:** Business category (Social Enterprise) → Venture type → Format → Location → Causes → Experience → Budget → Commitment → Depth → Ideas
 - **Idea Generation** — AI generates 4 tailored business concepts based on user profile
-- **Deep Dive V2** — Premium 5-tab experience (current version):
-  - **"🚀 Launch Checklist"** — 4-week action plan with 16 prioritized tasks, time/cost estimates, checkable progress
+- **Deep Dive V2** — Premium 6-tab experience (current version):
   - **"🏗️ Business Foundation"** — Viability score (0-100), market research (TAM/SAM/SOM), competitor analysis, legal structure, startup costs, suppliers, tech stack, insurance
+  - **"🚀 Launch Checklist"** — 4-week action plan with 16 prioritized tasks, time/cost estimates, checkable progress
   - **"📈 Growth Plan"** — Elevator pitch, landing page copy, social media posts (5 platforms), email templates, local marketing tactics
   - **"💰 Financial Model"** — Startup costs breakdown, monthly operating costs, revenue projections (3 scenarios), break-even analysis, pricing strategy
-  - **"💬 AI Advisor"** — Placeholder for future AI chat feature
+  - **"📍 Local Resources"** — Matched grants, accelerators, coworking spaces, and SBA resources for user's city
+  - **"💬 AI Advisor"** — Streaming chat with personalized AI business consultant that knows the user's full plan, profile, and local resources
 - **Deep Dive V1** (legacy, still supported for existing projects):
   - **"Will This Work?"** — Viability analysis with scoring breakdown, competitors, market research
   - **"Your Game Plan"** — Complete business/project plan with financials
@@ -96,9 +97,11 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Idea Generation & Deep Dive
 - `POST /api/generate-ideas` — Generate 4 ideas from user profile (supports both paths)
 - `POST /api/deep-dive` — Generate viability, plan, marketing, or roadmap content
+- `POST /api/deep-dive/resources` — Match local resources to user's idea
 - `POST /api/launch-kit` — Generate complete launch kit
 - `POST /api/build-asset` — Build specific assets (pitch deck, landing page, etc.)
 - `POST /api/export-pdf` — Generate downloadable PDF
+- `GET/POST /api/chat-advisor` — AI Advisor chat (GET: load messages, POST: send message with streaming response)
 
 ### User Data
 - `GET/POST /api/user/profile` — User preferences
@@ -145,7 +148,10 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `BusinessFoundationData` — marketViability (score, factors), legalStructure, startupCosts, suppliers, techStack, insurance
 - `GrowthPlanData` — elevatorPitch, landingPageCopy, socialMediaPosts, emailTemplates, localMarketing
 - `FinancialModelData` — startupCostsSummary, monthlyOperatingCosts, revenueProjections, breakEvenAnalysis, pricingStrategy
+- `LocalResourcesData` — Matched resources by category (coworking, grants, accelerators, sba) with relevance notes
 - `ChecklistProgress` — Record of task IDs to boolean completion status
+- `AdvisorMessage` — Chat message (id, role, content, created_at)
+- `AdvisorContext` — Full context for AI advisor (profile, idea, checklist, foundation, growth, financial)
 
 ### Deep Dive V1 Types (legacy)
 - `ViabilityReport` — Market research, competitor analysis, viability score
@@ -160,7 +166,8 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `saved_ideas` — Generated ideas linked to profiles (idea_data JSONB, is_selected, profile_id)
 - `deep_dive_results` — Deep dive content linked to saved_ideas by idea_id
   - V1 fields: `viability`, `business_plan`, `marketing`, `roadmap`
-  - V2 fields: `checklist`, `foundation`, `growth`, `financial`, `checklist_progress`
+  - V2 fields: `checklist`, `foundation`, `growth`, `financial`, `matched_resources`, `checklist_progress`, `advisor_message_count`
+- `advisor_messages` — AI Advisor chat history (project_id, user_id, role, content, created_at)
 
 ### Payments Tables
 - `user_credits` — Subscription tier, status, credits remaining, one-time purchases
@@ -266,6 +273,8 @@ Located in `src/components/`:
   - `BusinessFoundation.tsx` — Renders V2 market research, legal, costs
   - `GrowthPlan.tsx` — Renders V2 marketing content with copy buttons
   - `FinancialModel.tsx` — Renders V2 financial projections
+  - `LocalResources.tsx` — Renders matched local resources by category
+  - `AIAdvisor.tsx` — Streaming chat UI with the AI business advisor
 - `deep-dive/` — Deep dive section components
   - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (5 tabs)
   - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
@@ -296,6 +305,7 @@ sparklocal/
 │   │   ├── api/                 # All API routes
 │   │   │   ├── generate-ideas/
 │   │   │   ├── deep-dive/
+│   │   │   ├── chat-advisor/    # AI Advisor streaming chat
 │   │   │   ├── launch-kit/
 │   │   │   ├── stripe/          # Checkout & webhook
 │   │   │   ├── resources/
@@ -355,7 +365,11 @@ sparklocal/
 │       ├── 002_resource_directory.sql
 │       ├── 20240220_create_user_credits.sql
 │       ├── 20240221_create_newsletter_subscribers.sql
-│       └── 20240222_add_business_category_fields.sql  # Business category support
+│       ├── 20240222_add_business_category_fields.sql  # Business category support
+│       ├── 20240223_add_checklist_progress.sql        # Checklist progress tracking
+│       ├── 20240224_add_deep_dive_v2_columns.sql      # V2 deep dive columns
+│       ├── 20240225_add_matched_resources_column.sql  # Local resources column
+│       └── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
 └── public/                      # Static assets
 ```
 
@@ -430,7 +444,7 @@ The core product is fully functional with payments:
 - ✅ Business category selection (10 categories)
 - ✅ Conditional routing based on category
 - ✅ Idea generation (calibrated to business type)
-- ✅ Deep Dive V2 (5 tabs: Checklist, Foundation, Growth, Financial, AI Advisor)
+- ✅ Deep Dive V2 (6 tabs: Foundation, Checklist, Growth, Financial, Local Resources, AI Advisor)
 - ✅ Deep Dive V1 (legacy support for existing projects)
 - ✅ Auto-save deep dive content with proper JSON key conversion
 - ✅ Launch kit generation with payment gates
@@ -443,7 +457,8 @@ The core product is fully functional with payments:
 - ✅ Animated stats counters
 - ✅ Location sidebar with accurate local-only counts
 - ✅ URL slug aliases for categories
-- ✅ Matched resources in deep dive
+- ✅ Matched resources in deep dive (Local Resources tab)
+- ✅ AI Advisor chat with streaming responses (20 messages per project)
 - ✅ Dynamic sitemap (includes city hub pages)
 - ✅ Stripe payments (subscriptions + one-time purchases)
 - ✅ Pricing page with 3 tiers
@@ -488,3 +503,11 @@ The core product is fully functional with payments:
 2. Deep dive content auto-saves to `deep_dive_results` using `savedIdeaId` as `idea_id`
 3. Duplicate detection checks both idea ID and name+tagline
 4. When opening saved project, content passed as props to avoid regeneration
+
+### AI Advisor
+- Uses Claude Sonnet with streaming responses via Server-Sent Events (SSE)
+- System prompt includes full business context: idea, profile, checklist, foundation, growth, financial, and matched resources
+- Messages persisted to `advisor_messages` table for conversation continuity
+- Usage tracked via `advisor_message_count` on `deep_dive_results` (20 messages per deep dive purchase)
+- Advisor persona: practical, specific, references user's actual plan/city/budget/resources by name
+- Requires `savedIdeaId` to function (user must be logged in with saved project)
