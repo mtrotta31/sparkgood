@@ -36,7 +36,9 @@
       "Bash(npm run seed:directory:*)",
       "Bash(npm run enrich:directory:*)",
       "Bash(git commit:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npx vercel:*)",
+      "mcp__playwright__browser_navigate"
     ]
   },
   "enabledMcpjsonServers": [

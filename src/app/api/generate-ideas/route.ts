@@ -1,43 +1,65 @@
 // API route for idea generation
-// Takes user profile and generates 4 social impact ideas using Claude
+// Takes user profile and generates 4 business ideas using Claude
+// Supports both Social Enterprise and General Business paths
 
 import { NextRequest, NextResponse } from "next/server";
 import { sendMessageForJSON } from "@/lib/claude";
-import { generateIdeaPrompt, SYSTEM_PROMPT } from "@/prompts/idea-generation";
+import { generateIdeaPrompt, SYSTEM_PROMPT, SOCIAL_ENTERPRISE_SYSTEM_PROMPT } from "@/prompts/idea-generation";
 import type { UserProfile, Idea, ApiResponse } from "@/types";
 
 // Raw idea format from Claude (before we add IDs)
+// Supports fields from both social enterprise and general business paths
 interface RawIdea {
   id?: string;
   name: string;
   tagline: string;
   problem: string;
   audience: string;
-  mechanism: string;
-  sustainability: string;
-  impact: string;
-  whyNow: string;
-  firstStep: string;
+  mechanism?: string;
+  sustainability?: string;
+  revenueModel?: string;
+  // Social enterprise fields
+  impact?: string;
+  causeAreas?: string[];
+  // General business fields
+  valueProposition?: string;
+  competitiveAdvantage?: string;
+  businessCategory?: string;
+  whyNow?: string;
+  firstStep?: string;
+}
+
+// Helper to check if this is a social enterprise profile
+function isSocialEnterpriseProfile(profile: UserProfile): boolean {
+  return profile.businessCategory === "social_enterprise";
 }
 
 // Transform raw ideas into our Idea type
 function transformIdeas(rawIdeas: RawIdea[], profile: UserProfile): Idea[] {
+  const isSocialEnterprise = isSocialEnterpriseProfile(profile);
+
   return rawIdeas.map((raw, index) => ({
     id: raw.id || `idea-${Date.now()}-${index}`,
     name: raw.name,
     tagline: raw.tagline,
     problem: raw.problem,
     audience: raw.audience,
-    // Map the raw fields to our Idea type
-    revenueModel:
-      profile.ventureType === "project" ? null : raw.sustainability,
+    // Revenue model - use sustainability for social enterprise, revenueModel for general business
+    revenueModel: isSocialEnterprise
+      ? (profile.ventureType === "project" ? null : raw.sustainability || raw.revenueModel || null)
+      : (raw.revenueModel || raw.sustainability || null),
+    // Social enterprise fields
     impact: raw.impact,
-    causeAreas: profile.causes,
-    // Store additional fields as part of the idea for later use
+    causeAreas: isSocialEnterprise ? (profile.causes || []) : undefined,
+    // General business fields
+    businessCategory: !isSocialEnterprise ? (raw.businessCategory || profile.businessCategory || undefined) : undefined,
+    valueProposition: raw.valueProposition,
+    competitiveAdvantage: raw.competitiveAdvantage,
+    // Extended fields
     mechanism: raw.mechanism,
     whyNow: raw.whyNow,
     firstStep: raw.firstStep,
-  })) as (Idea & { mechanism: string; whyNow: string; firstStep: string })[];
+  })) as (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[];
 }
 
 export async function POST(request: NextRequest) {
@@ -46,12 +68,33 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const profile = body.profile as UserProfile;
 
-    // Validate required fields
-    if (!profile || !profile.ventureType || profile.causes.length === 0) {
+    // Basic validation - need at least a profile with commitment level
+    if (!profile || !profile.commitment) {
       return NextResponse.json<ApiResponse<Idea[]>>({
         success: false,
         error: "Missing required profile fields",
       });
+    }
+
+    // Path-specific validation
+    const isSocialEnterprise = isSocialEnterpriseProfile(profile);
+
+    if (isSocialEnterprise) {
+      // Social enterprise path requires ventureType and causes
+      if (!profile.ventureType || !profile.causes || profile.causes.length === 0) {
+        return NextResponse.json<ApiResponse<Idea[]>>({
+          success: false,
+          error: "Social enterprise requires venture type and cause areas",
+        });
+      }
+    } else {
+      // General business path requires businessCategory
+      if (!profile.businessCategory) {
+        return NextResponse.json<ApiResponse<Idea[]>>({
+          success: false,
+          error: "Please select a business category",
+        });
+      }
     }
 
     // Check for API key
@@ -64,12 +107,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate the prompt
+    // Generate the prompt and select appropriate system prompt
     const prompt = generateIdeaPrompt(profile);
+    const systemPrompt = isSocialEnterprise ? SOCIAL_ENTERPRISE_SYSTEM_PROMPT : SYSTEM_PROMPT;
 
     // Call Claude API
     const rawIdeas = await sendMessageForJSON<RawIdea[]>(prompt, {
-      systemPrompt: SYSTEM_PROMPT,
+      systemPrompt,
       temperature: 0.8, // Slightly higher for creativity
       maxTokens: 4096,
     });
@@ -100,19 +144,90 @@ export async function POST(request: NextRequest) {
 }
 
 // Mock ideas for development when API key is not set
-function getMockIdeas(profile: UserProfile): (Idea & { mechanism: string; whyNow: string; firstStep: string })[] {
-  // Return different ideas based on commitment level
-  if (profile.commitment === "weekend") {
-    return getWeekendWarriorIdeas(profile);
-  } else if (profile.commitment === "steady") {
-    return getSteadyBuilderIdeas(profile);
-  } else {
-    return getAllInIdeas(profile);
+function getMockIdeas(profile: UserProfile): (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[] {
+  const isSocialEnterprise = isSocialEnterpriseProfile(profile);
+
+  // Return different ideas based on path and commitment level
+  if (isSocialEnterprise) {
+    if (profile.commitment === "weekend") {
+      return getWeekendWarriorIdeas(profile);
+    } else if (profile.commitment === "steady") {
+      return getSteadyBuilderIdeas(profile);
+    } else {
+      return getAllInIdeas(profile);
+    }
   }
+
+  // General business mock ideas
+  return getGeneralBusinessMockIdeas(profile);
 }
 
-// Simple, actionable ideas for Weekend Warriors
-function getWeekendWarriorIdeas(profile: UserProfile): (Idea & { mechanism: string; whyNow: string; firstStep: string })[] {
+// General business mock ideas
+function getGeneralBusinessMockIdeas(profile: UserProfile): (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[] {
+  const category = profile.businessCategory || "other";
+
+  return [
+    {
+      id: "mock-1",
+      name: "Local Service Pro",
+      tagline: "Professional services for busy people",
+      problem: "People need reliable local service providers but don't know who to trust.",
+      audience: "Busy professionals and families who value quality and convenience.",
+      revenueModel: "Service-based pricing with premium tiers for rush jobs and ongoing contracts.",
+      businessCategory: category,
+      valueProposition: "Reliable, professional service with transparent pricing and guaranteed satisfaction.",
+      competitiveAdvantage: "Local expertise combined with professional-grade service standards.",
+      mechanism: "Start with one service, build reputation through referrals, expand offerings.",
+      whyNow: "People increasingly value convenience and are willing to pay for quality local services.",
+      firstStep: "Identify your first service offering and reach out to 5 potential customers this week.",
+    },
+    {
+      id: "mock-2",
+      name: "Niche Expertise Shop",
+      tagline: "Specialized products for passionate customers",
+      problem: "Generic retailers don't serve specialized needs well.",
+      audience: "Enthusiasts and hobbyists in your niche who want expert curation.",
+      revenueModel: "Product sales with premium margins on curated selections, plus advisory services.",
+      businessCategory: category,
+      valueProposition: "Expert curation and advice that general retailers can't provide.",
+      competitiveAdvantage: "Deep knowledge and passion that builds customer trust and loyalty.",
+      mechanism: "Start online, build community, consider pop-up or permanent location.",
+      whyNow: "E-commerce makes specialized retail viable without huge inventory investments.",
+      firstStep: "List 20 products you'd stock and identify 3 suppliers this week.",
+    },
+    {
+      id: "mock-3",
+      name: "Knowledge-to-Income",
+      tagline: "Turn what you know into what you earn",
+      problem: "People struggle to learn skills that would advance their careers or lives.",
+      audience: "Motivated learners who want practical skills, not just theory.",
+      revenueModel: "Course sales, coaching packages, and membership for ongoing access.",
+      businessCategory: category,
+      valueProposition: "Practical, results-oriented learning from someone who's done it.",
+      competitiveAdvantage: "Real-world experience and proven results in your specific domain.",
+      mechanism: "Start with 1-on-1 coaching, document your process, create scalable courses.",
+      whyNow: "Online learning is mainstream and people pay premium for specialized expertise.",
+      firstStep: "Define your signature methodology and reach out to 3 potential coaching clients.",
+    },
+    {
+      id: "mock-4",
+      name: "Community Connector",
+      tagline: "Bringing people together around shared interests",
+      problem: "People want community but don't know where to find others like them.",
+      audience: "People seeking connection around a shared interest, identity, or goal.",
+      revenueModel: "Events, memberships, sponsorships, and premium experiences.",
+      businessCategory: category,
+      valueProposition: "Curated community experiences that create real connections.",
+      competitiveAdvantage: "Deep understanding of your community's needs and desires.",
+      mechanism: "Start with free events, build email list, monetize through premium offerings.",
+      whyNow: "Post-pandemic loneliness crisis means people crave community more than ever.",
+      firstStep: "Host one free event this month and collect email addresses from attendees.",
+    },
+  ];
+}
+
+// Simple, actionable ideas for Weekend Warriors (Social Enterprise)
+function getWeekendWarriorIdeas(profile: UserProfile): (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[] {
   return [
     {
       id: "mock-1",
@@ -181,8 +296,8 @@ function getWeekendWarriorIdeas(profile: UserProfile): (Idea & { mechanism: stri
   ];
 }
 
-// Manageable, buildable ideas for Steady Builders
-function getSteadyBuilderIdeas(profile: UserProfile): (Idea & { mechanism: string; whyNow: string; firstStep: string })[] {
+// Manageable, buildable ideas for Steady Builders (Social Enterprise)
+function getSteadyBuilderIdeas(profile: UserProfile): (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[] {
   return [
     {
       id: "mock-1",
@@ -263,8 +378,8 @@ function getSteadyBuilderIdeas(profile: UserProfile): (Idea & { mechanism: strin
   ];
 }
 
-// Ambitious, substantial ideas for All In builders
-function getAllInIdeas(profile: UserProfile): (Idea & { mechanism: string; whyNow: string; firstStep: string })[] {
+// Ambitious, substantial ideas for All In builders (Social Enterprise)
+function getAllInIdeas(profile: UserProfile): (Idea & { mechanism?: string; whyNow?: string; firstStep?: string })[] {
   return [
     {
       id: "mock-1",

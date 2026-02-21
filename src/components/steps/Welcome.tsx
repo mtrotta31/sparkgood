@@ -17,22 +17,15 @@ export default function Welcome({ onNext }: WelcomeProps) {
 
       <FadeIn delay={200} duration={600}>
         <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-warmwhite mb-4 md:mb-6 tracking-tight max-w-3xl leading-tight">
-          Let&apos;s spark something{" "}
-          <span className="text-spark-gradient">good</span> together.
+          Let&apos;s build something{" "}
+          <span className="text-spark-gradient">great</span>.
         </h1>
       </FadeIn>
 
       <FadeIn delay={400} duration={600}>
-        <p className="text-lg md:text-xl text-warmwhite-muted max-w-xl mb-3 md:mb-4 leading-relaxed">
-          You want to make a difference in the world. That&apos;s the hardest
-          part — the caring. Now let&apos;s turn that into action.
-        </p>
-      </FadeIn>
-
-      <FadeIn delay={500} duration={600}>
-        <p className="text-sm md:text-base text-warmwhite-dim mb-8 md:mb-12 max-w-lg">
-          I&apos;ll ask you a few questions to understand what matters to you,
-          then help you find the perfect way to create real impact.
+        <p className="text-lg md:text-xl text-warmwhite-muted max-w-xl mb-8 md:mb-12 leading-relaxed">
+          I&apos;ll ask you a few questions to understand your goals, then help
+          you find the perfect business idea and create a plan to launch it.
         </p>
       </FadeIn>
 

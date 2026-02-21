@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProgressBar, Header } from "@/components/ui";
 import {
   Welcome,
@@ -72,9 +73,38 @@ const initialProfile: UserProfile = {
 // Extended Idea type with additional fields from generation
 type ExtendedIdea = Idea & { mechanism?: string; whyNow?: string; firstStep?: string };
 
+// Loading fallback for Suspense
+function BuilderLoading() {
+  return (
+    <main className="min-h-screen bg-charcoal-dark flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-2 border-spark border-t-transparent animate-spin" />
+    </main>
+  );
+}
+
+// Wrapper component with Suspense for useSearchParams
 export default function BuilderPage() {
-  const [currentStep, setCurrentStep] = useState<StepName>("welcome");
-  const [profile, setProfile] = useState<UserProfile>(initialProfile);
+  return (
+    <Suspense fallback={<BuilderLoading />}>
+      <BuilderContent />
+    </Suspense>
+  );
+}
+
+function BuilderContent() {
+  const searchParams = useSearchParams();
+  const pathParam = searchParams.get("path");
+  const isSocialEnterprisePath = pathParam === "social-enterprise";
+  const hasInitializedPath = useRef(false);
+
+  const [currentStep, setCurrentStep] = useState<StepName>(
+    isSocialEnterprisePath ? "venture_type" : "welcome"
+  );
+  const [profile, setProfile] = useState<UserProfile>({
+    ...initialProfile,
+    // Auto-select social_enterprise if coming from /good
+    businessCategory: isSocialEnterprisePath ? "social_enterprise" : null,
+  });
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Ideas state
@@ -208,6 +238,19 @@ export default function BuilderPage() {
       hasStartedGenerating.current = false;
     }
   }, [currentStep]);
+
+  // Handle social enterprise path from /good
+  useEffect(() => {
+    if (isSocialEnterprisePath && !hasInitializedPath.current) {
+      hasInitializedPath.current = true;
+      // Auto-set social_enterprise and skip to venture_type
+      setProfile((prev) => ({
+        ...prev,
+        businessCategory: "social_enterprise",
+      }));
+      setCurrentStep("venture_type");
+    }
+  }, [isSocialEnterprisePath]);
 
   // Restore session state after Stripe checkout completes
   useEffect(() => {

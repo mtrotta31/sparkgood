@@ -1,0 +1,18 @@
+[    1292ms] [ERROR] Access to font at 'https://sparklocal.co/_next/static/media/13971731025ec697-s.p.woff2' (redirected from 'https://www.sparklocal.co/_next/static/media/13971731025ec697-s.p.woff2') from origin 'https://www.sparklocal.co' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.sparklocal.co/:0
+[    1292ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://sparklocal.co/_next/static/media/13971731025ec697-s.p.woff2:0
+[    1294ms] [ERROR] Access to font at 'https://sparklocal.co/_next/static/media/eaead17c7dbfcd5d-s.p.woff2' (redirected from 'https://www.sparklocal.co/_next/static/media/eaead17c7dbfcd5d-s.p.woff2') from origin 'https://www.sparklocal.co' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.sparklocal.co/:0
+[    1294ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://sparklocal.co/_next/static/media/eaead17c7dbfcd5d-s.p.woff2:0
+[    1792ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/fd9d1056-393f53e329af6bef.js:0
+[    1795ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/782-b86d58a440f6e4c5.js:0
+[    1803ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/css/e919a78ddb6852a3.css:0
+[    1803ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/webpack-733146ef27134d4d.js:0
+[    1815ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/app/layout-b1f7719ae7056143.js:0
+[    1816ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/972-33432e7524e6e2cf.js:0
+[    1816ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:0
+[    1834ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/app/page-6fcbb43bb48053db.js:0
+[    1841ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/main-app-2dcde4753ea0d175.js:0
+[    1874ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/_next/static/chunks/117-1da5c752b3968ac8.js:0
+[    2446ms] [ERROR] Failed to load resource: net::ERR_TOO_MANY_REDIRECTS @ https://www.sparklocal.co/favicon.ico:0
+[    5446ms] [WARNING] The resource https://www.sparklocal.co/_next/static/media/eaead17c7dbfcd5d-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://www.sparklocal.co/:0
+[    5446ms] [WARNING] The resource https://www.sparklocal.co/_next/static/media/13971731025ec697-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://www.sparklocal.co/:0
+[    5446ms] [WARNING] The resource https://www.googletagmanager.com/gtag/js?id=G-3M3X64J7SM was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://www.sparklocal.co/:0

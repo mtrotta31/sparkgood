@@ -13,6 +13,30 @@ export interface PendingSessionState {
   timestamp: number;
 }
 
+// Default values for new profile fields (for migrating old sessions)
+const DEFAULT_PROFILE_FIELDS: Partial<UserProfile> = {
+  businessCategory: null,
+  targetCustomer: null,
+  businessModelPreference: null,
+  keySkills: [],
+};
+
+/**
+ * Migrate old profile format to include new fields
+ * Ensures backwards compatibility with sessions saved before the update
+ */
+function migrateProfile(profile: Partial<UserProfile>): UserProfile {
+  return {
+    // Apply defaults for new fields
+    ...DEFAULT_PROFILE_FIELDS,
+    // Then apply the stored profile (overwriting defaults where values exist)
+    ...profile,
+    // Ensure arrays are always arrays
+    keySkills: profile.keySkills || [],
+    causes: profile.causes || [],
+  } as UserProfile;
+}
+
 /**
  * Save current session state before auth flow
  */
@@ -31,13 +55,14 @@ export function savePendingSession(state: Omit<PendingSessionState, "timestamp">
 /**
  * Load and clear pending session state after auth
  * Returns null if no valid pending session exists
+ * Migrates old profiles to include new fields
  */
 export function loadPendingSession(): PendingSessionState | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
 
-    const data: PendingSessionState = JSON.parse(stored);
+    const data = JSON.parse(stored) as PendingSessionState;
 
     // Check if the session is less than 30 minutes old
     const maxAge = 30 * 60 * 1000; // 30 minutes
@@ -46,7 +71,11 @@ export function loadPendingSession(): PendingSessionState | null {
       return null;
     }
 
-    return data;
+    // Migrate profile to ensure new fields exist
+    return {
+      ...data,
+      profile: migrateProfile(data.profile),
+    };
   } catch (error) {
     console.error("Failed to load pending session:", error);
     return null;
