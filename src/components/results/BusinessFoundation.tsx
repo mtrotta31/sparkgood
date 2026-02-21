@@ -27,27 +27,28 @@ function getScoreBg(score: number): string {
 
 // Viability Score Card
 function ViabilityScoreCard({ score }: { score: number }) {
-  const label = score >= 70 ? "Strong Opportunity" : score >= 50 ? "Moderate Potential" : "Needs Work";
+  const safeScore = score ?? 0;
+  const label = safeScore >= 70 ? "Strong Opportunity" : safeScore >= 50 ? "Moderate Potential" : "Needs Work";
 
   return (
-    <div className={`${getScoreBg(score)} border rounded-2xl p-6 md:p-8`}>
+    <div className={`${getScoreBg(safeScore)} border rounded-2xl p-6 md:p-8`}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
           <div className="flex items-baseline gap-2 mb-2">
-            <span className={`text-5xl md:text-6xl font-bold ${getScoreColor(score)}`}>
-              {score}
+            <span className={`text-5xl md:text-6xl font-bold ${getScoreColor(safeScore)}`}>
+              {safeScore}
             </span>
             <span className="text-warmwhite-dim text-xl">/100</span>
           </div>
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${getScoreBg(score)} border`}>
-            <span className={`font-bold ${getScoreColor(score)}`}>{label}</span>
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${getScoreBg(safeScore)} border`}>
+            <span className={`font-bold ${getScoreColor(safeScore)}`}>{label}</span>
           </div>
         </div>
         <div className="flex-1 max-w-md">
           <p className="text-warmwhite-muted">
-            {score >= 70
+            {safeScore >= 70
               ? "This business idea shows strong market potential. Proceed with confidence."
-              : score >= 50
+              : safeScore >= 50
               ? "This idea has potential but needs refinement in some areas before launching."
               : "Consider addressing the weak areas before investing significant resources."}
           </p>
@@ -58,7 +59,13 @@ function ViabilityScoreCard({ score }: { score: number }) {
 }
 
 // Score Breakdown Table
-function ScoreBreakdownTable({ items }: { items: ViabilityScoreItem[] }) {
+function ScoreBreakdownTable({ items }: { items?: ViabilityScoreItem[] }) {
+  const safeItems = items ?? [];
+
+  if (safeItems.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 overflow-x-auto">
       <h3 className="font-display text-lg font-bold text-warmwhite mb-4 flex items-center gap-2">
@@ -76,13 +83,13 @@ function ScoreBreakdownTable({ items }: { items: ViabilityScoreItem[] }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => (
+          {safeItems.map((item, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
-              <td className="py-3 px-2 text-warmwhite font-medium">{item.factor}</td>
+              <td className="py-3 px-2 text-warmwhite font-medium">{item?.factor ?? "Unknown"}</td>
               <td className="py-3 px-2 text-center">
-                <span className={`font-bold ${getScoreColor(item.score)}`}>{item.score}</span>
+                <span className={`font-bold ${getScoreColor(item?.score ?? 0)}`}>{item?.score ?? 0}</span>
               </td>
-              <td className="py-3 px-2 text-warmwhite-muted">{item.assessment}</td>
+              <td className="py-3 px-2 text-warmwhite-muted">{item?.assessment ?? ""}</td>
             </tr>
           ))}
         </tbody>
@@ -92,7 +99,16 @@ function ScoreBreakdownTable({ items }: { items: ViabilityScoreItem[] }) {
 }
 
 // Market Research Section
-function MarketResearchSection({ data }: { data: BusinessFoundationData["marketViability"]["marketResearch"] }) {
+function MarketResearchSection({ data }: { data?: BusinessFoundationData["marketViability"]["marketResearch"] }) {
+  if (!data) {
+    return null;
+  }
+
+  const trends = data.trends ?? [];
+  const demandSignals = data.demandSignals ?? [];
+  const risks = data.risks ?? [];
+  const sources = data.sources ?? [];
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-6">
       <h3 className="font-display text-lg font-bold text-warmwhite flex items-center gap-2">
@@ -106,60 +122,68 @@ function MarketResearchSection({ data }: { data: BusinessFoundationData["marketV
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bg-charcoal-dark rounded-xl p-4">
           <div className="text-xs text-warmwhite-dim uppercase tracking-wider mb-1">TAM</div>
-          <div className="text-lg font-bold text-warmwhite">{data.tam}</div>
+          <div className="text-lg font-bold text-warmwhite">{data.tam ?? "N/A"}</div>
           <div className="text-xs text-warmwhite-dim">Total Addressable Market</div>
         </div>
         <div className="bg-charcoal-dark rounded-xl p-4">
           <div className="text-xs text-warmwhite-dim uppercase tracking-wider mb-1">SAM</div>
-          <div className="text-lg font-bold text-warmwhite">{data.sam}</div>
+          <div className="text-lg font-bold text-warmwhite">{data.sam ?? "N/A"}</div>
           <div className="text-xs text-warmwhite-dim">Serviceable Available Market</div>
         </div>
         <div className="bg-charcoal-dark rounded-xl p-4">
           <div className="text-xs text-warmwhite-dim uppercase tracking-wider mb-1">SOM</div>
-          <div className="text-lg font-bold text-warmwhite">{data.som}</div>
+          <div className="text-lg font-bold text-warmwhite">{data.som ?? "N/A"}</div>
           <div className="text-xs text-warmwhite-dim">Serviceable Obtainable Market</div>
         </div>
       </div>
 
       {/* Growth Rate */}
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-          <span className="text-sm font-medium text-warmwhite">Industry Growth Rate</span>
+      {data.growthRate && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span className="text-sm font-medium text-warmwhite">Industry Growth Rate</span>
+          </div>
+          <p className="text-warmwhite-muted text-sm">{data.growthRate}</p>
         </div>
-        <p className="text-warmwhite-muted text-sm">{data.growthRate}</p>
-      </div>
+      )}
 
       {/* Trends and Demand Signals */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <h4 className="text-sm font-medium text-warmwhite mb-3">Market Trends</h4>
-          <ul className="space-y-2">
-            {data.trends.map((trend, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
-                <span className="w-1.5 h-1.5 rounded-full bg-spark mt-2 flex-shrink-0" />
-                {trend}
-              </li>
-            ))}
-          </ul>
+      {(trends.length > 0 || demandSignals.length > 0) && (
+        <div className="grid md:grid-cols-2 gap-4">
+          {trends.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-warmwhite mb-3">Market Trends</h4>
+              <ul className="space-y-2">
+                {trends.map((trend, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
+                    <span className="w-1.5 h-1.5 rounded-full bg-spark mt-2 flex-shrink-0" />
+                    {trend}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {demandSignals.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-warmwhite mb-3">Demand Signals</h4>
+              <ul className="space-y-2">
+                {demandSignals.map((signal, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
+                    {signal}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-        <div>
-          <h4 className="text-sm font-medium text-warmwhite mb-3">Demand Signals</h4>
-          <ul className="space-y-2">
-            {data.demandSignals.map((signal, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
-                {signal}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      )}
 
       {/* Risks */}
-      {data.risks.length > 0 && (
+      {risks.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-red-400 mb-3 flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -168,7 +192,7 @@ function MarketResearchSection({ data }: { data: BusinessFoundationData["marketV
             Market Risks
           </h4>
           <ul className="space-y-2">
-            {data.risks.map((risk, i) => (
+            {risks.map((risk, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 flex-shrink-0" />
                 {risk}
@@ -179,11 +203,11 @@ function MarketResearchSection({ data }: { data: BusinessFoundationData["marketV
       )}
 
       {/* Sources */}
-      {data.sources.length > 0 && (
+      {sources.length > 0 && (
         <div className="pt-4 border-t border-warmwhite/10">
           <h4 className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider mb-2">Sources</h4>
           <ul className="flex flex-wrap gap-2">
-            {data.sources.map((source, i) => (
+            {sources.map((source, i) => (
               <li key={i} className="text-xs text-spark bg-spark/10 px-2 py-1 rounded">
                 {source}
               </li>
@@ -196,7 +220,13 @@ function MarketResearchSection({ data }: { data: BusinessFoundationData["marketV
 }
 
 // Competitor Table
-function CompetitorTable({ competitors }: { competitors: CompetitorAnalysisItem[] }) {
+function CompetitorTable({ competitors }: { competitors?: CompetitorAnalysisItem[] }) {
+  const safeCompetitors = competitors ?? [];
+
+  if (safeCompetitors.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 overflow-x-auto">
       <h3 className="font-display text-lg font-bold text-warmwhite mb-4 flex items-center gap-2">
@@ -215,22 +245,24 @@ function CompetitorTable({ competitors }: { competitors: CompetitorAnalysisItem[
           </tr>
         </thead>
         <tbody>
-          {competitors.map((competitor, i) => (
+          {safeCompetitors.map((competitor, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
               <td className="py-3 px-2">
-                <div className="font-medium text-warmwhite">{competitor.name}</div>
-                <a
-                  href={competitor.url.startsWith("http") ? competitor.url : `https://${competitor.url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-spark text-xs hover:underline"
-                >
-                  {competitor.url}
-                </a>
+                <div className="font-medium text-warmwhite">{competitor?.name ?? "Unknown"}</div>
+                {competitor?.url && (
+                  <a
+                    href={competitor.url.startsWith("http") ? competitor.url : `https://${competitor.url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-spark text-xs hover:underline"
+                  >
+                    {competitor.url}
+                  </a>
+                )}
               </td>
-              <td className="py-3 px-2 text-warmwhite-muted">{competitor.pricing}</td>
-              <td className="py-3 px-2 text-warmwhite-muted">{competitor.positioning}</td>
-              <td className="py-3 px-2 text-green-400">{competitor.weakness}</td>
+              <td className="py-3 px-2 text-warmwhite-muted">{competitor?.pricing ?? "N/A"}</td>
+              <td className="py-3 px-2 text-warmwhite-muted">{competitor?.positioning ?? "N/A"}</td>
+              <td className="py-3 px-2 text-green-400">{competitor?.weakness ?? "N/A"}</td>
             </tr>
           ))}
         </tbody>
@@ -240,7 +272,14 @@ function CompetitorTable({ competitors }: { competitors: CompetitorAnalysisItem[
 }
 
 // Legal Structure Section
-function LegalStructureSection({ data }: { data: BusinessFoundationData["legalStructure"] }) {
+function LegalStructureSection({ data }: { data?: BusinessFoundationData["legalStructure"] }) {
+  if (!data) {
+    return null;
+  }
+
+  const registrationSteps = data.registrationSteps ?? [];
+  const licensesRequired = data.licensesRequired ?? [];
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-4">
       <h3 className="font-display text-lg font-bold text-warmwhite flex items-center gap-2">
@@ -252,31 +291,33 @@ function LegalStructureSection({ data }: { data: BusinessFoundationData["legalSt
 
       <div className="bg-charcoal-dark rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-spark font-bold text-lg">{data.recommendedStructure}</span>
-          <span className="text-warmwhite-dim text-sm">Est. Cost: {data.estimatedCost}</span>
+          <span className="text-spark font-bold text-lg">{data.recommendedStructure ?? "LLC"}</span>
+          <span className="text-warmwhite-dim text-sm">Est. Cost: {data.estimatedCost ?? "Varies"}</span>
         </div>
-        <p className="text-warmwhite-muted text-sm">{data.reasoning}</p>
+        {data.reasoning && <p className="text-warmwhite-muted text-sm">{data.reasoning}</p>}
       </div>
 
-      <div>
-        <h4 className="text-sm font-medium text-warmwhite mb-2">Registration Steps</h4>
-        <ol className="space-y-2">
-          {data.registrationSteps.map((step, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm text-warmwhite-muted">
-              <span className="w-6 h-6 rounded-full bg-spark/20 text-spark flex items-center justify-center flex-shrink-0 text-xs font-bold">
-                {i + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ol>
-      </div>
+      {registrationSteps.length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium text-warmwhite mb-2">Registration Steps</h4>
+          <ol className="space-y-2">
+            {registrationSteps.map((step, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm text-warmwhite-muted">
+                <span className="w-6 h-6 rounded-full bg-spark/20 text-spark flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                  {i + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
-      {data.licensesRequired.length > 0 && (
+      {licensesRequired.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-warmwhite mb-2">Licenses Required</h4>
           <ul className="flex flex-wrap gap-2">
-            {data.licensesRequired.map((license, i) => (
+            {licensesRequired.map((license, i) => (
               <li key={i} className="text-xs bg-warmwhite/10 text-warmwhite-muted px-2 py-1 rounded">
                 {license}
               </li>
@@ -285,16 +326,24 @@ function LegalStructureSection({ data }: { data: BusinessFoundationData["legalSt
         </div>
       )}
 
-      <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
-        <h4 className="text-sm font-medium text-spark mb-1">When to Get a Lawyer</h4>
-        <p className="text-warmwhite-muted text-sm">{data.whenToGetLawyer}</p>
-      </div>
+      {data.whenToGetLawyer && (
+        <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
+          <h4 className="text-sm font-medium text-spark mb-1">When to Get a Lawyer</h4>
+          <p className="text-warmwhite-muted text-sm">{data.whenToGetLawyer}</p>
+        </div>
+      )}
     </div>
   );
 }
 
 // Startup Costs Table
-function StartupCostsTable({ items }: { items: StartupCostItem[] }) {
+function StartupCostsTable({ items }: { items?: StartupCostItem[] }) {
+  const safeItems = items ?? [];
+
+  if (safeItems.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 overflow-x-auto">
       <h3 className="font-display text-lg font-bold text-warmwhite mb-4 flex items-center gap-2">
@@ -313,16 +362,16 @@ function StartupCostsTable({ items }: { items: StartupCostItem[] }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => (
+          {safeItems.map((item, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
-              <td className="py-3 px-2 text-warmwhite font-medium">{item.item}</td>
-              <td className="py-3 px-2 text-right text-spark font-medium">{item.cost}</td>
+              <td className="py-3 px-2 text-warmwhite font-medium">{item?.item ?? "Unknown"}</td>
+              <td className="py-3 px-2 text-right text-spark font-medium">{item?.cost ?? "N/A"}</td>
               <td className="py-3 px-2 text-center">
                 <span className="text-xs px-2 py-0.5 rounded-full bg-warmwhite/10 text-warmwhite-dim">
-                  {item.priority}
+                  {item?.priority ?? "N/A"}
                 </span>
               </td>
-              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item.notes}</td>
+              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item?.notes ?? ""}</td>
             </tr>
           ))}
         </tbody>
@@ -332,7 +381,18 @@ function StartupCostsTable({ items }: { items: StartupCostItem[] }) {
 }
 
 // Suppliers Section
-function SuppliersSection({ data }: { data: BusinessFoundationData["suppliers"] }) {
+function SuppliersSection({ data }: { data?: BusinessFoundationData["suppliers"] }) {
+  if (!data) {
+    return null;
+  }
+
+  const platforms = data.platforms ?? [];
+  const evaluationChecklist = data.evaluationChecklist ?? [];
+
+  if (platforms.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-4">
       <h3 className="font-display text-lg font-bold text-warmwhite flex items-center gap-2">
@@ -343,58 +403,72 @@ function SuppliersSection({ data }: { data: BusinessFoundationData["suppliers"] 
       </h3>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {data.platforms.map((platform, i) => (
+        {platforms.map((platform, i) => (
           <a
             key={i}
-            href={platform.url}
+            href={platform?.url ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-charcoal-dark rounded-xl p-4 hover:bg-charcoal-dark/70 transition-colors group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-warmwhite group-hover:text-spark transition-colors">
-                {platform.name}
+                {platform?.name ?? "Unknown"}
               </span>
               <svg className="w-4 h-4 text-warmwhite-dim group-hover:text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </div>
-            <p className="text-warmwhite-muted text-sm mb-2">{platform.description}</p>
-            <span className="text-xs text-spark">Best for: {platform.bestFor}</span>
+            {platform?.description && <p className="text-warmwhite-muted text-sm mb-2">{platform.description}</p>}
+            {platform?.bestFor && <span className="text-xs text-spark">Best for: {platform.bestFor}</span>}
           </a>
         ))}
       </div>
 
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <h4 className="text-sm font-medium text-warmwhite mb-2">Supplier Evaluation Checklist</h4>
-        <ul className="space-y-1">
-          {data.evaluationChecklist.map((item, i) => (
-            <li key={i} className="flex items-center gap-2 text-sm text-warmwhite-muted">
-              <svg className="w-4 h-4 text-spark flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {evaluationChecklist.length > 0 && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <h4 className="text-sm font-medium text-warmwhite mb-2">Supplier Evaluation Checklist</h4>
+          <ul className="space-y-1">
+            {evaluationChecklist.map((item, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm text-warmwhite-muted">
+                <svg className="w-4 h-4 text-spark flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-charcoal-dark rounded-xl p-4">
-          <h4 className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider mb-2">Minimum Orders</h4>
-          <p className="text-warmwhite-muted text-sm">{data.minimumOrderExpectations}</p>
+      {(data.minimumOrderExpectations || data.paymentTermsInfo) && (
+        <div className="grid md:grid-cols-2 gap-4">
+          {data.minimumOrderExpectations && (
+            <div className="bg-charcoal-dark rounded-xl p-4">
+              <h4 className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider mb-2">Minimum Orders</h4>
+              <p className="text-warmwhite-muted text-sm">{data.minimumOrderExpectations}</p>
+            </div>
+          )}
+          {data.paymentTermsInfo && (
+            <div className="bg-charcoal-dark rounded-xl p-4">
+              <h4 className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider mb-2">Payment Terms</h4>
+              <p className="text-warmwhite-muted text-sm">{data.paymentTermsInfo}</p>
+            </div>
+          )}
         </div>
-        <div className="bg-charcoal-dark rounded-xl p-4">
-          <h4 className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider mb-2">Payment Terms</h4>
-          <p className="text-warmwhite-muted text-sm">{data.paymentTermsInfo}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
 // Tech Stack Section
-function TechStackSection({ data }: { data: BusinessFoundationData["techStack"] }) {
+function TechStackSection({ data }: { data?: BusinessFoundationData["techStack"] }) {
+  if (!data) {
+    return null;
+  }
+
+  const tools = data.tools ?? [];
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-4">
       <h3 className="font-display text-lg font-bold text-warmwhite flex items-center gap-2">
@@ -405,39 +479,50 @@ function TechStackSection({ data }: { data: BusinessFoundationData["techStack"] 
         Technology & Tools
       </h3>
 
-      <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="font-medium text-spark">{data.recommendation}</span>
-          <span className="text-xs text-warmwhite-dim">Setup: {data.setupTime}</span>
+      {(data.recommendation || data.reasoning) && (
+        <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            {data.recommendation && <span className="font-medium text-spark">{data.recommendation}</span>}
+            {data.setupTime && <span className="text-xs text-warmwhite-dim">Setup: {data.setupTime}</span>}
+          </div>
+          {data.reasoning && <p className="text-warmwhite-muted text-sm">{data.reasoning}</p>}
         </div>
-        <p className="text-warmwhite-muted text-sm">{data.reasoning}</p>
-      </div>
+      )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {data.tools.map((tool, i) => (
-          <a
-            key={i}
-            href={tool.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-charcoal-dark rounded-xl p-4 hover:bg-charcoal-dark/70 transition-colors group"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-medium text-warmwhite group-hover:text-spark transition-colors">
-                {tool.name}
-              </span>
-              <span className="text-xs text-spark font-medium">{tool.cost}</span>
-            </div>
-            <p className="text-warmwhite-muted text-sm">{tool.purpose}</p>
-          </a>
-        ))}
-      </div>
+      {tools.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {tools.map((tool, i) => (
+            <a
+              key={i}
+              href={tool?.url ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-charcoal-dark rounded-xl p-4 hover:bg-charcoal-dark/70 transition-colors group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-warmwhite group-hover:text-spark transition-colors">
+                  {tool?.name ?? "Unknown"}
+                </span>
+                {tool?.cost && <span className="text-xs text-spark font-medium">{tool.cost}</span>}
+              </div>
+              {tool?.purpose && <p className="text-warmwhite-muted text-sm">{tool.purpose}</p>}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 // Insurance Section
-function InsuranceSection({ data }: { data: BusinessFoundationData["insurance"] }) {
+function InsuranceSection({ data }: { data?: BusinessFoundationData["insurance"] }) {
+  if (!data) {
+    return null;
+  }
+
+  const required = data.required ?? [];
+  const complianceNotes = data.complianceNotes ?? [];
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-4">
       <h3 className="font-display text-lg font-bold text-warmwhite flex items-center gap-2">
@@ -447,39 +532,43 @@ function InsuranceSection({ data }: { data: BusinessFoundationData["insurance"] 
         Insurance & Compliance
       </h3>
 
-      <div className="grid gap-3">
-        {data.required.map((insurance, i) => (
-          <a
-            key={i}
-            href={insurance.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-charcoal-dark rounded-xl p-4 flex items-center justify-between hover:bg-charcoal-dark/70 transition-colors group"
-          >
-            <div>
-              <span className="font-medium text-warmwhite group-hover:text-spark transition-colors">
-                {insurance.type}
-              </span>
-              <p className="text-warmwhite-muted text-sm">via {insurance.provider}</p>
-            </div>
-            <div className="text-right">
-              <span className="text-spark font-medium">{insurance.estimatedCost}</span>
-              <p className="text-warmwhite-dim text-xs">per month</p>
-            </div>
-          </a>
-        ))}
-      </div>
+      {required.length > 0 && (
+        <div className="grid gap-3">
+          {required.map((insurance, i) => (
+            <a
+              key={i}
+              href={insurance?.url ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-charcoal-dark rounded-xl p-4 flex items-center justify-between hover:bg-charcoal-dark/70 transition-colors group"
+            >
+              <div>
+                <span className="font-medium text-warmwhite group-hover:text-spark transition-colors">
+                  {insurance?.type ?? "Insurance"}
+                </span>
+                {insurance?.provider && <p className="text-warmwhite-muted text-sm">via {insurance.provider}</p>}
+              </div>
+              <div className="text-right">
+                {insurance?.estimatedCost && <span className="text-spark font-medium">{insurance.estimatedCost}</span>}
+                <p className="text-warmwhite-dim text-xs">per month</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
 
-      <div className="bg-charcoal-dark rounded-xl p-4 flex items-center justify-between">
-        <span className="font-medium text-warmwhite">Total Estimated Insurance</span>
-        <span className="text-lg font-bold text-spark">{data.totalEstimatedCost}/mo</span>
-      </div>
+      {data.totalEstimatedCost && (
+        <div className="bg-charcoal-dark rounded-xl p-4 flex items-center justify-between">
+          <span className="font-medium text-warmwhite">Total Estimated Insurance</span>
+          <span className="text-lg font-bold text-spark">{data.totalEstimatedCost}/mo</span>
+        </div>
+      )}
 
-      {data.complianceNotes.length > 0 && (
+      {complianceNotes.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-warmwhite mb-2">Compliance Notes</h4>
           <ul className="space-y-1">
-            {data.complianceNotes.map((note, i) => (
+            {complianceNotes.map((note, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
                 <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
                 {note}
@@ -489,10 +578,12 @@ function InsuranceSection({ data }: { data: BusinessFoundationData["insurance"] 
         </div>
       )}
 
-      <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
-        <h4 className="text-sm font-medium text-spark mb-1">Tax Obligations</h4>
-        <p className="text-warmwhite-muted text-sm">{data.taxObligations}</p>
-      </div>
+      {data.taxObligations && (
+        <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
+          <h4 className="text-sm font-medium text-spark mb-1">Tax Obligations</h4>
+          <p className="text-warmwhite-muted text-sm">{data.taxObligations}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -528,24 +619,39 @@ export default function BusinessFoundation({ data, isLoading }: BusinessFoundati
     return <LoadingSkeleton />;
   }
 
+  // Defensive: if data is completely null/undefined, show nothing
+  if (!data) {
+    return (
+      <div className="bg-charcoal-light rounded-2xl p-8 text-center">
+        <p className="text-warmwhite-muted">No business foundation data available.</p>
+      </div>
+    );
+  }
+
+  // Safe access to nested properties
+  const marketViability = data.marketViability;
+  const overallScore = marketViability?.overallScore ?? 0;
+  const scoreBreakdown = marketViability?.scoreBreakdown;
+  const marketResearch = marketViability?.marketResearch;
+  const competitorAnalysis = marketViability?.competitorAnalysis;
+  const localMarketSize = marketViability?.localMarketSize;
+
   return (
     <div className="space-y-8">
       {/* Market Viability Score */}
-      <ViabilityScoreCard score={data.marketViability.overallScore} />
+      <ViabilityScoreCard score={overallScore} />
 
       {/* Score Breakdown */}
-      <ScoreBreakdownTable items={data.marketViability.scoreBreakdown} />
+      <ScoreBreakdownTable items={scoreBreakdown} />
 
       {/* Market Research */}
-      <MarketResearchSection data={data.marketViability.marketResearch} />
+      <MarketResearchSection data={marketResearch} />
 
       {/* Competitor Analysis */}
-      {data.marketViability.competitorAnalysis.length > 0 && (
-        <CompetitorTable competitors={data.marketViability.competitorAnalysis} />
-      )}
+      <CompetitorTable competitors={competitorAnalysis} />
 
       {/* Local Market Size */}
-      {data.marketViability.localMarketSize && (
+      {localMarketSize && (
         <div className="bg-charcoal-light rounded-2xl p-6">
           <h3 className="font-display text-lg font-bold text-warmwhite mb-3 flex items-center gap-2">
             <svg className="w-5 h-5 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -554,7 +660,7 @@ export default function BusinessFoundation({ data, isLoading }: BusinessFoundati
             </svg>
             Local Market Size
           </h3>
-          <p className="text-warmwhite-muted">{data.marketViability.localMarketSize}</p>
+          <p className="text-warmwhite-muted">{localMarketSize}</p>
         </div>
       )}
 
@@ -565,9 +671,7 @@ export default function BusinessFoundation({ data, isLoading }: BusinessFoundati
       <StartupCostsTable items={data.startupCosts} />
 
       {/* Suppliers */}
-      {data.suppliers.platforms.length > 0 && (
-        <SuppliersSection data={data.suppliers} />
-      )}
+      <SuppliersSection data={data.suppliers} />
 
       {/* Tech Stack */}
       <TechStackSection data={data.techStack} />

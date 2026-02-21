@@ -34,9 +34,12 @@ function getProfitColor(amount: number): string {
 }
 
 // Startup Costs Table
-function StartupCostsTable({ items }: { items: FinancialTableRow[] }) {
-  const total = items.reduce((sum, item) => {
-    const cost = parseFloat((item.cost || "0").replace(/[^0-9.-]/g, ""));
+function StartupCostsTable({ items }: { items?: FinancialTableRow[] }) {
+  const safeItems = items ?? [];
+  if (safeItems.length === 0) return null;
+
+  const total = safeItems.reduce((sum, item) => {
+    const cost = parseFloat((item?.cost || "0").replace(/[^0-9.-]/g, ""));
     return sum + (isNaN(cost) ? 0 : cost);
   }, 0);
 
@@ -57,11 +60,11 @@ function StartupCostsTable({ items }: { items: FinancialTableRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => (
+          {safeItems.map((item, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
-              <td className="py-3 px-2 text-warmwhite font-medium">{item.item}</td>
-              <td className="py-3 px-2 text-right text-spark font-medium">{item.cost}</td>
-              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item.notes}</td>
+              <td className="py-3 px-2 text-warmwhite font-medium">{item?.item ?? "Unknown"}</td>
+              <td className="py-3 px-2 text-right text-spark font-medium">{item?.cost ?? "N/A"}</td>
+              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item?.notes ?? ""}</td>
             </tr>
           ))}
         </tbody>
@@ -78,14 +81,17 @@ function StartupCostsTable({ items }: { items: FinancialTableRow[] }) {
 }
 
 // Monthly Operating Costs Table
-function OperatingCostsTable({ items }: { items: FinancialTableRow[] }) {
-  const monthlyTotal = items.reduce((sum, item) => {
-    const cost = parseFloat((item.monthlyCost || "0").replace(/[^0-9.-]/g, ""));
+function OperatingCostsTable({ items }: { items?: FinancialTableRow[] }) {
+  const safeItems = items ?? [];
+  if (safeItems.length === 0) return null;
+
+  const monthlyTotal = safeItems.reduce((sum, item) => {
+    const cost = parseFloat((item?.monthlyCost || "0").replace(/[^0-9.-]/g, ""));
     return sum + (isNaN(cost) ? 0 : cost);
   }, 0);
 
-  const annualTotal = items.reduce((sum, item) => {
-    const cost = parseFloat((item.annualCost || "0").replace(/[^0-9.-]/g, ""));
+  const annualTotal = safeItems.reduce((sum, item) => {
+    const cost = parseFloat((item?.annualCost || "0").replace(/[^0-9.-]/g, ""));
     return sum + (isNaN(cost) ? 0 : cost);
   }, 0);
 
@@ -107,12 +113,12 @@ function OperatingCostsTable({ items }: { items: FinancialTableRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => (
+          {safeItems.map((item, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
-              <td className="py-3 px-2 text-warmwhite font-medium">{item.item}</td>
-              <td className="py-3 px-2 text-right text-warmwhite">{item.monthlyCost}</td>
-              <td className="py-3 px-2 text-right text-warmwhite-muted">{item.annualCost}</td>
-              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item.notes}</td>
+              <td className="py-3 px-2 text-warmwhite font-medium">{item?.item ?? "Unknown"}</td>
+              <td className="py-3 px-2 text-right text-warmwhite">{item?.monthlyCost ?? "N/A"}</td>
+              <td className="py-3 px-2 text-right text-warmwhite-muted">{item?.annualCost ?? "N/A"}</td>
+              <td className="py-3 px-2 text-warmwhite-muted text-xs">{item?.notes ?? ""}</td>
             </tr>
           ))}
         </tbody>
@@ -130,7 +136,8 @@ function OperatingCostsTable({ items }: { items: FinancialTableRow[] }) {
 }
 
 // Revenue Projections Table
-function RevenueProjectionsTable({ projections }: { projections: FinancialModelData["revenueProjections"] }) {
+function RevenueProjectionsTable({ projections }: { projections?: FinancialModelData["revenueProjections"] }) {
+  if (!projections) return null;
   const scenarios: Array<{ key: keyof typeof projections; label: string }> = [
     { key: "conservative", label: "Conservative" },
     { key: "moderate", label: "Moderate" },
@@ -207,7 +214,11 @@ function RevenueProjectionsTable({ projections }: { projections: FinancialModelD
 }
 
 // Break-Even Analysis Card
-function BreakEvenCard({ analysis }: { analysis: FinancialModelData["breakEvenAnalysis"] }) {
+function BreakEvenCard({ analysis }: { analysis?: FinancialModelData["breakEvenAnalysis"] }) {
+  if (!analysis) return null;
+
+  const unitsNeeded = analysis.unitsNeeded ?? 0;
+
   return (
     <div className="bg-gradient-to-br from-spark/10 to-accent/10 border border-spark/20 rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-4">
@@ -222,7 +233,7 @@ function BreakEvenCard({ analysis }: { analysis: FinancialModelData["breakEvenAn
       <div className="flex items-center gap-4 mb-4">
         <div className="bg-charcoal-dark rounded-xl p-4 flex-1">
           <div className="text-sm text-warmwhite-dim mb-1">Units/Customers Needed</div>
-          <div className="text-3xl font-bold text-spark">{analysis.unitsNeeded}</div>
+          <div className="text-3xl font-bold text-spark">{unitsNeeded}</div>
           <div className="text-xs text-warmwhite-dim">per month to break even</div>
         </div>
 
@@ -245,7 +256,7 @@ function BreakEvenCard({ analysis }: { analysis: FinancialModelData["breakEvenAn
               fill="none"
               stroke="currentColor"
               strokeWidth="8"
-              strokeDasharray={`${Math.min(100, analysis.unitsNeeded) * 2.51} 251`}
+              strokeDasharray={`${Math.min(100, unitsNeeded) * 2.51} 251`}
               strokeLinecap="round"
               className="text-spark"
             />
@@ -258,13 +269,17 @@ function BreakEvenCard({ analysis }: { analysis: FinancialModelData["breakEvenAn
         </div>
       </div>
 
-      <p className="text-warmwhite-muted">{analysis.description}</p>
+      {analysis.description && <p className="text-warmwhite-muted">{analysis.description}</p>}
     </div>
   );
 }
 
 // Pricing Strategy Card
-function PricingStrategyCard({ strategy }: { strategy: FinancialModelData["pricingStrategy"] }) {
+function PricingStrategyCard({ strategy }: { strategy?: FinancialModelData["pricingStrategy"] }) {
+  if (!strategy) return null;
+
+  const psychologyTips = strategy.psychologyTips ?? [];
+
   return (
     <div className="bg-charcoal-light rounded-2xl p-6 space-y-4">
       <div className="flex items-center gap-3">
@@ -279,16 +294,16 @@ function PricingStrategyCard({ strategy }: { strategy: FinancialModelData["prici
       <div className="bg-charcoal-dark rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-warmwhite-dim text-sm">Recommended Price</span>
-          <span className="text-2xl font-bold text-spark">{strategy.recommendedPrice}</span>
+          <span className="text-2xl font-bold text-spark">{strategy.recommendedPrice ?? "TBD"}</span>
         </div>
-        <p className="text-warmwhite-muted text-sm">{strategy.reasoning}</p>
+        {strategy.reasoning && <p className="text-warmwhite-muted text-sm">{strategy.reasoning}</p>}
       </div>
 
-      {strategy.psychologyTips.length > 0 && (
+      {psychologyTips.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-warmwhite mb-2">Pricing Psychology Tips</h4>
           <ul className="space-y-2">
-            {strategy.psychologyTips.map((tip, i) => (
+            {psychologyTips.map((tip, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-warmwhite-muted">
                 <svg className="w-4 h-4 text-spark flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -300,10 +315,12 @@ function PricingStrategyCard({ strategy }: { strategy: FinancialModelData["prici
         </div>
       )}
 
-      <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
-        <h4 className="text-sm font-medium text-spark mb-1">How to Test Pricing</h4>
-        <p className="text-warmwhite-muted text-sm">{strategy.testingApproach}</p>
-      </div>
+      {strategy.testingApproach && (
+        <div className="bg-spark/10 border border-spark/20 rounded-xl p-4">
+          <h4 className="text-sm font-medium text-spark mb-1">How to Test Pricing</h4>
+          <p className="text-warmwhite-muted text-sm">{strategy.testingApproach}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -331,26 +348,45 @@ export default function FinancialModel({ data, isLoading }: FinancialModelProps)
     return <LoadingSkeleton />;
   }
 
+  // Defensive: if data is completely null/undefined, show nothing
+  if (!data) {
+    return (
+      <div className="bg-charcoal-light rounded-2xl p-8 text-center">
+        <p className="text-warmwhite-muted">No financial model data available.</p>
+      </div>
+    );
+  }
+
+  // Safe access to arrays
+  const startupCostsSummary = data.startupCostsSummary ?? [];
+  const monthlyOperatingCosts = data.monthlyOperatingCosts ?? [];
+
   return (
     <div className="space-y-8">
       {/* Startup Costs */}
-      {data.startupCostsSummary.length > 0 && (
-        <StartupCostsTable items={data.startupCostsSummary} />
+      {startupCostsSummary.length > 0 && (
+        <StartupCostsTable items={startupCostsSummary} />
       )}
 
       {/* Monthly Operating Costs */}
-      {data.monthlyOperatingCosts.length > 0 && (
-        <OperatingCostsTable items={data.monthlyOperatingCosts} />
+      {monthlyOperatingCosts.length > 0 && (
+        <OperatingCostsTable items={monthlyOperatingCosts} />
       )}
 
       {/* Revenue Projections */}
-      <RevenueProjectionsTable projections={data.revenueProjections} />
+      {data.revenueProjections && (
+        <RevenueProjectionsTable projections={data.revenueProjections} />
+      )}
 
       {/* Break-Even Analysis */}
-      <BreakEvenCard analysis={data.breakEvenAnalysis} />
+      {data.breakEvenAnalysis && (
+        <BreakEvenCard analysis={data.breakEvenAnalysis} />
+      )}
 
       {/* Pricing Strategy */}
-      <PricingStrategyCard strategy={data.pricingStrategy} />
+      {data.pricingStrategy && (
+        <PricingStrategyCard strategy={data.pricingStrategy} />
+      )}
     </div>
   );
 }

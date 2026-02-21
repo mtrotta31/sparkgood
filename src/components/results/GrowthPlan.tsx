@@ -130,25 +130,30 @@ function ElevatorPitchSection({ pitch }: { pitch: string }) {
 }
 
 // Landing Page Copy Section
-function LandingPageSection({ data }: { data: GrowthPlanData["landingPageCopy"] }) {
-  const fullCopy = `
-# ${data.headline}
+function LandingPageSection({ data }: { data?: GrowthPlanData["landingPageCopy"] }) {
+  if (!data) return null;
 
-${data.subheadline}
+  const benefits = data.benefits ?? [];
+  const faq = data.faq ?? [];
+
+  const fullCopy = `
+# ${data.headline ?? ""}
+
+${data.subheadline ?? ""}
 
 ## Benefits
 
-${data.benefits.map(b => `### ${b.title}\n${b.description}`).join('\n\n')}
+${benefits.map(b => `### ${b?.title ?? ""}\n${b?.description ?? ""}`).join('\n\n')}
 
 ## About
 
-${data.aboutSection}
+${data.aboutSection ?? ""}
 
 ## FAQ
 
-${data.faq.map(f => `**${f.question}**\n${f.answer}`).join('\n\n')}
+${faq.map(f => `**${f?.question ?? ""}**\n${f?.answer ?? ""}`).join('\n\n')}
 
-[${data.ctaButtonText}]
+[${data.ctaButtonText ?? "Get Started"}]
   `.trim();
 
   return (
@@ -166,74 +171,86 @@ ${data.faq.map(f => `**${f.question}**\n${f.answer}`).join('\n\n')}
       </div>
 
       {/* Headline */}
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">Headline</span>
-          <CopyButton text={data.headline} />
+      {data.headline && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">Headline</span>
+            <CopyButton text={data.headline} />
+          </div>
+          <p className="font-display text-2xl font-bold text-warmwhite">{data.headline}</p>
         </div>
-        <p className="font-display text-2xl font-bold text-warmwhite">{data.headline}</p>
-      </div>
+      )}
 
       {/* Subheadline */}
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">Subheadline</span>
-          <CopyButton text={data.subheadline} />
+      {data.subheadline && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">Subheadline</span>
+            <CopyButton text={data.subheadline} />
+          </div>
+          <p className="text-warmwhite-muted text-lg">{data.subheadline}</p>
         </div>
-        <p className="text-warmwhite-muted text-lg">{data.subheadline}</p>
-      </div>
+      )}
 
       {/* Benefits */}
-      <div>
-        <h3 className="text-sm font-medium text-warmwhite mb-3">Benefits</h3>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {data.benefits.map((benefit, i) => (
-            <div key={i} className="bg-charcoal-dark rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-warmwhite text-sm">{benefit.title}</span>
-                <CopyButton text={`${benefit.title}\n${benefit.description}`} />
+      {benefits.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-warmwhite mb-3">Benefits</h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {benefits.map((benefit, i) => (
+              <div key={i} className="bg-charcoal-dark rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-warmwhite text-sm">{benefit?.title ?? ""}</span>
+                  <CopyButton text={`${benefit?.title ?? ""}\n${benefit?.description ?? ""}`} />
+                </div>
+                <p className="text-warmwhite-muted text-sm">{benefit?.description ?? ""}</p>
               </div>
-              <p className="text-warmwhite-muted text-sm">{benefit.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* CTA */}
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">CTA Button</span>
-          <CopyButton text={data.ctaButtonText} />
+      {data.ctaButtonText && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">CTA Button</span>
+            <CopyButton text={data.ctaButtonText} />
+          </div>
+          <span className="inline-block px-6 py-2 bg-spark text-charcoal-dark font-bold rounded-lg">
+            {data.ctaButtonText}
+          </span>
         </div>
-        <span className="inline-block px-6 py-2 bg-spark text-charcoal-dark font-bold rounded-lg">
-          {data.ctaButtonText}
-        </span>
-      </div>
+      )}
 
       {/* About */}
-      <div className="bg-charcoal-dark rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">About Section</span>
-          <CopyButton text={data.aboutSection} />
+      {data.aboutSection && (
+        <div className="bg-charcoal-dark rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-warmwhite-dim uppercase tracking-wider">About Section</span>
+            <CopyButton text={data.aboutSection} />
+          </div>
+          <p className="text-warmwhite-muted">{data.aboutSection}</p>
         </div>
-        <p className="text-warmwhite-muted">{data.aboutSection}</p>
-      </div>
+      )}
 
       {/* FAQ */}
-      <div>
-        <h3 className="text-sm font-medium text-warmwhite mb-3">FAQ</h3>
-        <div className="space-y-3">
-          {data.faq.map((faq, i) => (
-            <div key={i} className="bg-charcoal-dark rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-warmwhite text-sm">{faq.question}</span>
-                <CopyButton text={`Q: ${faq.question}\nA: ${faq.answer}`} />
+      {faq.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-warmwhite mb-3">FAQ</h3>
+          <div className="space-y-3">
+            {faq.map((faqItem, i) => (
+              <div key={i} className="bg-charcoal-dark rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-warmwhite text-sm">{faqItem?.question ?? ""}</span>
+                  <CopyButton text={`Q: ${faqItem?.question ?? ""}\nA: ${faqItem?.answer ?? ""}`} />
+                </div>
+                <p className="text-warmwhite-muted text-sm">{faqItem?.answer ?? ""}</p>
               </div>
-              <p className="text-warmwhite-muted text-sm">{faq.answer}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Setup Guide */}
       {data.setupGuide && (
@@ -416,27 +433,41 @@ export default function GrowthPlan({ data, isLoading }: GrowthPlanProps) {
     return <LoadingSkeleton />;
   }
 
+  // Defensive: if data is completely null/undefined, show nothing
+  if (!data) {
+    return (
+      <div className="bg-charcoal-light rounded-2xl p-8 text-center">
+        <p className="text-warmwhite-muted">No growth plan data available.</p>
+      </div>
+    );
+  }
+
+  // Safe access to arrays
+  const socialMediaPosts = data.socialMediaPosts ?? [];
+  const emailTemplates = data.emailTemplates ?? [];
+  const localMarketing = data.localMarketing ?? [];
+
   return (
     <div className="space-y-8">
       {/* Elevator Pitch */}
-      <ElevatorPitchSection pitch={data.elevatorPitch} />
+      {data.elevatorPitch && <ElevatorPitchSection pitch={data.elevatorPitch} />}
 
       {/* Landing Page Copy */}
-      <LandingPageSection data={data.landingPageCopy} />
+      {data.landingPageCopy && <LandingPageSection data={data.landingPageCopy} />}
 
       {/* Social Media Posts */}
-      {data.socialMediaPosts.length > 0 && (
-        <SocialMediaSection posts={data.socialMediaPosts} />
+      {socialMediaPosts.length > 0 && (
+        <SocialMediaSection posts={socialMediaPosts} />
       )}
 
       {/* Email Templates */}
-      {data.emailTemplates.length > 0 && (
-        <EmailTemplatesSection emails={data.emailTemplates} />
+      {emailTemplates.length > 0 && (
+        <EmailTemplatesSection emails={emailTemplates} />
       )}
 
       {/* Local Marketing */}
-      {data.localMarketing.length > 0 && (
-        <LocalMarketingSection tactics={data.localMarketing} />
+      {localMarketing.length > 0 && (
+        <LocalMarketingSection tactics={localMarketing} />
       )}
     </div>
   );

@@ -242,14 +242,17 @@ export default function LaunchChecklist({
   onProgressChange,
   isLoading,
 }: LaunchChecklistProps) {
+  // Defensive: ensure weeks array exists
+  const weeks = data?.weeks ?? [];
+
   // Calculate progress stats
   const stats = useMemo(() => {
-    const allItems = data.weeks.flatMap((week) => week.items);
+    const allItems = weeks.flatMap((week) => week?.items ?? []);
     const totalItems = allItems.length;
-    const completedItems = allItems.filter((item) => progress[item.id]).length;
+    const completedItems = allItems.filter((item) => item?.id && progress[item.id]).length;
     const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     return { total: totalItems, completed: completedItems, percentage };
-  }, [data, progress]);
+  }, [weeks, progress]);
 
   const handleToggle = useCallback(
     (itemId: string) => {
@@ -260,6 +263,15 @@ export default function LaunchChecklist({
 
   if (isLoading) {
     return <LoadingSkeleton />;
+  }
+
+  // Defensive: if no data at all, show empty state
+  if (!data || weeks.length === 0) {
+    return (
+      <div className="bg-charcoal-light rounded-2xl p-8 text-center">
+        <p className="text-warmwhite-muted">No checklist data available.</p>
+      </div>
+    );
   }
 
   return (
@@ -293,41 +305,47 @@ export default function LaunchChecklist({
       </div>
 
       {/* Weeks */}
-      {data.weeks.map((week) => (
-        <div key={week.weekNumber} className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className={`
-              w-10 h-10 rounded-full flex items-center justify-center font-bold
-              ${week.weekNumber === 1 ? "bg-spark/20 text-spark" : ""}
-              ${week.weekNumber === 2 ? "bg-accent/20 text-accent" : ""}
-              ${week.weekNumber === 3 ? "bg-purple-500/20 text-purple-400" : ""}
-              ${week.weekNumber === 4 ? "bg-green-500/20 text-green-400" : ""}
-              ${week.weekNumber > 4 ? "bg-blue-500/20 text-blue-400" : ""}
-            `}>
-              {week.weekNumber}
-            </div>
-            <div>
-              <h3 className="font-display text-lg font-bold text-warmwhite">
-                Week {week.weekNumber}: {week.title}
-              </h3>
-              <p className="text-warmwhite-dim text-sm">
-                {week.items.filter((item) => progress[item.id]).length} of {week.items.length} complete
-              </p>
-            </div>
-          </div>
+      {weeks.map((week) => {
+        const weekNumber = week?.weekNumber ?? 0;
+        const weekTitle = week?.title ?? "";
+        const weekItems = week?.items ?? [];
 
-          <div className="space-y-3 ml-5 pl-8 border-l-2 border-warmwhite/10">
-            {week.items.map((item) => (
-              <ChecklistItemRow
-                key={item.id}
-                item={item}
-                isChecked={!!progress[item.id]}
-                onToggle={() => handleToggle(item.id)}
-              />
-            ))}
+        return (
+          <div key={weekNumber} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className={`
+                w-10 h-10 rounded-full flex items-center justify-center font-bold
+                ${weekNumber === 1 ? "bg-spark/20 text-spark" : ""}
+                ${weekNumber === 2 ? "bg-accent/20 text-accent" : ""}
+                ${weekNumber === 3 ? "bg-purple-500/20 text-purple-400" : ""}
+                ${weekNumber === 4 ? "bg-green-500/20 text-green-400" : ""}
+                ${weekNumber > 4 ? "bg-blue-500/20 text-blue-400" : ""}
+              `}>
+                {weekNumber}
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-warmwhite">
+                  Week {weekNumber}: {weekTitle}
+                </h3>
+                <p className="text-warmwhite-dim text-sm">
+                  {weekItems.filter((item) => item?.id && progress[item.id]).length} of {weekItems.length} complete
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 ml-5 pl-8 border-l-2 border-warmwhite/10">
+              {weekItems.map((item) => item?.id && (
+                <ChecklistItemRow
+                  key={item.id}
+                  item={item}
+                  isChecked={!!progress[item.id]}
+                  onToggle={() => handleToggle(item.id)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
