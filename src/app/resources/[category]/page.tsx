@@ -495,7 +495,7 @@ async function renderCategoryPage(
       </section>
 
       {/* Main Content */}
-      <section className="py-8 px-4">
+      <section className="py-8 px-4 scroll-mt-32">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Sidebar - Popular Locations */}
@@ -505,6 +505,18 @@ async function renderCategoryPage(
                   Browse by Location
                 </h3>
                 <div className="space-y-2">
+                  {/* All [Category] entry - always show first as default */}
+                  <Link
+                    href={`/resources/${category}`}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 hover:border-amber-400 hover:shadow-sm transition-all group"
+                  >
+                    <span className="text-amber-700 group-hover:text-amber-900 transition-colors font-semibold">
+                      All {categoryInfo.plural}
+                    </span>
+                    <span className="text-amber-600 text-sm font-semibold">
+                      {unfilteredCount}
+                    </span>
+                  </Link>
                   {/* Nationwide entry */}
                   {nationwideCount && nationwideCount > 0 && (
                     <Link

@@ -3,6 +3,7 @@
 
 "use client";
 
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
@@ -27,7 +28,15 @@ export default function CategoryFiltersLight({
 
   const currentState = searchParams.get("state") || "";
   const currentCity = searchParams.get("city") || "";
+  const [cityInput, setCityInput] = useState(currentCity);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const cityInputRef = useRef<HTMLInputElement>(null);
   const currentSubcategory = searchParams.get("subcategory") || "";
+
+  // Sync local state with URL params
+  useEffect(() => {
+    setCityInput(currentCity);
+  }, [currentCity]);
   const currentRemote = searchParams.get("remote") === "true";
   const currentSort = searchParams.get("sort") || "relevance";
   const currentOpenOnly = searchParams.get("open") === "true";
@@ -112,15 +121,43 @@ export default function CategoryFiltersLight({
           </select>
         )}
 
-        {/* City search input */}
+        {/* City search input with debounced autocomplete */}
         <div className="relative">
           <input
+            ref={cityInputRef}
             type="text"
             placeholder="Search city..."
             className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent w-40"
-            value={currentCity}
-            onChange={(e) => updateFilter("city", e.target.value)}
-            list="city-suggestions"
+            value={cityInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              setCityInput(value);
+              setShowCitySuggestions(value.length >= 2);
+              // Check if user selected from datalist (exact match)
+              if (cities.includes(value)) {
+                updateFilter("city", value);
+                setShowCitySuggestions(false);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                updateFilter("city", cityInput);
+                setShowCitySuggestions(false);
+              } else if (e.key === "Escape") {
+                setCityInput(currentCity);
+                setShowCitySuggestions(false);
+              }
+            }}
+            onBlur={() => {
+              // Delay to allow click on suggestion
+              setTimeout(() => setShowCitySuggestions(false), 150);
+            }}
+            onFocus={() => {
+              if (cityInput.length >= 2) {
+                setShowCitySuggestions(true);
+              }
+            }}
           />
           <svg
             className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
@@ -131,12 +168,31 @@ export default function CategoryFiltersLight({
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
-          {cities.length > 0 && (
-            <datalist id="city-suggestions">
-              {cities.slice(0, 20).map((city) => (
-                <option key={city} value={city} />
-              ))}
-            </datalist>
+          {/* Custom dropdown instead of datalist for better control */}
+          {showCitySuggestions && cities.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+              {cities
+                .filter((city) => city.toLowerCase().includes(cityInput.toLowerCase()))
+                .slice(0, 10)
+                .map((city) => (
+                  <button
+                    key={city}
+                    type="button"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setCityInput(city);
+                      updateFilter("city", city);
+                      setShowCitySuggestions(false);
+                    }}
+                  >
+                    {city}
+                  </button>
+                ))}
+              {cities.filter((city) => city.toLowerCase().includes(cityInput.toLowerCase())).length === 0 && (
+                <div className="px-3 py-2 text-sm text-gray-500">No cities found</div>
+              )}
+            </div>
           )}
         </div>
 
