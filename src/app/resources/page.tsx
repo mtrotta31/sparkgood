@@ -278,20 +278,10 @@ export default async function ResourcesPage() {
     localListingCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
   });
 
-  // Query listings for each city to get accurate counts
+  // Query listings for each city to get accurate counts per category
   // This matches the exact query used by city hub pages
   await Promise.all(
     topCities.map(async (city) => {
-      const { count } = await supabase
-        .from("resource_listings")
-        .select("*", { count: "exact", head: true })
-        .eq("is_active", true)
-        .eq("city", city.city)
-        .eq("state", city.state)
-        .eq("is_remote", false)
-        .or("is_nationwide.eq.false,is_nationwide.is.null");
-
-      // Also get counts per category
       const categories = ["grant", "coworking", "accelerator", "sba"] as const;
       await Promise.all(
         categories.map(async (cat) => {
