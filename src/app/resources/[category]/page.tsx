@@ -357,8 +357,8 @@ async function renderCategoryPage(
     new Set(allListings?.flatMap((l) => l.subcategories || []) || [])
   ).sort() as string[];
 
-  // Get popular locations with ACCURATE local-only counts
-  // Query listings directly to exclude nationwide/remote from per-city counts
+  // Get local listings by STATE for sidebar
+  // Query listings that are state-specific (not nationwide/remote)
   const { data: localListingsForCounts } = await supabase
     .from("resource_listings")
     .select("city, state")
@@ -366,44 +366,26 @@ async function renderCategoryPage(
     .eq("category", category)
     .eq("is_nationwide", false)
     .eq("is_remote", false)
-    .not("city", "is", null);
+    .not("state", "is", null);
 
-  // Count listings per city
-  const cityCountMap = new Map<string, { city: string; state: string; count: number }>();
+  // Count listings per state (for sidebar)
+  const stateCountMap = new Map<string, number>();
   localListingsForCounts?.forEach((listing) => {
-    if (listing.city && listing.state) {
-      const key = `${listing.city}-${listing.state}`;
-      const existing = cityCountMap.get(key);
-      if (existing) {
-        existing.count++;
-      } else {
-        cityCountMap.set(key, { city: listing.city, state: listing.state, count: 1 });
-      }
+    if (listing.state) {
+      stateCountMap.set(listing.state, (stateCountMap.get(listing.state) || 0) + 1);
     }
   });
 
-  // Get location slugs for the top cities
-  const topCityCounts = Array.from(cityCountMap.values())
+  // Get top states by count
+  const topStateCounts = Array.from(stateCountMap.entries())
+    .map(([state, count]) => ({ state, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 8);
 
-  const { data: locationSlugs } = await supabase
-    .from("resource_locations")
-    .select("city, state, slug")
-    .in("city", topCityCounts.map((c) => c.city));
-
-  const slugMap = new Map(
-    locationSlugs?.map((l) => [`${l.city}-${l.state}`, l.slug]) || []
-  );
-
-  // Build locations array with correct counts
-  const locations = topCityCounts.map((c) => ({
-    location: {
-      city: c.city,
-      state: c.state,
-      slug: slugMap.get(`${c.city}-${c.state}`) || `${c.city.toLowerCase().replace(/\s+/g, "-")}-${c.state.toLowerCase()}`,
-    },
-    listing_count: c.count,
+  // Build locations array with state data for sidebar
+  const locations = topStateCounts.map((s) => ({
+    state: s.state,
+    count: s.count,
   }));
 
   // Get nationwide/remote count for this category
@@ -495,7 +477,7 @@ async function renderCategoryPage(
       </section>
 
       {/* Main Content */}
-      <section className="py-8 px-4 scroll-mt-32">
+      <section className="py-8 px-4 scroll-mt-44">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Sidebar - Popular Locations */}
@@ -531,18 +513,18 @@ async function renderCategoryPage(
                       </span>
                     </Link>
                   )}
-                  {/* City entries */}
+                  {/* State entries - local resources by state */}
                   {locations?.map((loc) => (
                     <Link
-                      key={`${loc.location?.city}-${loc.location?.state}`}
-                      href={`/resources/${category}/${loc.location?.slug}`}
+                      key={loc.state}
+                      href={`/resources/${category}?state=${encodeURIComponent(loc.state)}`}
                       className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all group"
                     >
                       <span className="text-gray-700 group-hover:text-gray-900 transition-colors">
-                        {loc.location?.city}, {loc.location?.state}
+                        {loc.state}
                       </span>
                       <span className="text-gray-400 text-sm">
-                        {loc.listing_count}
+                        {loc.count}
                       </span>
                     </Link>
                   ))}
