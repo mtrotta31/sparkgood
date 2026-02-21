@@ -271,7 +271,7 @@ export default async function ResourcesPage() {
 
   // Fetch LOCAL listings for all top cities
   // We query each city individually to ensure accurate counts matching city hub pages
-  const localListingCounts: Record<string, Record<string, number>> = {};
+  const localListingCounts: Record<string, { grant: number; coworking: number; accelerator: number; sba: number }> = {};
 
   // Initialize counts for all cities
   topCities.forEach((city) => {
