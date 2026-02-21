@@ -38,7 +38,10 @@
       "Bash(git commit:*)",
       "Bash(node -e:*)",
       "Bash(npx vercel:*)",
-      "mcp__playwright__browser_navigate"
+      "mcp__playwright__browser_navigate",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(git show:*)"
     ]
   },
   "enabledMcpjsonServers": [

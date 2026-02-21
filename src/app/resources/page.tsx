@@ -285,12 +285,13 @@ export default async function ResourcesPage() {
     cityStateToId.set(`${c.city}|${c.state}`, c.id);
   });
 
-  // Fetch local listings for all top cities in one query (excluding nationwide/remote)
+  // Fetch local listings for all top cities in one query
+  // Include resources that have a matching city, regardless of is_nationwide flag
+  // (some local SBA resources like "SCORE Denver" have is_nationwide=true incorrectly)
   const { data: localListings } = await supabase
     .from("resource_listings")
     .select("category, city, state")
     .eq("is_active", true)
-    .eq("is_nationwide", false)
     .eq("is_remote", false)
     .in("city", topCities.map((c) => c.city));
 

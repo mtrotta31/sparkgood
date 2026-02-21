@@ -21,6 +21,20 @@ import { formatHours } from "@/lib/formatHours";
 import { formatDescription } from "@/lib/format-description";
 import { formatAmount, formatAmountRange } from "@/lib/format-amount";
 
+// Safely format eligibility for display
+// Handles: string, array, object, null/undefined
+function formatEligibility(eligibility: unknown): string | null {
+  if (!eligibility) return null;
+  if (typeof eligibility === "string") return eligibility;
+  if (Array.isArray(eligibility)) return eligibility.join(", ");
+  if (typeof eligibility === "object") {
+    // Try to extract meaningful text from object
+    const values = Object.values(eligibility).filter(Boolean);
+    return values.length > 0 ? values.join(", ") : null;
+  }
+  return String(eligibility);
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -431,10 +445,10 @@ export default async function ListingPage({ params }: PageProps) {
                       </div>
                     )}
                   </div>
-                  {details.eligibility && (
+                  {details.eligibility && formatEligibility(details.eligibility) && (
                     <div className="mt-6">
                       <p className="text-gray-500 text-sm mb-2">Eligibility</p>
-                      <p className="text-gray-700">{details.eligibility}</p>
+                      <p className="text-gray-700">{formatEligibility(details.eligibility)}</p>
                     </div>
                   )}
                 </div>

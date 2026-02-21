@@ -17,6 +17,16 @@ import { formatHours } from "@/lib/formatHours";
 import { formatDescription } from "@/lib/format-description";
 import { formatAmount, formatAmountRange } from "@/lib/format-amount";
 
+// Safely convert eligibility to a lowercase string for searching
+// Handles: string, array, object, null/undefined
+function getEligibilityString(eligibility: unknown): string {
+  if (!eligibility) return "";
+  if (typeof eligibility === "string") return eligibility.toLowerCase();
+  if (Array.isArray(eligibility)) return eligibility.join(" ").toLowerCase();
+  if (typeof eligibility === "object") return JSON.stringify(eligibility).toLowerCase();
+  return String(eligibility).toLowerCase();
+}
+
 interface Props {
   listing: ResourceListing;
   variant?: "grid" | "list"; // Reserved for future layout variants
@@ -205,24 +215,32 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
         </div>
 
         {/* Eligibility tags */}
-        {details.eligibility && (
-          <div className="flex flex-wrap gap-1.5">
-            {details.eligibility.toLowerCase().includes("women") && (
-              <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded text-xs font-medium">Women</span>
-            )}
-            {details.eligibility.toLowerCase().includes("minority") && (
-              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">Minority</span>
-            )}
-            {details.eligibility.toLowerCase().includes("veteran") && (
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">Veteran</span>
-            )}
-            {details.grant_type && (
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs capitalize">
-                {details.grant_type}
-              </span>
-            )}
-          </div>
-        )}
+        {(() => {
+          const eligibilityStr = getEligibilityString(details.eligibility);
+          const hasEligibilityTags = eligibilityStr.includes("women") ||
+                                     eligibilityStr.includes("minority") ||
+                                     eligibilityStr.includes("veteran") ||
+                                     details.grant_type;
+          if (!hasEligibilityTags) return null;
+          return (
+            <div className="flex flex-wrap gap-1.5">
+              {eligibilityStr.includes("women") && (
+                <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded text-xs font-medium">Women</span>
+              )}
+              {eligibilityStr.includes("minority") && (
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">Minority</span>
+              )}
+              {eligibilityStr.includes("veteran") && (
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">Veteran</span>
+              )}
+              {details.grant_type && (
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs capitalize">
+                  {details.grant_type}
+                </span>
+              )}
+            </div>
+          );
+        })()}
       </>
     );
   };
