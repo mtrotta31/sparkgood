@@ -177,17 +177,17 @@ function CityCard({
       <div className="flex flex-wrap gap-2">
         {categoryCounts.grant > 0 && (
           <span className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full">
-            {categoryCounts.grant} grants
+            {categoryCounts.grant} {categoryCounts.grant === 1 ? "grant" : "grants"}
           </span>
         )}
         {categoryCounts.coworking > 0 && (
           <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
-            {categoryCounts.coworking} coworking
+            {categoryCounts.coworking} {categoryCounts.coworking === 1 ? "coworking space" : "coworking"}
           </span>
         )}
         {categoryCounts.accelerator > 0 && (
           <span className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded-full">
-            {categoryCounts.accelerator} accelerators
+            {categoryCounts.accelerator} {categoryCounts.accelerator === 1 ? "accelerator" : "accelerators"}
           </span>
         )}
         {categoryCounts.sba > 0 && (
