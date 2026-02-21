@@ -22,7 +22,13 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
   - **General Business Path:** Business category → Target customer → Business model → Key skills → Location → Experience → Budget → Commitment → Depth → Ideas
   - **Social Enterprise Path:** Business category (Social Enterprise) → Venture type → Format → Location → Causes → Experience → Budget → Commitment → Depth → Ideas
 - **Idea Generation** — AI generates 4 tailored business concepts based on user profile
-- **Deep Dive** — Premium 4-tab experience:
+- **Deep Dive V2** — Premium 5-tab experience (current version):
+  - **"🚀 Launch Checklist"** — 4-week action plan with 16 prioritized tasks, time/cost estimates, checkable progress
+  - **"🏗️ Business Foundation"** — Viability score (0-100), market research (TAM/SAM/SOM), competitor analysis, legal structure, startup costs, suppliers, tech stack, insurance
+  - **"📈 Growth Plan"** — Elevator pitch, landing page copy, social media posts (5 platforms), email templates, local marketing tactics
+  - **"💰 Financial Model"** — Startup costs breakdown, monthly operating costs, revenue projections (3 scenarios), break-even analysis, pricing strategy
+  - **"💬 AI Advisor"** — Placeholder for future AI chat feature
+- **Deep Dive V1** (legacy, still supported for existing projects):
   - **"Will This Work?"** — Viability analysis with scoring breakdown, competitors, market research
   - **"Your Game Plan"** — Complete business/project plan with financials
   - **"Spread the Word"** — Marketing assets (pitch, social posts, email templates)
@@ -134,12 +140,27 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `UserProfile` — Contains both path fields; `businessCategory` determines which path
 - `Idea` — Shared fields + optional path-specific fields (`impact`/`causeAreas` for social enterprise, `valueProposition`/`competitiveAdvantage` for general business)
 
+### Deep Dive V2 Types
+- `LaunchChecklistData` — Array of weeks, each with tasks (title, description, estimatedTime, estimatedCost, priority, resources)
+- `BusinessFoundationData` — marketViability (score, factors), legalStructure, startupCosts, suppliers, techStack, insurance
+- `GrowthPlanData` — elevatorPitch, landingPageCopy, socialMediaPosts, emailTemplates, localMarketing
+- `FinancialModelData` — startupCostsSummary, monthlyOperatingCosts, revenueProjections, breakEvenAnalysis, pricingStrategy
+- `ChecklistProgress` — Record of task IDs to boolean completion status
+
+### Deep Dive V1 Types (legacy)
+- `ViabilityReport` — Market research, competitor analysis, viability score
+- `BusinessPlan` — Mission, revenue streams, impact metrics
+- `MarketingAssets` — Social posts, email templates, landing page copy
+- `ActionRoadmap` — Quick wins, phases, matched resources
+
 ## Database Schema
 
 ### Core Tables
 - `user_profiles` — User preferences (business_category, venture_type, format, location, causes, target_customer, business_model_preference, key_skills, etc.)
-- `saved_ideas` — Generated ideas linked to profiles
-- `deep_dive_results` — Viability, plan, marketing, roadmap content
+- `saved_ideas` — Generated ideas linked to profiles (idea_data JSONB, is_selected, profile_id)
+- `deep_dive_results` — Deep dive content linked to saved_ideas by idea_id
+  - V1 fields: `viability`, `business_plan`, `marketing`, `roadmap`
+  - V2 fields: `checklist`, `foundation`, `growth`, `financial`, `checklist_progress`
 
 ### Payments Tables
 - `user_credits` — Subscription tier, status, credits remaining, one-time purchases
@@ -240,8 +261,17 @@ welcome → business_category → venture_type → format → location → cause
 Located in `src/components/`:
 - `ui/` — Reusable primitives (FadeIn, Header, etc.)
 - `steps/` — Builder flow step components
-- `results/` — Idea cards, result displays
+- `results/` — Idea cards, result displays, V2 tab components
+  - `LaunchChecklist.tsx` — Renders V2 checklist with progress tracking
+  - `BusinessFoundation.tsx` — Renders V2 market research, legal, costs
+  - `GrowthPlan.tsx` — Renders V2 marketing content with copy buttons
+  - `FinancialModel.tsx` — Renders V2 financial projections
 - `deep-dive/` — Deep dive section components
+  - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (5 tabs)
+  - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
+  - `LaunchKitModal.tsx` — Launch kit generation modal
+  - `ConfirmDialog.tsx` — Regeneration confirmation
+  - V1 view components: `ViabilityReport.tsx`, `BusinessPlanView.tsx`, etc.
 - `resources/` — Resource directory components (see below)
 - `auth/` — Authentication modals
 
@@ -349,6 +379,13 @@ Parse hours JSONB from database into readable format:
 ### `format-description.ts`
 Clean up listing descriptions by removing boilerplate text.
 
+### `claude.ts`
+Claude API wrapper with JSON handling:
+- `sendMessage(prompt, options)` — Send message to Claude, get text response
+- `sendMessageForJSON<T>(prompt, options)` — Send message, parse JSON response with automatic snake_case to camelCase conversion
+- `extractJSON(response)` — Extract JSON from Claude response (handles markdown code blocks, extra text)
+- Automatic key conversion ensures Claude's snake_case responses match TypeScript camelCase types
+
 ## Development Commands
 
 ```bash
@@ -393,7 +430,9 @@ The core product is fully functional with payments:
 - ✅ Business category selection (10 categories)
 - ✅ Conditional routing based on category
 - ✅ Idea generation (calibrated to business type)
-- ✅ Deep dive (all 4 tabs) with payment gates
+- ✅ Deep Dive V2 (5 tabs: Checklist, Foundation, Growth, Financial, AI Advisor)
+- ✅ Deep Dive V1 (legacy support for existing projects)
+- ✅ Auto-save deep dive content with proper JSON key conversion
 - ✅ Launch kit generation with payment gates
 - ✅ PDF export
 - ✅ User auth & saved projects
@@ -429,3 +468,23 @@ The core product is fully functional with payments:
 - The resource directory is a key SEO play — location pages drive organic traffic
 - Deep dive "Start Here" tab shows REAL matched resources, not placeholders
 - Platform now supports ANY business type, not just social enterprises
+
+## Technical Notes
+
+### Deep Dive V1 vs V2 Detection
+- Project pages detect V1 vs V2 using `hasV2Data()` function
+- V2 projects have `checklist`, `foundation`, `growth`, or `financial` data
+- V1 projects use `viability`, `businessPlan`, `marketing`, `roadmap`
+- Both versions supported simultaneously for backward compatibility
+
+### Claude API JSON Handling
+- Claude responses use snake_case keys (e.g., `estimated_time`)
+- TypeScript types use camelCase (e.g., `estimatedTime`)
+- `sendMessageForJSON()` in `claude.ts` automatically converts keys
+- Prompts in `src/prompts/deep-dive.ts` should specify camelCase keys in examples to help Claude
+
+### Project Save Flow
+1. User enters deep dive → idea saved to `saved_ideas` table → returns `savedIdeaId`
+2. Deep dive content auto-saves to `deep_dive_results` using `savedIdeaId` as `idea_id`
+3. Duplicate detection checks both idea ID and name+tagline
+4. When opening saved project, content passed as props to avoid regeneration
