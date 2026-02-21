@@ -15,10 +15,19 @@ interface Project {
   createdAt: string;
   updatedAt: string;
   deepDiveStatus: {
+    // V1 fields
     hasViability: boolean;
     hasPlan: boolean;
     hasMarketing: boolean;
     hasRoadmap: boolean;
+    // V2 fields
+    hasChecklist: boolean;
+    hasFoundation: boolean;
+    hasGrowth: boolean;
+    hasFinancial: boolean;
+    hasResources: boolean;
+    // Which version
+    isV2: boolean;
   };
 }
 

@@ -43,40 +43,46 @@ export async function POST(request: Request) {
     }
 
     // Check if this idea already exists for this user
-    // First check by idea.id (exact match)
-    const { data: existingById } = await supabase
+    // Use raw SQL query for reliable JSONB comparison
+    const { data: existingIdeas, error: searchError } = await supabase
       .from("saved_ideas")
-      .select("id")
-      .eq("user_id", user.id)
-      .filter("idea_data->id", "eq", idea.id)
-      .single();
+      .select("id, idea_data")
+      .eq("user_id", user.id);
 
-    console.log("[save-idea] Existing by ID check:", { existing: existingById?.id });
-
-    if (existingById) {
-      console.log("[save-idea] Idea already saved (by ID)");
-      return NextResponse.json({
-        success: true,
-        data: { savedId: existingById.id, alreadySaved: true },
-      });
+    if (searchError) {
+      console.error("[save-idea] Error checking existing ideas:", searchError);
+      return NextResponse.json(
+        { success: false, error: "Failed to check for existing ideas" },
+        { status: 500 }
+      );
     }
 
-    // Also check by idea name + tagline to catch duplicates with regenerated IDs
-    const { data: existingByName } = await supabase
-      .from("saved_ideas")
-      .select("id")
-      .eq("user_id", user.id)
-      .filter("idea_data->name", "eq", idea.name)
-      .filter("idea_data->tagline", "eq", idea.tagline)
-      .single();
+    // Check for existing idea by ID or by name+tagline
+    interface SavedIdea {
+      id: string;
+      idea_data: Idea;
+    }
 
-    console.log("[save-idea] Existing by name check:", { existing: existingByName?.id });
+    const existingIdea = (existingIdeas as SavedIdea[] | null)?.find((saved) => {
+      const savedIdea = saved.idea_data;
+      // Check by ID first
+      if (savedIdea.id === idea.id) {
+        console.log("[save-idea] Found existing by ID match");
+        return true;
+      }
+      // Then check by name + tagline
+      if (savedIdea.name === idea.name && savedIdea.tagline === idea.tagline) {
+        console.log("[save-idea] Found existing by name+tagline match");
+        return true;
+      }
+      return false;
+    });
 
-    if (existingByName) {
-      console.log("[save-idea] Idea already saved (by name+tagline)");
+    if (existingIdea) {
+      console.log("[save-idea] Idea already saved:", { savedId: existingIdea.id });
       return NextResponse.json({
         success: true,
-        data: { savedId: existingByName.id, alreadySaved: true },
+        data: { savedId: existingIdea.id, alreadySaved: true },
       });
     }
 

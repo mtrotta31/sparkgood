@@ -27,10 +27,19 @@ const commitmentLabels: Record<string, string> = {
 };
 
 interface DeepDiveStatus {
+  // V1 fields
   hasViability: boolean;
   hasPlan: boolean;
   hasMarketing: boolean;
   hasRoadmap: boolean;
+  // V2 fields
+  hasChecklist: boolean;
+  hasFoundation: boolean;
+  hasGrowth: boolean;
+  hasFinancial: boolean;
+  hasResources: boolean;
+  // Which version
+  isV2: boolean;
 }
 
 interface ProjectCardProps {
@@ -52,14 +61,26 @@ export default function ProjectCard({
   deepDiveStatus,
   index,
 }: ProjectCardProps) {
-  // Calculate completion percentage
-  const completedTabs = [
-    deepDiveStatus.hasViability,
-    deepDiveStatus.hasPlan,
-    deepDiveStatus.hasMarketing,
-    deepDiveStatus.hasRoadmap,
-  ].filter(Boolean).length;
-  const completionPercent = Math.round((completedTabs / 4) * 100);
+  // Calculate completion percentage based on V1 or V2
+  const isV2 = deepDiveStatus.isV2;
+
+  const completedTabs = isV2
+    ? [
+        deepDiveStatus.hasFoundation,
+        deepDiveStatus.hasChecklist,
+        deepDiveStatus.hasGrowth,
+        deepDiveStatus.hasFinancial,
+        deepDiveStatus.hasResources,
+      ].filter(Boolean).length
+    : [
+        deepDiveStatus.hasViability,
+        deepDiveStatus.hasPlan,
+        deepDiveStatus.hasMarketing,
+        deepDiveStatus.hasRoadmap,
+      ].filter(Boolean).length;
+
+  const totalTabs = isV2 ? 5 : 4;
+  const completionPercent = Math.round((completedTabs / totalTabs) * 100);
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -144,10 +165,22 @@ export default function ProjectCard({
 
           {/* Deep dive status indicators */}
           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-warmwhite/5">
-            <StatusDot filled={deepDiveStatus.hasViability} label="Viability" />
-            <StatusDot filled={deepDiveStatus.hasPlan} label="Plan" />
-            <StatusDot filled={deepDiveStatus.hasMarketing} label="Marketing" />
-            <StatusDot filled={deepDiveStatus.hasRoadmap} label="Roadmap" />
+            {isV2 ? (
+              <>
+                <StatusDot filled={deepDiveStatus.hasFoundation} label="Foundation" />
+                <StatusDot filled={deepDiveStatus.hasChecklist} label="Checklist" />
+                <StatusDot filled={deepDiveStatus.hasGrowth} label="Growth" />
+                <StatusDot filled={deepDiveStatus.hasFinancial} label="Financial" />
+                <StatusDot filled={deepDiveStatus.hasResources} label="Resources" />
+              </>
+            ) : (
+              <>
+                <StatusDot filled={deepDiveStatus.hasViability} label="Viability" />
+                <StatusDot filled={deepDiveStatus.hasPlan} label="Plan" />
+                <StatusDot filled={deepDiveStatus.hasMarketing} label="Marketing" />
+                <StatusDot filled={deepDiveStatus.hasRoadmap} label="Roadmap" />
+              </>
+            )}
           </div>
         </div>
       </Link>
