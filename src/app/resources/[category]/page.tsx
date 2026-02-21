@@ -1,4 +1,4 @@
-// SparkGood Resource Directory - Category Page
+// SparkLocal Resource Directory - Category Page
 // Lists all resources in a category with filters
 
 import Link from "next/link";
@@ -41,8 +41,8 @@ export async function generateMetadata({
 
   const listingCount = count || 0;
 
-  const title = `${info.plural} for Entrepreneurs | SparkGood Resources`;
-  const description = `Browse ${listingCount} ${info.plural.toLowerCase()} to launch your social venture. ${info.description}. Compare options, eligibility, and apply.`;
+  const title = `${info.plural} for Entrepreneurs | SparkLocal Resources`;
+  const description = `Browse ${listingCount} ${info.plural.toLowerCase()} to launch your business. ${info.description}. Compare options, eligibility, and apply.`;
 
   return {
     title,
@@ -51,15 +51,15 @@ export async function generateMetadata({
       info.plural.toLowerCase(),
       `${info.name.toLowerCase()} for small business`,
       "entrepreneur resources",
-      "social venture support",
+      "business support",
       "business funding",
     ],
     openGraph: {
       title,
       description,
       type: "website",
-      siteName: "SparkGood",
-      url: `https://sparkgood.io/resources/${category}`,
+      siteName: "SparkLocal",
+      url: `https://sparklocal.co/resources/${category}`,
     },
     twitter: {
       card: "summary",
@@ -67,7 +67,7 @@ export async function generateMetadata({
       description,
     },
     alternates: {
-      canonical: `https://sparkgood.io/resources/${category}`,
+      canonical: `https://sparklocal.co/resources/${category}`,
     },
   };
 }
@@ -138,7 +138,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                 <span className="text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
             <span className="text-warmwhite-dim">/</span>
@@ -234,7 +234,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                     Get Matched
                   </h4>
                   <p className="text-warmwhite-dim text-sm mb-4">
-                    Let SparkGood recommend the best resources for your specific
+                    Let SparkLocal recommend the best resources for your specific
                     idea and location.
                   </p>
                   <Link

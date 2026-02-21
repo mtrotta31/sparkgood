@@ -1,8 +1,8 @@
 {
-  "name": "sparkgood",
+  "name": "sparklocal",
   "version": "0.1.0",
   "private": true,
-  "description": "Turn good intentions into real impact",
+  "description": "Find everything you need to start a business",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

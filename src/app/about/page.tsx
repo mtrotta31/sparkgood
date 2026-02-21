@@ -1,20 +1,20 @@
 // About Page
-// SparkGood's mission - bridging the intention-action gap
+// SparkLocal's mission - helping people start businesses
 
 import Link from "next/link";
 import type { Metadata } from "next";
 import Footer from "@/components/ui/Footer";
 
 export const metadata: Metadata = {
-  title: "About SparkGood — Our Mission",
+  title: "About SparkLocal — Our Mission",
   description:
-    "SparkGood bridges the gap between wanting to help and actually helping. We make it easy to turn good intentions into real-world impact through AI-powered tools and resources.",
+    "We believe starting a business shouldn't be this hard. SparkLocal removes the barriers between wanting to start a business and actually doing it.",
   openGraph: {
-    title: "About SparkGood — Our Mission",
-    description: "Bridging the gap between good intentions and real impact.",
+    title: "About SparkLocal — Our Mission",
+    description: "Removing barriers between wanting to start a business and doing it.",
     type: "website",
-    siteName: "SparkGood",
-    url: "https://sparkgood.io/about",
+    siteName: "SparkLocal",
+    url: "https://sparklocal.co/about",
   },
 };
 
@@ -29,7 +29,7 @@ export default function AboutPage() {
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold">
-              SparkGood
+              SparkLocal
             </span>
           </Link>
           <Link
@@ -45,15 +45,15 @@ export default function AboutPage() {
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-warmwhite mb-6">
-            Bridging the{" "}
+            Starting a business{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-spark to-accent">
-              intention-action gap
+              shouldn&apos;t be this hard
             </span>
           </h1>
           <p className="text-xl text-warmwhite-muted leading-relaxed">
-            Most people want to make a difference. The problem isn&apos;t caring —
-            it&apos;s knowing where to start. SparkGood removes the barriers between
-            good intentions and real impact.
+            SparkLocal removes the barriers between wanting to start a business
+            and actually doing it. We give you the tools, research, and local
+            resources to turn your idea into reality.
           </p>
         </div>
       </section>
@@ -67,30 +67,31 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-5xl font-bold text-spark mb-4">70%</div>
+              <div className="text-5xl font-bold text-spark mb-4">62%</div>
               <p className="text-warmwhite-muted">
-                of Americans care deeply about social causes and want to make a difference
+                of Americans dream of starting their own business
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-5xl font-bold text-red-400 mb-4">Few</div>
+              <div className="text-5xl font-bold text-red-400 mb-4">6%</div>
               <p className="text-warmwhite-muted">
-                translate that care into concrete, sustained action
+                actually take the leap and start one
               </p>
             </div>
           </div>
 
           <div className="prose prose-invert max-w-none">
             <p className="text-warmwhite-muted text-lg leading-relaxed mb-6">
-              It&apos;s not a motivation problem. It&apos;s a clarity problem.
+              It&apos;s not a motivation problem. It&apos;s an overwhelm problem.
             </p>
             <p className="text-warmwhite-muted text-lg leading-relaxed mb-6">
-              People get stuck asking: <em>What cause should I focus on? What can I realistically
-              do with my time and budget? How do I know if my idea will work? Where do I even begin?</em>
+              People get stuck asking: <em>What business should I start? Will this idea
+              actually work? How do I validate it? Where do I find funding? How do I write
+              a business plan? What do I do first?</em>
             </p>
             <p className="text-warmwhite text-lg leading-relaxed font-medium">
-              SparkGood answers these questions. We guide you from &ldquo;I want to help&rdquo;
-              to &ldquo;Here&apos;s exactly what to do.&rdquo;
+              SparkLocal answers these questions. We guide you from &ldquo;I have an idea&rdquo;
+              to &ldquo;Here&apos;s exactly how to launch it.&rdquo;
             </p>
           </div>
         </div>
@@ -106,43 +107,45 @@ export default function AboutPage() {
           <div className="space-y-6">
             <div className="p-6 rounded-2xl bg-charcoal border border-warmwhite/10">
               <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                Personalized to You
+                AI-Powered Business Planning
               </h3>
               <p className="text-warmwhite-muted">
-                Not everyone can start a nonprofit or quit their job. We meet you where you are —
-                whether you have a few hours a month or you&apos;re ready to go all in. Your budget,
-                time, experience, and passions shape every recommendation.
+                Our Idea Builder takes your interests, skills, and constraints and generates
+                personalized business ideas tailored to you. Not generic templates — real
+                opportunities matched to your unique situation.
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-charcoal border border-warmwhite/10">
               <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                Research-Backed Ideas
+                Real Market Research
               </h3>
               <p className="text-warmwhite-muted">
-                We don&apos;t just brainstorm — we research. Every idea is validated against real
-                market data, competitive landscape, and feasibility factors. You know before you
-                start whether your concept has legs.
+                We don&apos;t just brainstorm — we validate. Every idea gets real market
+                analysis, competitive landscape research, and viability scoring. You know
+                before you start whether your concept has potential.
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-charcoal border border-warmwhite/10">
               <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                Action-Ready Packages
+                Complete Launch Packages
               </h3>
               <p className="text-warmwhite-muted">
-                Ideas are worthless without execution. We give you business plans, marketing copy,
-                and step-by-step roadmaps. Not theory — tools you can use today.
+                Ideas are worthless without execution. We give you business plans, marketing
+                copy, financial projections, and step-by-step roadmaps. Not theory — tools
+                you can use today.
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-charcoal border border-warmwhite/10">
               <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                Free Resources
+                2,400+ Local Resources
               </h3>
               <p className="text-warmwhite-muted">
-                Our directory connects you with grants, accelerators, SBA resources, and more.
-                Real opportunities, searchable by location and focus area. All free.
+                Our directory connects you with coworking spaces, grants, accelerators,
+                SBA resources, and mentors in your area. Real opportunities, searchable
+                by location. All free to browse.
               </p>
             </div>
           </div>
@@ -160,11 +163,11 @@ export default function AboutPage() {
             <div className="text-center p-6">
               <div className="text-3xl mb-4">✦</div>
               <h3 className="font-display text-lg font-bold text-warmwhite mb-2">
-                Everyone Can Contribute
+                Everyone Can Start
               </h3>
               <p className="text-warmwhite-muted text-sm">
-                Impact isn&apos;t reserved for the wealthy or well-connected. Everyone has
-                something to offer.
+                Entrepreneurship isn&apos;t reserved for MBAs or venture capitalists.
+                Everyone has a business inside them waiting to come out.
               </p>
             </div>
 
@@ -182,11 +185,11 @@ export default function AboutPage() {
             <div className="text-center p-6">
               <div className="text-3xl mb-4">🌱</div>
               <h3 className="font-display text-lg font-bold text-warmwhite mb-2">
-                Small Starts Scale
+                Start Local, Scale Up
               </h3>
               <p className="text-warmwhite-muted text-sm">
-                The biggest movements started small. A local project can become a
-                national movement.
+                The best businesses start by solving problems in your community.
+                Local roots create global potential.
               </p>
             </div>
           </div>
@@ -197,16 +200,17 @@ export default function AboutPage() {
       <section className="py-24 px-4 bg-charcoal-dark">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-6">
-            Ready to make a difference?
+            Ready to start your business?
           </h2>
           <p className="text-warmwhite-muted text-lg mb-8">
-            Five minutes from now, you could have tailored ideas for creating impact.
+            Five minutes from now, you could have a personalized business idea with
+            a complete launch plan.
           </p>
           <Link
             href="/builder"
             className="inline-flex items-center gap-3 px-10 py-5 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/20"
           >
-            Find Your Spark
+            Start Building
             <svg
               className="w-5 h-5"
               fill="none"

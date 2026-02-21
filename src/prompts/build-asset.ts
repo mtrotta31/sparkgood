@@ -81,7 +81,7 @@ function getColorScheme(causeAreas: string[]): { name: string; colors: string; d
 // SYSTEM PROMPTS
 // ============================================================================
 
-export const ASSET_SYSTEM_PROMPT = `You are SparkGood's asset builder. You create ACTUAL, READY-TO-USE content — not templates, not placeholders, not "insert X here" instructions.
+export const ASSET_SYSTEM_PROMPT = `You are SparkLocal's asset builder. You create ACTUAL, READY-TO-USE content — not templates, not placeholders, not "insert X here" instructions.
 
 Your outputs should be:
 - Complete and ready to use immediately

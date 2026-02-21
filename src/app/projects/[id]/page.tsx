@@ -236,10 +236,14 @@ export default function ProjectPage() {
 
     // Build profile from project data or use defaults
     const profile: UserProfile = project.profile || {
+      businessCategory: null,
+      targetCustomer: null,
+      businessModelPreference: null,
+      keySkills: [],
       ventureType: null,
+      causes: [],
       format: null,
       location: null,
-      causes: [],
       experience: null,
       budget: null,
       commitment: null,
@@ -339,10 +343,14 @@ export default function ProjectPage() {
     setIsDownloadingPDF(true);
     try {
       const profile: UserProfile = project.profile || {
+        businessCategory: null,
+        targetCustomer: null,
+        businessModelPreference: null,
+        keySkills: [],
         ventureType: null,
+        causes: [],
         format: null,
         location: null,
-        causes: [],
         experience: null,
         budget: null,
         commitment: null,
@@ -376,7 +384,7 @@ export default function ProjectPage() {
 
       const contentDisposition = response.headers.get("Content-Disposition");
       const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-      link.download = filenameMatch?.[1] || `sparkgood-${project.idea.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+      link.download = filenameMatch?.[1] || `sparklocal-${project.idea.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
 
       document.body.appendChild(link);
       link.click();
@@ -406,10 +414,14 @@ export default function ProjectPage() {
 
     // Build profile from project data or use defaults
     const projectProfile: UserProfile = project.profile || {
+      businessCategory: null,
+      targetCustomer: null,
+      businessModelPreference: null,
+      keySkills: [],
       ventureType: null,
+      causes: [],
       format: null,
       location: null,
-      causes: [],
       experience: null,
       budget: null,
       commitment: null,
@@ -519,7 +531,7 @@ export default function ProjectPage() {
                 <span className="text-xs md:text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold hidden sm:inline text-sm">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
           </div>
@@ -547,10 +559,14 @@ export default function ProjectPage() {
 
   // Build profile for view components
   const profile: UserProfile = project.profile || {
+    businessCategory: null,
+    targetCustomer: null,
+    businessModelPreference: null,
+    keySkills: [],
     ventureType: null,
+    causes: [],
     format: null,
     location: null,
-    causes: [],
     experience: null,
     budget: null,
     commitment: null,
@@ -573,7 +589,7 @@ export default function ProjectPage() {
                   <span className="text-xs md:text-sm">✦</span>
                 </div>
                 <span className="font-display text-warmwhite font-semibold hidden sm:inline text-sm">
-                  SparkGood
+                  SparkLocal
                 </span>
               </Link>
 

@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 import Footer from "@/components/ui/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | SparkGood",
-  description: "SparkGood privacy policy - how we collect, use, and protect your data.",
+  title: "Privacy Policy | SparkLocal",
+  description: "SparkLocal privacy policy - how we collect, use, and protect your data.",
   robots: {
     index: true,
     follow: true,
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold">
-              SparkGood
+              SparkLocal
             </span>
           </Link>
           <Link
@@ -55,10 +55,10 @@ export default function PrivacyPage() {
                 Overview
               </h2>
               <p className="text-warmwhite-muted leading-relaxed">
-                SparkGood (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) respects your
+                SparkLocal (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) respects your
                 privacy and is committed to protecting your personal data. This privacy policy
                 explains how we collect, use, and safeguard your information when you use
-                our website and services at sparkgood.io.
+                our website and services at sparklocal.co.
               </p>
             </section>
 
@@ -150,7 +150,7 @@ export default function PrivacyPage() {
                 <li>Opt out of marketing communications</li>
               </ul>
               <p className="text-warmwhite-muted leading-relaxed mt-4">
-                To exercise these rights, contact us at privacy@sparkgood.io.
+                To exercise these rights, contact us at privacy@sparklocal.co.
               </p>
             </section>
 
@@ -196,7 +196,7 @@ export default function PrivacyPage() {
                 contact us at:
               </p>
               <p className="text-warmwhite mt-4">
-                privacy@sparkgood.io
+                privacy@sparklocal.co
               </p>
             </section>
           </div>

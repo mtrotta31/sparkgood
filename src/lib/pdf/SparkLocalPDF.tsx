@@ -1,4 +1,4 @@
-// SparkGood PDF Document
+// SparkLocal PDF Document
 // Generates a branded PDF with all deep dive sections
 
 import {
@@ -28,7 +28,7 @@ Font.register({
   ],
 });
 
-// SparkGood brand colors
+// SparkLocal brand colors
 const colors = {
   spark: "#F59E0B", // Amber accent
   sparkLight: "#FEF3C7",
@@ -297,7 +297,7 @@ function getVerdictText(verdict: string): string {
 }
 
 // Props for PDF document
-interface SparkGoodPDFProps {
+interface SparkLocalPDFProps {
   idea: Idea;
   profile: UserProfile;
   viability: ViabilityReport | null;
@@ -307,14 +307,14 @@ interface SparkGoodPDFProps {
 }
 
 // Main PDF Document Component
-export function SparkGoodPDF({
+export function SparkLocalPDF({
   idea,
   profile,
   viability,
   plan,
   marketing,
   roadmap,
-}: SparkGoodPDFProps) {
+}: SparkLocalPDFProps) {
   const generatedDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -339,7 +339,7 @@ export function SparkGoodPDF({
             <View style={styles.logoIcon}>
               <Text style={{ color: "#FFF", fontSize: 12 }}>✦</Text>
             </View>
-            <Text style={styles.logoText}>SparkGood</Text>
+            <Text style={styles.logoText}>SparkLocal</Text>
           </View>
           <Text style={styles.date}>Generated {generatedDate}</Text>
         </View>
@@ -465,7 +465,7 @@ export function SparkGoodPDF({
         {/* Footer */}
         <View style={styles.footer} fixed>
           <Text style={styles.footerText}>
-            SparkGood | sparkgood.io | Spark something good.
+            SparkLocal | sparklocal.co | Everything you need to start a business.
           </Text>
           <Text
             style={styles.pageNumber}
@@ -584,7 +584,7 @@ export function SparkGoodPDF({
           {/* Footer */}
           <View style={styles.footer} fixed>
             <Text style={styles.footerText}>
-              SparkGood | sparkgood.io | Spark something good.
+              SparkLocal | sparklocal.co | Everything you need to start a business.
             </Text>
             <Text
               style={styles.pageNumber}
@@ -680,7 +680,7 @@ export function SparkGoodPDF({
           {/* Footer */}
           <View style={styles.footer} fixed>
             <Text style={styles.footerText}>
-              SparkGood | sparkgood.io | Spark something good.
+              SparkLocal | sparklocal.co | Everything you need to start a business.
             </Text>
             <Text
               style={styles.pageNumber}
@@ -793,14 +793,14 @@ export function SparkGoodPDF({
               }}
             >
               The best time to start was yesterday. The second best time is now.
-              Pick one quick win and do it today. Spark something good.
+              Pick one quick win and do it today. Everything you need to start a business.
             </Text>
           </View>
 
           {/* Footer */}
           <View style={styles.footer} fixed>
             <Text style={styles.footerText}>
-              SparkGood | sparkgood.io | Spark something good.
+              SparkLocal | sparklocal.co | Everything you need to start a business.
             </Text>
             <Text
               style={styles.pageNumber}
@@ -815,4 +815,4 @@ export function SparkGoodPDF({
   );
 }
 
-export default SparkGoodPDF;
+export default SparkLocalPDF;

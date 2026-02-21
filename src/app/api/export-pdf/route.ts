@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
-import { SparkGoodPDF } from "@/lib/pdf/SparkGoodPDF";
+import { SparkLocalPDF } from "@/lib/pdf/SparkLocalPDF";
 import type {
   Idea,
   UserProfile,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     // Generate PDF buffer
     const pdfBuffer = await renderToBuffer(
-      SparkGoodPDF({
+      SparkLocalPDF({
         idea,
         profile,
         viability,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "")
       .substring(0, 50);
-    const filename = `sparkgood-${safeName}-${Date.now()}.pdf`;
+    const filename = `sparklocal-${safeName}-${Date.now()}.pdf`;
 
     console.log(`PDF generated successfully: ${filename} (${pdfBuffer.length} bytes)`);
 

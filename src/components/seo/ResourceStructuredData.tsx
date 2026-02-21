@@ -27,7 +27,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     "@context": "https://schema.org",
     name: listing.name,
     description: listing.description || listing.short_description,
-    url: listing.website || `https://sparkgood.io/resources/listing/${listing.slug}`,
+    url: listing.website || `https://sparklocal.co/resources/listing/${listing.slug}`,
   };
 
   // Add address if available
@@ -73,7 +73,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "event_space":
       return {
         "@type": "LocalBusiness",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -97,7 +97,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "incubator":
       return {
         "@type": "Organization",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -109,7 +109,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "sba":
       return {
         "@type": "GovernmentOrganization",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -125,7 +125,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "pitch_competition":
       return {
         "@type": "Organization",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -137,7 +137,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "marketing":
       return {
         "@type": "ProfessionalService",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -148,7 +148,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     case "investor":
       return {
         "@type": "Organization",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -159,7 +159,7 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
     default:
       return {
         "@type": "Organization",
-        "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+        "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
         ...baseData,
         ...addressData,
         ...contactData,
@@ -183,7 +183,7 @@ function generateGrantSchema(
 
   return {
     "@type": "MonetaryGrant",
-    "@id": `https://sparkgood.io/resources/listing/${listing.slug}`,
+    "@id": `https://sparklocal.co/resources/listing/${listing.slug}`,
     ...baseData,
     // Funder information
     funder: {

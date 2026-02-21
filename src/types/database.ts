@@ -18,11 +18,19 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
+          // Business category (determines path)
+          business_category: string | null;
+          // General business path fields
+          target_customer: string | null;
+          business_model_preference: string | null;
+          key_skills: string[];
+          // Social enterprise path fields
           venture_type: string | null;
+          causes: string[];
+          // Common fields
           format: string | null;
           location_city: string | null;
           location_state: string | null;
-          causes: string[];
           experience: string | null;
           budget: string | null;
           commitment: string | null;
@@ -35,11 +43,15 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
+          business_category?: string | null;
+          target_customer?: string | null;
+          business_model_preference?: string | null;
+          key_skills?: string[];
           venture_type?: string | null;
+          causes?: string[];
           format?: string | null;
           location_city?: string | null;
           location_state?: string | null;
-          causes?: string[];
           experience?: string | null;
           budget?: string | null;
           commitment?: string | null;
@@ -52,11 +64,15 @@ export interface Database {
         Update: {
           id?: string;
           user_id?: string;
+          business_category?: string | null;
+          target_customer?: string | null;
+          business_model_preference?: string | null;
+          key_skills?: string[];
           venture_type?: string | null;
+          causes?: string[];
           format?: string | null;
           location_city?: string | null;
           location_state?: string | null;
-          causes?: string[];
           experience?: string | null;
           budget?: string | null;
           commitment?: string | null;
@@ -183,13 +199,21 @@ export function dbProfileToUserProfile(
   row: Database["public"]["Tables"]["user_profiles"]["Row"]
 ): UserProfile {
   return {
+    // Business category (determines path)
+    businessCategory: row.business_category as UserProfile["businessCategory"],
+    // General business path fields
+    targetCustomer: row.target_customer as UserProfile["targetCustomer"],
+    businessModelPreference: row.business_model_preference as UserProfile["businessModelPreference"],
+    keySkills: (row.key_skills || []) as UserProfile["keySkills"],
+    // Social enterprise path fields
     ventureType: row.venture_type as UserProfile["ventureType"],
+    causes: (row.causes || []) as UserProfile["causes"],
+    // Common fields
     format: row.format as UserProfile["format"],
     location:
       row.location_city && row.location_state
         ? { city: row.location_city, state: row.location_state }
         : null,
-    causes: row.causes as UserProfile["causes"],
     experience: row.experience as UserProfile["experience"],
     budget: row.budget as UserProfile["budget"],
     commitment: row.commitment as UserProfile["commitment"],
@@ -205,11 +229,19 @@ export function userProfileToDbProfile(
 ): Database["public"]["Tables"]["user_profiles"]["Insert"] {
   return {
     user_id: userId,
+    // Business category
+    business_category: profile.businessCategory,
+    // General business path fields
+    target_customer: profile.targetCustomer,
+    business_model_preference: profile.businessModelPreference,
+    key_skills: profile.keySkills || [],
+    // Social enterprise path fields
     venture_type: profile.ventureType,
+    causes: profile.causes || [],
+    // Common fields
     format: profile.format,
     location_city: profile.location?.city || null,
     location_state: profile.location?.state || null,
-    causes: profile.causes,
     experience: profile.experience,
     budget: profile.budget,
     commitment: profile.commitment,

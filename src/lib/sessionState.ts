@@ -3,7 +3,7 @@
 
 import type { UserProfile, Idea } from "@/types";
 
-const STORAGE_KEY = "sparkgood_pending_session";
+const STORAGE_KEY = "sparklocal_pending_session";
 
 export interface PendingSessionState {
   profile: UserProfile;

@@ -44,7 +44,7 @@ export default function Header({
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold hidden sm:inline">
-              SparkGood
+              SparkLocal
             </span>
           </Link>
 

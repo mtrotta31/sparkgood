@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 import Footer from "@/components/ui/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | SparkGood",
-  description: "SparkGood terms of service - the rules and guidelines for using our platform.",
+  title: "Terms of Service | SparkLocal",
+  description: "SparkLocal terms of service - the rules and guidelines for using our platform.",
   robots: {
     index: true,
     follow: true,
@@ -27,7 +27,7 @@ export default function TermsPage() {
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold">
-              SparkGood
+              SparkLocal
             </span>
           </Link>
           <Link
@@ -55,7 +55,7 @@ export default function TermsPage() {
                 Agreement to Terms
               </h2>
               <p className="text-warmwhite-muted leading-relaxed">
-                By accessing or using SparkGood (&ldquo;the Service&rdquo;), you agree to be bound
+                By accessing or using SparkLocal (&ldquo;the Service&rdquo;), you agree to be bound
                 by these Terms of Service. If you do not agree to these terms, please do not
                 use our Service.
               </p>
@@ -66,10 +66,9 @@ export default function TermsPage() {
                 Description of Service
               </h2>
               <p className="text-warmwhite-muted leading-relaxed">
-                SparkGood is a platform that helps users generate social impact ideas and
-                provides tools for planning, marketing, and launching ventures. We also
-                offer a directory of business resources including grants, accelerators,
-                and other entrepreneurial support services.
+                SparkLocal is a platform that helps users start businesses by providing
+                AI-powered planning tools and a directory of local business resources
+                including coworking spaces, grants, accelerators, and mentorship programs.
               </p>
             </section>
 
@@ -112,7 +111,7 @@ export default function TermsPage() {
               </h2>
               <p className="text-warmwhite-muted leading-relaxed mb-4">
                 <strong>Our Content:</strong> The Service and its original content, features,
-                and functionality are owned by SparkGood and are protected by international
+                and functionality are owned by SparkLocal and are protected by international
                 copyright, trademark, and other intellectual property laws.
               </p>
               <p className="text-warmwhite-muted leading-relaxed">
@@ -194,7 +193,7 @@ export default function TermsPage() {
                 Indemnification
               </h2>
               <p className="text-warmwhite-muted leading-relaxed">
-                You agree to indemnify and hold harmless SparkGood and its officers, directors,
+                You agree to indemnify and hold harmless SparkLocal and its officers, directors,
                 employees, and agents from any claims, damages, losses, or expenses arising
                 from your use of the Service or violation of these Terms.
               </p>
@@ -242,7 +241,7 @@ export default function TermsPage() {
                 If you have questions about these Terms of Service, please contact us at:
               </p>
               <p className="text-warmwhite mt-4">
-                legal@sparkgood.io
+                legal@sparklocal.co
               </p>
             </section>
           </div>

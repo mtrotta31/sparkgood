@@ -1,4 +1,4 @@
-// SparkGood Resource Directory - Individual Listing Page
+// SparkLocal Resource Directory - Individual Listing Page
 // Detailed view of a single resource
 
 import Link from "next/link";
@@ -48,7 +48,7 @@ export async function generateMetadata({
     ? `in ${listing.city}, ${listing.state}`
     : "";
 
-  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs | SparkGood`;
+  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs | SparkLocal`;
 
   const description = listing.short_description ||
     `${listing.name} is a ${categoryName} ${location} for entrepreneurs. Learn about eligibility, how to apply, and more.`;
@@ -68,8 +68,8 @@ export async function generateMetadata({
       title: listing.name,
       description,
       type: "website",
-      siteName: "SparkGood",
-      url: `https://sparkgood.io/resources/listing/${slug}`,
+      siteName: "SparkLocal",
+      url: `https://sparklocal.co/resources/listing/${slug}`,
       ...(listing.logo_url && {
         images: [
           {
@@ -88,7 +88,7 @@ export async function generateMetadata({
       ...(listing.logo_url && { images: [listing.logo_url] }),
     },
     alternates: {
-      canonical: `https://sparkgood.io/resources/listing/${slug}`,
+      canonical: `https://sparklocal.co/resources/listing/${slug}`,
     },
   };
 }
@@ -145,7 +145,7 @@ export default async function ListingPage({ params }: PageProps) {
                 <span className="text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
           </div>
@@ -545,13 +545,13 @@ export default async function ListingPage({ params }: PageProps) {
                   </dl>
                 </div>
 
-                {/* SparkGood CTA */}
+                {/* SparkLocal CTA */}
                 <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
                   <h4 className="font-display text-warmwhite font-semibold mb-2">
                     Need help applying?
                   </h4>
                   <p className="text-warmwhite-dim text-sm mb-4">
-                    SparkGood can help you build a business plan, pitch deck,
+                    SparkLocal can help you build a business plan, pitch deck,
                     and application materials.
                   </p>
                   <Link

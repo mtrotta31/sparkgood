@@ -1,5 +1,5 @@
-// SparkGood Landing Page
-// "Campfire energy" - warm, grounded, mentorship-feeling
+// SparkLocal Landing Page
+// "Find everything you need to start a business."
 
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -31,8 +31,18 @@ async function getCategoryCounts() {
   }
 }
 
+// Calculate total resources
+function getTotalResources(counts: Record<string, number>): string {
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  if (total >= 1000) {
+    return `${(total / 1000).toFixed(1)}k+`;
+  }
+  return `${total}+`;
+}
+
 export default async function Home() {
   const categoryCounts = await getCategoryCounts();
+  const totalResources = getTotalResources(categoryCounts);
 
   return (
     <main className="min-h-screen bg-charcoal-dark">
@@ -44,15 +54,23 @@ export default async function Home() {
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold">
-              SparkGood
+              SparkLocal
             </span>
           </div>
-          <Link
-            href="/builder"
-            className="px-5 py-2 bg-spark hover:bg-spark-600 text-charcoal-dark font-semibold rounded-full transition-colors text-sm"
-          >
-            Get Started
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/resources"
+              className="text-warmwhite-muted hover:text-warmwhite transition-colors text-sm hidden sm:block"
+            >
+              Resources
+            </Link>
+            <Link
+              href="/builder"
+              className="px-5 py-2 bg-spark hover:bg-spark-600 text-charcoal-dark font-semibold rounded-full transition-colors text-sm"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -67,43 +85,65 @@ export default async function Home() {
 
         {/* Headline */}
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold text-warmwhite mb-6 tracking-tight max-w-4xl px-2">
-          Spark something{" "}
+          Start your{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-spark to-accent">
-            good.
-          </span>
+            business
+          </span>{" "}
+          today.
         </h1>
 
-        {/* Subheadline - reader as hero */}
+        {/* Subheadline */}
         <p className="text-xl md:text-2xl text-warmwhite-muted max-w-2xl mb-8 font-body leading-relaxed">
-          You want to make a difference but don&apos;t know where to start.
+          AI-powered business planning and {totalResources} local resources.
           <br className="hidden md:block" />
-          We&apos;ll help you find the right idea — and actually launch it.
+          Everything you need to go from idea to launch.
         </p>
 
-        {/* Primary CTA */}
-        <Link
-          href="/builder"
-          className="group px-10 py-5 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/20 hover:shadow-xl hover:shadow-spark/30 flex items-center gap-3"
-        >
-          Find Your Spark
-          <svg
-            className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
+        {/* Dual CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <Link
+            href="/builder"
+            className="group px-10 py-5 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/20 hover:shadow-xl hover:shadow-spark/30 flex items-center gap-3"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
-          </svg>
-        </Link>
+            Build Your Plan
+            <svg
+              className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+          </Link>
+          <Link
+            href="/resources"
+            className="group px-10 py-5 bg-warmwhite/10 hover:bg-warmwhite/20 text-warmwhite font-bold rounded-full transition-all text-lg flex items-center gap-3"
+          >
+            Find Local Resources
+            <svg
+              className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </Link>
+        </div>
 
         {/* Trust Badge */}
-        <p className="mt-8 text-warmwhite-dim text-sm">
-          Free to start • Takes 5 minutes • No credit card
+        <p className="mt-4 text-warmwhite-dim text-sm">
+          Free to start • No credit card required
         </p>
 
         {/* Scroll indicator */}
@@ -124,59 +164,116 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* The Problem - Intention-Action Gap */}
+      {/* Two Products Section */}
       <section className="py-24 px-4 bg-charcoal border-t border-warmwhite/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-6">
-            The gap between{" "}
-            <span className="text-spark">wanting to help</span> and{" "}
-            <span className="text-spark">actually helping</span>
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mt-12">
-            {/* Stat Card 1 */}
-            <div className="p-6 md:p-8 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-spark mb-3 md:mb-4">
-                70%
-              </div>
-              <p className="text-warmwhite-muted text-base md:text-lg">
-                of Americans care deeply about social causes
-              </p>
-            </div>
-
-            {/* Stat Card 2 */}
-            <div className="p-6 md:p-8 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-red-400 mb-3 md:mb-4">
-                Few
-              </div>
-              <p className="text-warmwhite-muted text-base md:text-lg">
-                translate that care into concrete action
-              </p>
-            </div>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
+              Two ways to get started
+            </h2>
+            <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto">
+              Whether you need help figuring out your idea or you&apos;re ready to find resources, we&apos;ve got you covered.
+            </p>
           </div>
 
-          <p className="text-warmwhite-muted text-lg mt-12 max-w-2xl mx-auto leading-relaxed">
-            It&apos;s not that people don&apos;t care. It&apos;s that they
-            don&apos;t know where to start. Too many ideas, not enough
-            direction. Too much complexity, not enough time.
-          </p>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Product 1: Business Idea Builder */}
+            <div className="p-8 rounded-2xl bg-gradient-to-br from-spark/10 to-accent/5 border border-spark/20">
+              <div className="w-14 h-14 rounded-xl bg-spark/20 flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-2xl font-bold text-warmwhite mb-3">
+                Business Idea Builder
+              </h3>
+              <p className="text-warmwhite-muted mb-6 leading-relaxed">
+                Answer a few questions about yourself. Get 4 personalized business ideas tailored to your skills, budget, and goals. Then dive deep with market research, business plans, and marketing assets.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-spark">✓</span>
+                  AI-generated business ideas
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-spark">✓</span>
+                  Market research & viability analysis
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-spark">✓</span>
+                  Complete business plans
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-spark">✓</span>
+                  Marketing assets & launch roadmap
+                </li>
+              </ul>
+              <Link
+                href="/builder"
+                className="inline-flex items-center gap-2 text-spark hover:text-spark-400 font-medium transition-colors"
+              >
+                Start Building
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
 
-          <p className="text-warmwhite text-xl mt-8 font-medium">
-            SparkGood closes that gap.
-          </p>
+            {/* Product 2: Local Resources Directory */}
+            <div className="p-8 rounded-2xl bg-charcoal-light border border-warmwhite/10">
+              <div className="w-14 h-14 rounded-xl bg-blue-400/10 flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-2xl font-bold text-warmwhite mb-3">
+                Local Resources Directory
+              </h3>
+              <p className="text-warmwhite-muted mb-6 leading-relaxed">
+                Search {totalResources} coworking spaces, grants, accelerators, and SBA resources near you. Filter by location and find exactly what you need to get your business off the ground.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-blue-400">✓</span>
+                  {categoryCounts.coworking}+ coworking spaces
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-blue-400">✓</span>
+                  {categoryCounts.grant}+ grant programs
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-blue-400">✓</span>
+                  {categoryCounts.accelerator}+ accelerators
+                </li>
+                <li className="flex items-center gap-2 text-warmwhite-muted text-sm">
+                  <span className="text-blue-400">✓</span>
+                  {categoryCounts.sba}+ SBA resources
+                </li>
+              </ul>
+              <Link
+                href="/resources"
+                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+              >
+                Browse Resources
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* How the Builder Works */}
       <section className="py-24 px-4 bg-charcoal-dark">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
-              From &ldquo;I want to help&rdquo; to &ldquo;I&apos;m making a
-              difference&rdquo;
+              From idea to launch plan in minutes
             </h2>
             <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto">
-              Three steps. One conversation. Your complete launch package.
+              Our AI does the heavy lifting. You just answer a few questions.
             </p>
           </div>
 
@@ -189,12 +286,10 @@ export default async function Home() {
                   <span className="text-spark font-bold text-xl">1</span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                  Answer a few questions
+                  Tell us about yourself
                 </h3>
                 <p className="text-warmwhite-muted leading-relaxed">
-                  Not a survey — a conversation. What causes light you up? How
-                  much time can you give? What&apos;s your budget? We get to
-                  know you.
+                  What are you interested in? How much time can you commit? What&apos;s your budget? A quick conversation to understand your situation.
                 </p>
               </div>
               {/* Connector */}
@@ -208,12 +303,10 @@ export default async function Home() {
                   <span className="text-spark font-bold text-xl">2</span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-warmwhite mb-3">
-                  Get tailored ideas
+                  Get business ideas
                 </h3>
                 <p className="text-warmwhite-muted leading-relaxed">
-                  AI generates social impact concepts calibrated to your life.
-                  Weekend warrior? Simple actions. All in? Ambitious ventures.
-                  Each idea fits you.
+                  Our AI generates 4 personalized business concepts that match your interests, skills, and constraints. Pick the one that excites you.
                 </p>
               </div>
               {/* Connector */}
@@ -230,9 +323,7 @@ export default async function Home() {
                   Get your launch package
                 </h3>
                 <p className="text-warmwhite-muted leading-relaxed">
-                  Viability analysis. Game plan. Marketing copy. Action
-                  roadmap. Everything you need to stop planning and start
-                  doing.
+                  Market research. Business plan. Marketing copy. Action roadmap. Everything you need to stop planning and start doing.
                 </p>
               </div>
             </div>
@@ -240,7 +331,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Free Business Resources */}
+      {/* Resource Directory Preview */}
       <section className="py-24 px-4 bg-charcoal border-t border-warmwhite/5">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -248,11 +339,10 @@ export default async function Home() {
               Free Resource
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
-              Business Resources Directory
+              {totalResources} Local Business Resources
             </h2>
             <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto">
-              Grants, accelerators, and support programs to fuel your venture.
-              Searchable by location. Always free.
+              Find coworking spaces, grants, accelerators, and mentorship programs near you. Searchable by location. Always free.
             </p>
           </div>
 
@@ -292,7 +382,7 @@ export default async function Home() {
                 Accelerators
               </h3>
               <p className="text-warmwhite-muted text-sm mb-3">
-                Intensive programs to fast-track your startup
+                Intensive programs to fast-track growth
               </p>
               <span className="text-warmwhite-dim text-xs">
                 {categoryCounts.accelerator} listings
@@ -356,108 +446,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Social Proof Stats */}
-      <section className="py-24 px-4 bg-charcoal border-t border-b border-warmwhite/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
-              The movement is already happening
-            </h2>
-            <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto">
-              Social entrepreneurship isn&apos;t a niche. It&apos;s where the
-              world is heading.
-            </p>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div className="text-center p-4 md:p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-spark mb-2">
-                $2T
-              </div>
-              <p className="text-warmwhite-muted text-xs sm:text-sm">
-                annual social enterprise revenue globally
-              </p>
-            </div>
-
-            <div className="text-center p-4 md:p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-spark mb-2">
-                10M
-              </div>
-              <p className="text-warmwhite-muted text-xs sm:text-sm">
-                social enterprises worldwide
-              </p>
-            </div>
-
-            <div className="text-center p-4 md:p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-spark mb-2">
-                200M+
-              </div>
-              <p className="text-warmwhite-muted text-xs sm:text-sm">
-                jobs created by social ventures
-              </p>
-            </div>
-
-            <div className="text-center p-4 md:p-6 rounded-2xl bg-charcoal-light border border-warmwhite/10">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-spark mb-2">
-                60%
-              </div>
-              <p className="text-warmwhite-muted text-xs sm:text-sm">
-                of entrepreneurs prioritize impact over profit
-              </p>
-            </div>
-          </div>
-
-          {/* Supporting Quote */}
-          <div className="mt-16 text-center">
-            <p className="text-warmwhite text-xl md:text-2xl font-display italic max-w-3xl mx-auto">
-              &ldquo;When people see clear pathways to help, action increases by
-              55%.&rdquo;
-            </p>
-            <p className="text-warmwhite-dim text-sm mt-4">
-              — Social Impact Research, 2024
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Who It's For */}
       <section className="py-24 px-4 bg-charcoal-dark">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-4">
-              Built for people who want to do good
+              Built for aspiring entrepreneurs
             </h2>
             <p className="text-warmwhite-muted text-lg">
-              Not just for startup founders. For anyone with good intentions.
+              Whether you&apos;re starting a side hustle or going all in, we&apos;ve got you.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {[
               {
-                title: "Weekend Warriors",
+                title: "Side Hustlers",
                 description:
-                  "You have a few hours a month and want to make them count. We'll find simple, powerful actions you can start this weekend.",
+                  "You have a few hours a week and want to start something on the side. We'll help you find low-commitment business ideas that work with your schedule.",
                 icon: "☀️",
               },
               {
-                title: "Steady Builders",
+                title: "First-Time Founders",
                 description:
-                  "You can commit a few hours a week to something meaningful. We'll help you build something that grows over time.",
-                icon: "⚡",
+                  "You're ready to start a real business but don't know where to begin. We'll guide you from idea to launch with everything you need.",
+                icon: "🚀",
               },
               {
                 title: "Career Changers",
                 description:
-                  "You're ready to align your work with your values. We'll help you explore purpose-driven paths that fit your skills.",
+                  "You're ready to leave your job and do your own thing. We'll help you explore options and build a plan you can believe in.",
                 icon: "🔄",
               },
               {
-                title: "All-In Entrepreneurs",
+                title: "Local Business Owners",
                 description:
-                  "You're ready to commit serious time and resources. We'll help you build a venture that can change the world.",
-                icon: "🚀",
+                  "You're starting a local business and need resources. Find coworking spaces, grants, and mentors in your area.",
+                icon: "📍",
               },
             ].map((persona) => (
               <div
@@ -516,7 +541,7 @@ export default async function Home() {
               {
                 title: "Your Game Plan",
                 description:
-                  "A clear business or project plan tailored to your venture type and budget.",
+                  "A clear business plan tailored to your venture type and budget.",
                 icon: (
                   <svg
                     className="w-6 h-6"
@@ -601,19 +626,18 @@ export default async function Home() {
           </div>
 
           <h2 className="font-display text-4xl md:text-5xl font-bold text-warmwhite mb-6">
-            Ready to spark something good?
+            Ready to start your business?
           </h2>
 
           <p className="text-warmwhite-muted text-xl mb-10 max-w-xl mx-auto">
-            Five minutes from now, you could have four tailored ideas for making
-            a difference. The world needs what you have to offer.
+            In just a few minutes, you could have personalized business ideas and a complete plan to make it happen.
           </p>
 
           <Link
             href="/builder"
             className="group inline-flex items-center gap-3 px-12 py-6 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-all text-xl shadow-xl shadow-spark/30 hover:shadow-2xl hover:shadow-spark/40"
           >
-            Find Your Spark
+            Get Started Free
             <svg
               className="w-6 h-6 group-hover:translate-x-1 transition-transform"
               fill="none"

@@ -1,4 +1,4 @@
-// Robots.txt for SparkGood
+// Robots.txt for SparkLocal
 // Tells search engines where to find the sitemap and what to crawl
 
 import { MetadataRoute } from "next";
@@ -15,6 +15,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://sparkgood.io/sitemap.xml",
+    sitemap: "https://sparklocal.co/sitemap.xml",
   };
 }

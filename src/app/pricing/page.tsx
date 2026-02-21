@@ -58,7 +58,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl">✨</span>
-            <span className="font-display text-xl font-bold text-warmwhite">SparkGood</span>
+            <span className="font-display text-xl font-bold text-warmwhite">SparkLocal</span>
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
@@ -87,7 +87,7 @@ export default function PricingPage() {
             Turn Ideas Into <span className="text-spark">Action</span>
           </h1>
           <p className="text-lg md:text-xl text-warmwhite-muted max-w-2xl mx-auto">
-            From spark to launch. Get market research, business plans, marketing assets, and action roadmaps — everything you need to make your impact real.
+            From idea to launch. Get market research, business plans, marketing assets, and action roadmaps — everything you need to start your business.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function PricingPage() {
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-3xl font-bold text-warmwhite">$0</span>
               </div>
-              <p className="text-warmwhite-muted text-sm">Start exploring your impact</p>
+              <p className="text-warmwhite-muted text-sm">Start exploring your ideas</p>
             </div>
 
             <ul className="space-y-3 mb-8">

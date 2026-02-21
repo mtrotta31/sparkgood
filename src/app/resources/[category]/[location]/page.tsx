@@ -1,4 +1,4 @@
-// SparkGood Resource Directory - Category + Location Page
+// SparkLocal Resource Directory - Category + Location Page
 // Lists resources in a specific category and location (e.g., /resources/grant/austin-tx)
 
 import Link from "next/link";
@@ -53,7 +53,7 @@ export async function generateMetadata({
 
   // Generate SEO-optimized title
   const title = locationData.seo_title ||
-    `${categoryInfo.name === "Grant" ? "Small Business Grants" : categoryInfo.plural} in ${cityState} | SparkGood`;
+    `${categoryInfo.name === "Grant" ? "Small Business Grants" : categoryInfo.plural} in ${cityState} | SparkLocal`;
 
   // Generate SEO-optimized description with count
   const description = locationData.seo_description ||
@@ -73,8 +73,8 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      siteName: "SparkGood",
-      url: `https://sparkgood.io/resources/${category}/${location}`,
+      siteName: "SparkLocal",
+      url: `https://sparklocal.co/resources/${category}/${location}`,
     },
     twitter: {
       card: "summary",
@@ -82,7 +82,7 @@ export async function generateMetadata({
       description,
     },
     alternates: {
-      canonical: `https://sparkgood.io/resources/${category}/${location}`,
+      canonical: `https://sparklocal.co/resources/${category}/${location}`,
     },
   };
 }
@@ -152,7 +152,7 @@ export default async function CategoryLocationPage({ params }: PageProps) {
                 <span className="text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
           </div>
@@ -370,10 +370,10 @@ export default async function CategoryLocationPage({ params }: PageProps) {
                 <span className="text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
-            <p className="text-warmwhite-dim text-sm">© 2026 SparkGood</p>
+            <p className="text-warmwhite-dim text-sm">© 2026 SparkLocal</p>
           </div>
         </div>
       </footer>

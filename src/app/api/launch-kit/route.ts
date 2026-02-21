@@ -17,7 +17,7 @@ interface LaunchKitRequest {
   profile: UserProfile;
 }
 
-const LAUNCH_KIT_SYSTEM_PROMPT = `You are SparkGood's launch kit generator — a marketing expert who creates complete launch packages for social impact ventures.
+const LAUNCH_KIT_SYSTEM_PROMPT = `You are SparkLocal's launch kit generator — a marketing expert who creates complete launch packages for social impact ventures.
 
 Your copy is:
 - Action-oriented and specific
@@ -138,7 +138,7 @@ Create a simple, standalone HTML page that works without external dependencies. 
 
 **IMPORTANT - Color Scheme:** Use a ${colorScheme.description}.
 Specific colors: ${colorScheme.colors}
-DO NOT use dark backgrounds or the default amber/charcoal SparkGood brand colors. The landing page should feel appropriate for a ${idea.causeAreas?.[0] || "community"}-focused venture.
+DO NOT use dark backgrounds or the default amber/charcoal SparkLocal brand colors. The landing page should feel appropriate for a ${idea.causeAreas?.[0] || "community"}-focused venture.
 
 ### 2. Social Media Posts (4 platforms)
 Create launch announcement posts for:
@@ -505,6 +505,6 @@ Ready?
 P.S. — Hit reply and let me know which action you're taking. I'll personally respond.`,
       },
     },
-    elevatorPitch: `We help ${idea.audience.toLowerCase()} by ${idea.tagline.toLowerCase()}. ${idea.problem.split('.')[0]}. ${idea.name} changes that by creating ${idea.impact.toLowerCase()}. Join us and be part of the solution.`,
+    elevatorPitch: `We help ${idea.audience.toLowerCase()} by ${idea.tagline.toLowerCase()}. ${idea.problem.split('.')[0]}. ${idea.name} changes that by ${idea.impact ? `creating ${idea.impact.toLowerCase()}` : idea.valueProposition || 'delivering real value'}. Join us and be part of the solution.`,
   };
 }

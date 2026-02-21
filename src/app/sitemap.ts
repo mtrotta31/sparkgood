@@ -1,4 +1,4 @@
-// Dynamic Sitemap for SparkGood
+// Dynamic Sitemap for SparkLocal
 // Generates sitemap.xml for all resource directory pages
 // Critical for SEO - helps Google index 16,000+ pages
 
@@ -6,7 +6,7 @@ import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
 
-const BASE_URL = "https://sparkgood.io";
+const BASE_URL = "https://sparklocal.co";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();

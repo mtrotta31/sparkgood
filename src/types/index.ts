@@ -1,4 +1,4 @@
-// SparkGood TypeScript Types
+// SparkLocal TypeScript Types
 
 // User intake/profile types
 export type VentureType = "project" | "nonprofit" | "business" | "hybrid";
@@ -8,6 +8,38 @@ export type BudgetLevel = "zero" | "low" | "medium" | "high";
 export type CommitmentLevel = "weekend" | "steady" | "all_in";
 export type Depth = "ideas" | "full";
 
+// Business category types (general business path)
+export type BusinessCategory =
+  | "food_beverage"
+  | "health_wellness"
+  | "education"
+  | "technology"
+  | "ecommerce"
+  | "professional_services"
+  | "creative_arts"
+  | "real_estate"
+  | "social_enterprise"
+  | "other";
+
+export type BusinessModelPreference =
+  | "product"
+  | "service"
+  | "subscription"
+  | "marketplace";
+
+export type TargetCustomer = "b2b" | "b2c" | "b2g" | "other";
+
+export type KeySkill =
+  | "sales_marketing"
+  | "technical"
+  | "design_creative"
+  | "finance_accounting"
+  | "operations"
+  | "customer_service"
+  | "leadership"
+  | "industry_expertise";
+
+// Cause areas (social enterprise path)
 export type CauseArea =
   | "environment"
   | "education"
@@ -23,10 +55,21 @@ export type CauseArea =
   | "tech_access";
 
 export interface UserProfile {
+  // Business category (first choice - determines path)
+  businessCategory: BusinessCategory | null;
+
+  // General business path fields
+  targetCustomer: TargetCustomer | null;
+  businessModelPreference: BusinessModelPreference | null;
+  keySkills: KeySkill[];
+
+  // Social enterprise path fields
   ventureType: VentureType | null;
+  causes: CauseArea[];
+
+  // Common fields (both paths)
   format: Format | null;
   location: UserLocation | null;
-  causes: CauseArea[];
   experience: ExperienceLevel | null;
   budget: BudgetLevel | null;
   commitment: CommitmentLevel | null;
@@ -48,8 +91,16 @@ export interface Idea {
   problem: string;
   audience: string;
   revenueModel: string | null; // null for pure community projects
-  impact: string;
-  causeAreas: CauseArea[];
+
+  // Social enterprise fields
+  impact?: string;
+  causeAreas?: CauseArea[];
+
+  // General business fields
+  businessCategory?: BusinessCategory;
+  valueProposition?: string;
+  competitiveAdvantage?: string;
+
   // Extended fields from generation
   mechanism?: string;
   whyNow?: string;
@@ -242,10 +293,17 @@ export interface EmailSequence {
 // Step state for the guided flow
 export type StepName =
   | "welcome"
+  | "business_category" // New first step - choose business category
+  // General business path
+  | "target_customer"
+  | "business_model"
+  | "key_skills"
+  // Social enterprise path
   | "venture_type"
+  | "causes"
+  // Common steps (both paths)
   | "format"
   | "location"
-  | "causes"
   | "experience"
   | "budget"
   | "commitment"

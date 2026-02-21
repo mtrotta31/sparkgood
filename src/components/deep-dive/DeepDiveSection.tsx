@@ -543,7 +543,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
       // Extract filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get("Content-Disposition");
       const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-      link.download = filenameMatch?.[1] || `sparkgood-${idea.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+      link.download = filenameMatch?.[1] || `sparklocal-${idea.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
 
       document.body.appendChild(link);
       link.click();
@@ -571,7 +571,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
                   <span className="text-xs md:text-sm">✦</span>
                 </div>
                 <span className="font-display text-warmwhite font-semibold hidden sm:inline text-sm">
-                  SparkGood
+                  SparkLocal
                 </span>
               </a>
 

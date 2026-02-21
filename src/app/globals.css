@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SparkGood Brand Variables */
+/* SparkLocal Brand Variables */
 :root {
   /* Colors */
   --spark: #F59E0B;
@@ -19,7 +19,7 @@
   --foreground: #1C1412;
 }
 
-/* SparkGood uses dark mode by default - "campfire energy" */
+/* SparkLocal uses dark mode by default - "campfire energy" */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0F0B09;
@@ -27,7 +27,7 @@
   }
 }
 
-/* Force dark mode for SparkGood brand */
+/* Force dark mode for SparkLocal brand */
 html {
   color-scheme: dark;
 }

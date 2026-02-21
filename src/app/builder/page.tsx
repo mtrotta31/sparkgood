@@ -4,10 +4,17 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { ProgressBar, Header } from "@/components/ui";
 import {
   Welcome,
+  BusinessCategory,
+  // General business path
+  TargetCustomer,
+  BusinessModel,
+  KeySkills,
+  // Social enterprise path
   VentureType,
+  CauseSelect,
+  // Common steps
   Format,
   Location,
-  CauseSelect,
   Experience,
   Budget,
   Commitment,
@@ -25,6 +32,10 @@ import { loadPendingSession, clearPendingSession } from "@/lib/sessionState";
 import type {
   UserProfile,
   UserLocation,
+  BusinessCategory as BusinessCategoryType,
+  TargetCustomer as TargetCustomerType,
+  BusinessModelPreference,
+  KeySkill,
   VentureType as VentureTypeValue,
   Format as FormatValue,
   ExperienceLevel,
@@ -38,10 +49,18 @@ import type {
 
 // Initial user profile state
 const initialProfile: UserProfile = {
+  // Business category (first choice - determines path)
+  businessCategory: null,
+  // General business path fields
+  targetCustomer: null,
+  businessModelPreference: null,
+  keySkills: [],
+  // Social enterprise path fields
   ventureType: null,
+  causes: [],
+  // Common fields
   format: null,
   location: null,
-  causes: [],
   experience: null,
   budget: null,
   commitment: null,
@@ -266,60 +285,110 @@ export default function BuilderPage() {
     clearPendingSession();
   }, [user]);
 
-  // Step navigation logic
+  // Step navigation logic - branching based on businessCategory
+  const isSocialEnterprise = profile.businessCategory === "social_enterprise";
+
   const getNextStep = (current: StepName): StepName => {
-    const stepOrder: StepName[] = [
-      "welcome",
-      "venture_type",
-      "format",
+    // After welcome, always go to business_category
+    if (current === "welcome") return "business_category";
+
+    // After business_category, branch based on selection
+    if (current === "business_category") {
+      return isSocialEnterprise ? "venture_type" : "target_customer";
+    }
+
+    // Social Enterprise path
+    if (isSocialEnterprise) {
+      const socialEnterpriseSteps: StepName[] = [
+        "business_category",
+        "venture_type",
+        "format",
+        "location",
+        "causes",
+        "experience",
+        "budget",
+        "commitment",
+        "depth",
+        "has_idea",
+      ];
+      const currentIndex = socialEnterpriseSteps.indexOf(current);
+      if (currentIndex === -1) return "business_category";
+
+      // Special case: after has_idea
+      if (current === "has_idea") {
+        return profile.hasIdea ? "own_idea" : "generating";
+      }
+      if (current === "own_idea") return "generating";
+
+      return socialEnterpriseSteps[currentIndex + 1] || "ideas";
+    }
+
+    // General Business path
+    const businessSteps: StepName[] = [
+      "business_category",
+      "target_customer",
+      "business_model",
+      "key_skills",
       "location",
-      "causes",
       "experience",
       "budget",
       "commitment",
       "depth",
       "has_idea",
     ];
+    const currentIndex = businessSteps.indexOf(current);
+    if (currentIndex === -1) return "business_category";
 
-    const currentIndex = stepOrder.indexOf(current);
-    if (currentIndex === -1) return "welcome";
-
-    // Special case: after has_idea, either go to own_idea or generating
+    // Special case: after has_idea
     if (current === "has_idea") {
       return profile.hasIdea ? "own_idea" : "generating";
     }
+    if (current === "own_idea") return "generating";
 
-    // Special case: after own_idea, go to generating
-    if (current === "own_idea") {
-      return "generating";
-    }
-
-    return stepOrder[currentIndex + 1] || "ideas";
+    return businessSteps[currentIndex + 1] || "ideas";
   };
 
   const getPrevStep = (current: StepName): StepName => {
-    const stepOrder: StepName[] = [
+    // Special case: from own_idea, go back to has_idea
+    if (current === "own_idea") return "has_idea";
+
+    // Social Enterprise path
+    if (isSocialEnterprise) {
+      const socialEnterpriseSteps: StepName[] = [
+        "welcome",
+        "business_category",
+        "venture_type",
+        "format",
+        "location",
+        "causes",
+        "experience",
+        "budget",
+        "commitment",
+        "depth",
+        "has_idea",
+      ];
+      const currentIndex = socialEnterpriseSteps.indexOf(current);
+      if (currentIndex <= 0) return "welcome";
+      return socialEnterpriseSteps[currentIndex - 1];
+    }
+
+    // General Business path
+    const businessSteps: StepName[] = [
       "welcome",
-      "venture_type",
-      "format",
+      "business_category",
+      "target_customer",
+      "business_model",
+      "key_skills",
       "location",
-      "causes",
       "experience",
       "budget",
       "commitment",
       "depth",
       "has_idea",
     ];
-
-    const currentIndex = stepOrder.indexOf(current);
-
-    // Special case: from own_idea, go back to has_idea
-    if (current === "own_idea") {
-      return "has_idea";
-    }
-
+    const currentIndex = businessSteps.indexOf(current);
     if (currentIndex <= 0) return "welcome";
-    return stepOrder[currentIndex - 1];
+    return businessSteps[currentIndex - 1];
   };
 
   // Render current step
@@ -331,8 +400,46 @@ export default function BuilderPage() {
 
     switch (currentStep) {
       case "welcome":
-        return <Welcome onNext={() => goToStep("venture_type")} />;
+        return <Welcome onNext={() => goToStep("business_category")} />;
 
+      case "business_category":
+        return (
+          <BusinessCategory
+            value={profile.businessCategory}
+            onChange={(v: BusinessCategoryType) => updateProfile("businessCategory", v)}
+            {...stepProps}
+          />
+        );
+
+      // General business path steps
+      case "target_customer":
+        return (
+          <TargetCustomer
+            value={profile.targetCustomer}
+            onChange={(v: TargetCustomerType) => updateProfile("targetCustomer", v)}
+            {...stepProps}
+          />
+        );
+
+      case "business_model":
+        return (
+          <BusinessModel
+            value={profile.businessModelPreference}
+            onChange={(v: BusinessModelPreference) => updateProfile("businessModelPreference", v)}
+            {...stepProps}
+          />
+        );
+
+      case "key_skills":
+        return (
+          <KeySkills
+            value={profile.keySkills}
+            onChange={(v: KeySkill[]) => updateProfile("keySkills", v)}
+            {...stepProps}
+          />
+        );
+
+      // Social enterprise path steps
       case "venture_type":
         return (
           <VentureType
@@ -500,7 +607,7 @@ export default function BuilderPage() {
         );
 
       default:
-        return <Welcome onNext={() => goToStep("venture_type")} />;
+        return <Welcome onNext={() => goToStep("business_category")} />;
     }
   };
 

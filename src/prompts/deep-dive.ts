@@ -6,15 +6,30 @@
 // - All-In → Full professional frameworks
 //
 // Note: Research-enhanced prompts are in research-enhanced-prompts.ts
+// Supports both Social Enterprise and General Business paths
 
-import type { UserProfile, Idea, CauseArea, CommitmentLevel } from "@/types";
-import { CAUSE_AREAS } from "@/lib/constants";
+import type { UserProfile, Idea, CauseArea, CommitmentLevel, BusinessCategory } from "@/types";
+import { CAUSE_AREAS, BUSINESS_CATEGORIES } from "@/lib/constants";
+
+// Helper to determine if this is a social enterprise idea
+const isSocialEnterpriseIdea = (idea: Idea, profile: UserProfile): boolean => {
+  // Check if idea has causeAreas or if profile is social_enterprise
+  const hasCauseAreas = idea.causeAreas && idea.causeAreas.length > 0;
+  const isSocialCategory = profile.businessCategory === "social_enterprise";
+  return Boolean(isSocialCategory || hasCauseAreas);
+};
 
 // Helper to get cause labels
 const getCauseLabels = (causes: CauseArea[]): string => {
+  if (!causes || causes.length === 0) return "";
   return causes
     .map((c) => CAUSE_AREAS.find((ca) => ca.id === c)?.label || c)
     .join(", ");
+};
+
+// Helper to get business category label
+const getBusinessCategoryLabel = (category: BusinessCategory): string => {
+  return BUSINESS_CATEGORIES.find((c) => c.id === category)?.label || category;
 };
 
 // Helper to get commitment level with fallback
@@ -44,22 +59,283 @@ const getLocationContext = (profile: UserProfile): string => {
 // ============================================================================
 
 export function generateViabilityPrompt(idea: Idea, profile: UserProfile): string {
-  const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
   const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
 
-  // Weekend Warriors get dramatically simplified output
+  // Branch based on whether this is social enterprise or general business
+  if (isSocialEnterprise) {
+    const ventureType = profile.ventureType || "project";
+    const causes = getCauseLabels(idea.causeAreas || []);
+
+    if (commitment === "weekend") {
+      return generateWeekendViabilityPrompt(idea, profile, causes);
+    }
+    if (commitment === "steady") {
+      return generateSteadyViabilityPrompt(idea, profile, causes);
+    }
+    return generateAllInViabilityPrompt(idea, profile, ventureType, causes);
+  }
+
+  // General business viability analysis
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
+
   if (commitment === "weekend") {
-    return generateWeekendViabilityPrompt(idea, profile, causes);
+    return generateWeekendBusinessViabilityPrompt(idea, profile, category);
   }
-
-  // Steady Builders get a simple scorecard
   if (commitment === "steady") {
-    return generateSteadyViabilityPrompt(idea, profile, causes);
+    return generateSteadyBusinessViabilityPrompt(idea, profile, category);
   }
+  return generateAllInBusinessViabilityPrompt(idea, profile, category);
+}
 
-  // All-In gets full analysis
-  return generateAllInViabilityPrompt(idea, profile, ventureType, causes);
+// ============================================================================
+// GENERAL BUSINESS VIABILITY PROMPTS
+// ============================================================================
+
+function generateWeekendBusinessViabilityPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  return `You help people figure out if their side business idea will work. No MBA jargon. Just practical advice.
+
+## The Business Idea
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**What it is:** ${idea.tagline}
+**The problem:** ${idea.problem}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "To be determined"}
+
+## Your Job
+
+Give them a practical assessment. This is a weekend side hustle — they need to know if people will pay for this and how to get first customers.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "marketSize": "One sentence on the market opportunity (keep it simple)",
+  "demandAnalysis": "1-2 sentences on why people will pay for this",
+  "competitors": [
+    {
+      "name": "Similar business that exists",
+      "url": "https://example.com",
+      "description": "What they do (one sentence)",
+      "strengths": ["What works for them"],
+      "weaknesses": ["Gap you could fill"]
+    }
+  ],
+  "targetAudience": {
+    "primaryPersona": "Plain English description of your ideal customer (1 sentence)",
+    "demographics": "Who specifically would buy this",
+    "painPoints": ["Main problem they have"],
+    "motivations": ["Why they'd pay you to solve it"]
+  },
+  "strengths": ["Why this will work", "Another reason"],
+  "risks": ["Watch out for this — here's how to handle it"],
+  "opportunities": ["Could grow into this"],
+  "viabilityScore": 7.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 8,
+      "explanation": "Clear demand for this type of service"
+    },
+    "competitionLevel": {
+      "score": 7,
+      "explanation": "Competition exists but room for differentiation"
+    },
+    "feasibility": {
+      "score": 8,
+      "explanation": "You can start this with minimal setup"
+    },
+    "revenuePotential": {
+      "score": 7,
+      "explanation": "Good side income potential"
+    },
+    "impactPotential": {
+      "score": 7,
+      "explanation": "Solves a real problem for customers"
+    }
+  },
+  "verdict": "go",
+  "recommendation": "YES — here's how to get your first paying customer: [specific practical advice]"
+}
+\`\`\`
+
+## Important
+- Focus on getting first customers, not scaling
+- viabilityScore should be 6-9 for most valid business ideas
+- scoreBreakdown: each dimension should have a DIFFERENT score
+- recommendation should focus on FIRST SALE, not grand strategy
+- Return ONLY valid JSON`;
+}
+
+function generateSteadyBusinessViabilityPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You help people evaluate business ideas. Give them a clear scorecard with actionable next steps.
+
+## The Business Idea
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Problem:** ${idea.problem}
+**Audience:** ${idea.audience}
+**Revenue Model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value Proposition:** ${idea.valueProposition}` : ""}
+
+## User Context
+
+**Experience:** ${profile.experience || "beginner"}
+**Budget:** ${profile.budget || "zero"}${locationContext}
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "marketSize": "2 sentences on the market opportunity",
+  "demandAnalysis": "2-3 sentences on demand signals and validation",
+  "competitors": [
+    {
+      "name": "Competitor name",
+      "url": "https://example.com",
+      "description": "What they do",
+      "strengths": ["Strength 1", "Strength 2"],
+      "weaknesses": ["Gap you could fill"]
+    }
+  ],
+  "targetAudience": {
+    "primaryPersona": "Who your ideal customer is (2 sentences)",
+    "demographics": "Key characteristics",
+    "painPoints": ["Pain 1", "Pain 2"],
+    "motivations": ["Why they'll buy"]
+  },
+  "strengths": ["What's working for this idea"],
+  "risks": ["Risk — how to mitigate it"],
+  "opportunities": ["Growth opportunity"],
+  "viabilityScore": 7.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 7,
+      "explanation": "Clear market exists, growing demand"
+    },
+    "competitionLevel": {
+      "score": 8,
+      "explanation": "Moderate competition with differentiation possible"
+    },
+    "feasibility": {
+      "score": 7,
+      "explanation": "Achievable with your current skills and resources"
+    },
+    "revenuePotential": {
+      "score": 7,
+      "explanation": "Good revenue potential at this price point"
+    },
+    "impactPotential": {
+      "score": 6,
+      "explanation": "Solves a real customer problem"
+    }
+  },
+  "verdict": "refine",
+  "recommendation": "Overall verdict with 2-3 specific things to validate before launching"
+}
+\`\`\`
+
+## Notes
+- viabilityScore: 8+ = GO, 6-7.9 = WORK ON IT (refine), below 6 = RETHINK (pivot)
+- scoreBreakdown: each dimension should have a DIFFERENT score
+- Focus on validation and first customers
+- Return ONLY valid JSON`;
+}
+
+function generateAllInBusinessViabilityPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You are a business analyst specializing in early-stage viability assessment. Evaluate this business idea with rigorous analysis.
+
+## The Business Idea
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Problem:** ${idea.problem}
+**Audience:** ${idea.audience}
+**Revenue Model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value Proposition:** ${idea.valueProposition}` : ""}
+${idea.competitiveAdvantage ? `**Competitive Advantage:** ${idea.competitiveAdvantage}` : ""}
+
+## User Context
+
+**Experience Level:** ${profile.experience || "beginner"}
+**Budget:** ${profile.budget || "zero"}${locationContext}
+
+## Evaluation Framework
+
+Evaluate across 5 dimensions, each scored 1-10:
+
+1. **Market Opportunity (25%)** - Is there real, demonstrated market demand?
+2. **Competition Level (20%)** - How crowded is this space? (higher = less competition = better)
+3. **Feasibility (20%)** - Can this actually be built and delivered?
+4. **Revenue Potential (20%)** - What's the realistic revenue opportunity?
+5. **Founder-Idea Fit (15%)** - Based on stated experience and skills
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "marketSize": "Analysis of market size and opportunity (2-3 sentences)",
+  "demandAnalysis": "Analysis of demand signals and evidence (3-4 sentences)",
+  "competitors": [
+    {
+      "name": "Competitor Name",
+      "url": "https://example.com",
+      "description": "What they do (1-2 sentences)",
+      "strengths": ["Strength 1", "Strength 2"],
+      "weaknesses": ["Weakness 1", "Weakness 2"]
+    }
+  ],
+  "targetAudience": {
+    "primaryPersona": "Description of ideal customer (2-3 sentences)",
+    "demographics": "Age, location, income, relevant characteristics",
+    "painPoints": ["Pain point 1", "Pain point 2", "Pain point 3"],
+    "motivations": ["Motivation 1", "Motivation 2", "Motivation 3"]
+  },
+  "strengths": ["Strength 1", "Strength 2", "Strength 3", "Strength 4"],
+  "risks": ["Risk 1", "Risk 2", "Risk 3"],
+  "opportunities": ["Opportunity 1", "Opportunity 2", "Opportunity 3"],
+  "viabilityScore": 7.5,
+  "scoreBreakdown": {
+    "marketOpportunity": {
+      "score": 7.5,
+      "explanation": "Growing market with increasing demand"
+    },
+    "competitionLevel": {
+      "score": 6.5,
+      "explanation": "Moderate competition but differentiation possible"
+    },
+    "feasibility": {
+      "score": 7.0,
+      "explanation": "Achievable with current resources; some gaps to address"
+    },
+    "revenuePotential": {
+      "score": 7.5,
+      "explanation": "Strong unit economics if customer acquisition costs managed"
+    },
+    "impactPotential": {
+      "score": 7.0,
+      "explanation": "Solves meaningful customer problem"
+    }
+  },
+  "verdict": "go",
+  "recommendation": "Strategic recommendation and critical next steps (3-4 sentences)"
+}
+\`\`\`
+
+## Notes
+- Include 2-4 real competitors with actual URLs
+- viabilityScore should be weighted average of the 5 dimensions
+- scoreBreakdown: each dimension MUST have a DIFFERENT score
+- verdict: "go" (8+), "refine" (6-7.9), "pivot" (below 6)
+- Return ONLY valid JSON`;
 }
 
 function generateWeekendViabilityPrompt(idea: Idea, _profile: UserProfile, _causes: string): string {
@@ -334,16 +610,239 @@ Return a JSON object with this structure:
 
 export function generateBusinessPlanPrompt(idea: Idea, profile: UserProfile): string {
   const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+
+  // Social Enterprise path uses existing prompts
+  if (isSocialEnterprise) {
+    if (commitment === "weekend") {
+      return generateWeekendPlanPrompt(idea, profile);
+    }
+    if (commitment === "steady") {
+      return generateSteadyPlanPrompt(idea, profile);
+    }
+    return generateAllInPlanPrompt(idea, profile);
+  }
+
+  // General Business path uses business-focused prompts
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
 
   if (commitment === "weekend") {
-    return generateWeekendPlanPrompt(idea, profile);
+    return generateWeekendBusinessPlanPrompt(idea, profile, category);
   }
-
   if (commitment === "steady") {
-    return generateSteadyPlanPrompt(idea, profile);
+    return generateSteadyBusinessPlanPrompt(idea, profile, category);
   }
+  return generateAllInBusinessPlanPrompt(idea, profile, category);
+}
 
-  return generateAllInPlanPrompt(idea, profile);
+// ============================================================================
+// GENERAL BUSINESS PLAN PROMPTS
+// ============================================================================
+
+function generateWeekendBusinessPlanPrompt(idea: Idea, _profile: UserProfile, category: string): string {
+  return `You create simple action plans for side businesses. No business jargon. Just what they need to do to get first customers.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**What it is:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "To be determined"}
+
+## Your Job
+
+Create a simple plan they can follow to get their first paying customer. This is a side hustle — they need a checklist, not a business plan.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "executiveSummary": "One paragraph max. What you're selling, who buys it, what first success looks like.",
+  "missionStatement": "One simple sentence about what this business does.",
+  "impactThesis": "One sentence on the value you create for customers.",
+  "revenueStreams": [
+    {
+      "name": "Primary revenue",
+      "description": "How you make money",
+      "estimatedRevenue": "First month goal",
+      "timeline": "This week"
+    }
+  ],
+  "budgetPlan": [
+    {
+      "category": "Essentials",
+      "amount": 50,
+      "priority": "essential",
+      "notes": "Keep startup costs minimal"
+    }
+  ],
+  "partnerships": [
+    {
+      "type": "None needed to start",
+      "description": "You can do this solo",
+      "potentialPartners": ["Maybe later: local businesses for referrals"]
+    }
+  ],
+  "operations": "Find first customer. Deliver service. Get testimonial. Find second customer. Repeat.",
+  "impactMeasurement": [
+    {
+      "metric": "Paying customers",
+      "target": "3 customers",
+      "measurementMethod": "Count them",
+      "frequency": "Weekly"
+    },
+    {
+      "metric": "Revenue",
+      "target": "$500",
+      "measurementMethod": "Track payments",
+      "frequency": "Monthly"
+    }
+  ]
+}
+\`\`\`
+
+## Rules
+- Keep EVERYTHING simple and short
+- Focus on getting FIRST CUSTOMER, not scaling
+- Budget should be under $100 to start
+- Operations should be a simple checklist
+- Return ONLY valid JSON`;
+}
+
+function generateSteadyBusinessPlanPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You create practical business plans for growing side businesses. Structured but accessible.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value proposition:** ${idea.valueProposition}` : ""}
+
+## User Context
+
+**Experience:** ${profile.experience || "beginner"}
+**Budget:** ${profile.budget || "zero"}${locationContext}
+
+## Your Job
+
+Create a realistic plan for someone spending 10-15 hours a week growing this business. Include a 4-week launch plan.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "executiveSummary": "2 paragraphs covering: what this is, who it serves, how you make money, what success looks like in 3 months",
+  "missionStatement": "Clear, simple mission (one sentence)",
+  "impactThesis": "The value you create for customers (2 sentences)",
+  "revenueStreams": [
+    {
+      "name": "Primary revenue stream",
+      "description": "How this works, pricing",
+      "estimatedRevenue": "Month 3 target",
+      "timeline": "Starts week 1"
+    }
+  ],
+  "financialProjections": [
+    { "year": 1, "revenue": 12000, "expenses": 3000, "netIncome": 9000 }
+  ],
+  "partnerships": [
+    {
+      "type": "Partnership type",
+      "description": "What this provides",
+      "potentialPartners": ["Specific options"]
+    }
+  ],
+  "operations": "Week 1: [tasks]. Week 2: [tasks]. Week 3: [tasks]. Week 4: First customers. Ongoing: Weekly rhythm.",
+  "impactMeasurement": [
+    {
+      "metric": "Simple, countable metric",
+      "target": "3-month target",
+      "measurementMethod": "How to track",
+      "frequency": "Weekly"
+    }
+  ]
+}
+\`\`\`
+
+## Guidelines
+- Keep language accessible
+- Be realistic about what someone with 10-15 hours/week can do
+- Include a clear 4-week launch plan in operations
+- Financial projections should be conservative
+- Return ONLY valid JSON`;
+}
+
+function generateAllInBusinessPlanPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You are a business planning expert. Create a comprehensive, professional business plan.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Problem:** ${idea.problem}
+**Audience:** ${idea.audience}
+**Revenue Model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value Proposition:** ${idea.valueProposition}` : ""}
+${idea.competitiveAdvantage ? `**Competitive Advantage:** ${idea.competitiveAdvantage}` : ""}
+
+## User Context
+
+**Experience Level:** ${profile.experience || "beginner"}
+**Budget:** ${profile.budget || "zero"}${locationContext}
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "executiveSummary": "2-3 paragraph executive summary covering problem, solution, market opportunity, and key metrics",
+  "missionStatement": "One sentence mission statement",
+  "impactThesis": "2-3 sentences on your value proposition and competitive positioning",
+  "revenueStreams": [
+    {
+      "name": "Revenue Stream Name",
+      "description": "How this revenue stream works, pricing strategy",
+      "estimatedRevenue": "Year 1 estimate",
+      "timeline": "When this activates"
+    }
+  ],
+  "financialProjections": [
+    { "year": 1, "revenue": 50000, "expenses": 20000, "netIncome": 30000 },
+    { "year": 2, "revenue": 120000, "expenses": 45000, "netIncome": 75000 },
+    { "year": 3, "revenue": 250000, "expenses": 100000, "netIncome": 150000 }
+  ],
+  "partnerships": [
+    {
+      "type": "Partnership type (Channel, Strategic, Technology, etc.)",
+      "description": "What this partnership provides",
+      "potentialPartners": ["Partner 1", "Partner 2"]
+    }
+  ],
+  "operations": "2-3 paragraphs on how the business operates day-to-day, key activities, team requirements, and resources needed",
+  "impactMeasurement": [
+    {
+      "metric": "What you're measuring (MRR, customers, etc.)",
+      "target": "Year 1 target",
+      "measurementMethod": "How you'll track this",
+      "frequency": "How often you'll measure"
+    }
+  ]
+}
+\`\`\`
+
+## Guidelines
+- Financial projections should be realistic and defensible
+- Include 2-4 revenue streams if applicable
+- Operations should cover team, technology, and processes
+- Return ONLY valid JSON`;
 }
 
 function generateWeekendPlanPrompt(idea: Idea, _profile: UserProfile): string {
@@ -416,7 +915,7 @@ Return the same structure but with DRAMATICALLY simplified content:
 }
 
 function generateSteadyPlanPrompt(idea: Idea, profile: UserProfile): string {
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const locationContext = getLocationContext(profile);
 
   return `You create 3-page starter plans for ongoing volunteer projects. Structured but accessible.
@@ -489,7 +988,7 @@ Create a realistic plan for someone spending a few hours a week on this. Include
 
 function generateAllInPlanPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const isProject = ventureType === "project";
   const isNonprofit = ventureType === "nonprofit";
   const isBusiness = ventureType === "business";
@@ -586,16 +1085,211 @@ Return ONLY valid JSON, no markdown formatting`;
 
 export function generateMarketingPrompt(idea: Idea, profile: UserProfile): string {
   const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+
+  // Social Enterprise path uses existing prompts
+  if (isSocialEnterprise) {
+    if (commitment === "weekend") {
+      return generateWeekendMarketingPrompt(idea, profile);
+    }
+    if (commitment === "steady") {
+      return generateSteadyMarketingPrompt(idea, profile);
+    }
+    return generateAllInMarketingPrompt(idea, profile);
+  }
+
+  // General Business path uses business-focused prompts
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
 
   if (commitment === "weekend") {
-    return generateWeekendMarketingPrompt(idea, profile);
+    return generateWeekendBusinessMarketingPrompt(idea, profile, category);
   }
-
   if (commitment === "steady") {
-    return generateSteadyMarketingPrompt(idea, profile);
+    return generateSteadyBusinessMarketingPrompt(idea, profile, category);
   }
+  return generateAllInBusinessMarketingPrompt(idea, profile, category);
+}
 
-  return generateAllInMarketingPrompt(idea, profile);
+// ============================================================================
+// GENERAL BUSINESS MARKETING PROMPTS
+// ============================================================================
+
+function generateWeekendBusinessMarketingPrompt(idea: Idea, _profile: UserProfile, category: string): string {
+  return `You write simple marketing messages for side businesses. No marketing jargon. Just clear, persuasive copy.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**What it is:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "Service-based"}
+
+## Your Job
+
+Write the messages they need to get first customers. This is a side hustle — they need a social post and a DM template.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "elevatorPitch": "One sentence you'd say to a potential customer.",
+  "tagline": "3-5 words max that capture the value",
+  "landingPageHeadline": "They might not need a website yet, but if they do: clear headline",
+  "landingPageSubheadline": "What you do and for whom (one sentence)",
+  "socialPosts": [
+    {
+      "platform": "twitter",
+      "content": "A Facebook/LinkedIn post announcing the business (3-4 sentences). Focus on the problem you solve.",
+      "hashtags": []
+    },
+    {
+      "platform": "linkedin",
+      "content": "A DM template to send to potential customers. Personal, not salesy. (2-3 sentences)",
+      "hashtags": []
+    },
+    {
+      "platform": "instagram",
+      "content": "Instagram caption with clear CTA",
+      "hashtags": ["local", "business"]
+    }
+  ],
+  "emailTemplate": {
+    "subject": "Simple, clear subject line",
+    "body": "Follow-up email for interested leads. 2-3 sentences. Clear next step."
+  },
+  "primaryCTA": "Book Now / Get Started / Contact Me"
+}
+\`\`\`
+
+## Rules
+- Write like a human, not a marketer
+- Focus on the problem you solve
+- Include clear calls to action
+- Keep it SHORT
+- Return ONLY valid JSON`;
+}
+
+function generateSteadyBusinessMarketingPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You create marketing content for growing businesses. Clear, professional, action-oriented.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value proposition:** ${idea.valueProposition}` : ""}
+${locationContext}
+
+## Your Job
+
+Write marketing content that converts. Professional but approachable.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "elevatorPitch": "2-3 sentence pitch explaining what you do and why it matters.",
+  "tagline": "5-7 word memorable phrase",
+  "landingPageHeadline": "Clear headline for website (10 words or fewer)",
+  "landingPageSubheadline": "One sentence explaining what you do and for whom",
+  "socialPosts": [
+    {
+      "platform": "twitter",
+      "content": "LinkedIn post announcing or explaining the business (2-3 paragraphs)",
+      "hashtags": ["business", "relevant"]
+    },
+    {
+      "platform": "linkedin",
+      "content": "Facebook/Instagram post with clear CTA",
+      "hashtags": ["local", "business"]
+    },
+    {
+      "platform": "instagram",
+      "content": "Instagram post with engaging hook and CTA",
+      "hashtags": ["business", "relevant"]
+    }
+  ],
+  "emailTemplate": {
+    "subject": "Clear, specific subject line",
+    "body": "Welcome email for new leads OR outreach email. 3 paragraphs, clear ask."
+  },
+  "primaryCTA": "2-4 word action phrase"
+}
+\`\`\`
+
+## Guidelines
+- Professional but personable
+- Specific, not vague
+- Action-oriented — every message should have clear next step
+- Return ONLY valid JSON`;
+}
+
+function generateAllInBusinessMarketingPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You are a direct response copywriter. Create compelling marketing assets that convert.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Problem:** ${idea.problem}
+**Audience:** ${idea.audience}
+**Revenue Model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value Proposition:** ${idea.valueProposition}` : ""}
+${idea.competitiveAdvantage ? `**Competitive Advantage:** ${idea.competitiveAdvantage}` : ""}
+${locationContext}
+
+## Copy Philosophy
+
+1. **Lead with Value, Not Features** - What does the customer get?
+2. **Be Specific, Not Vague** - Numbers and concrete outcomes
+3. **Clear CTA** - One obvious next step
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "elevatorPitch": "30-second pitch: We help [CUSTOMER] [ACHIEVE OUTCOME] by [UNIQUE MECHANISM]. (25-40 words)",
+  "tagline": "3-7 word memorable tagline",
+  "landingPageHeadline": "10 words or fewer, value proposition or bold claim",
+  "landingPageSubheadline": "20-30 words explaining mechanism, who you serve, and differentiator",
+  "socialPosts": [
+    {
+      "platform": "twitter",
+      "content": "Tweet announcing the business (under 280 characters)",
+      "hashtags": ["relevant", "hashtags"]
+    },
+    {
+      "platform": "linkedin",
+      "content": "Professional LinkedIn post (2-3 short paragraphs)",
+      "hashtags": ["professional", "hashtags"]
+    },
+    {
+      "platform": "instagram",
+      "content": "Instagram caption with hook, value, and CTA",
+      "hashtags": ["business", "hashtags"]
+    }
+  ],
+  "emailTemplate": {
+    "subject": "Compelling email subject line",
+    "body": "Welcome/sales email (3-4 paragraphs, clear CTA)"
+  },
+  "primaryCTA": "Primary call-to-action (2-4 words)"
+}
+\`\`\`
+
+## Guidelines
+- Focus on customer outcomes, not features
+- Include specific numbers where possible
+- Clear, single CTA per asset
+- Return ONLY valid JSON`;
 }
 
 function generateWeekendMarketingPrompt(idea: Idea, _profile: UserProfile): string {
@@ -711,7 +1405,7 @@ Write the core messages they need to recruit volunteers and participants for an 
 
 function generateAllInMarketingPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const locationContext = getLocationContext(profile);
 
   return `You are a direct response copywriter specialized in cause-driven organizations. Create compelling marketing assets that convert interest into action.
@@ -789,16 +1483,379 @@ Return ONLY valid JSON, no markdown formatting`;
 
 export function generateRoadmapPrompt(idea: Idea, profile: UserProfile): string {
   const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+
+  // Social Enterprise path uses existing prompts
+  if (isSocialEnterprise) {
+    if (commitment === "weekend") {
+      return generateWeekendRoadmapPrompt(idea, profile);
+    }
+    if (commitment === "steady") {
+      return generateSteadyRoadmapPrompt(idea, profile);
+    }
+    return generateAllInRoadmapPrompt(idea, profile);
+  }
+
+  // General Business path uses business-focused prompts
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
 
   if (commitment === "weekend") {
-    return generateWeekendRoadmapPrompt(idea, profile);
+    return generateWeekendBusinessRoadmapPrompt(idea, profile, category);
   }
-
   if (commitment === "steady") {
-    return generateSteadyRoadmapPrompt(idea, profile);
+    return generateSteadyBusinessRoadmapPrompt(idea, profile, category);
   }
+  return generateAllInBusinessRoadmapPrompt(idea, profile, category);
+}
 
-  return generateAllInRoadmapPrompt(idea, profile);
+// ============================================================================
+// GENERAL BUSINESS ROADMAP PROMPTS
+// ============================================================================
+
+function generateWeekendBusinessRoadmapPrompt(idea: Idea, _profile: UserProfile, category: string): string {
+  return `You create simple checklists for starting side businesses. No phases — just what to do today and this week.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**What it is:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "Service-based"}
+
+## Your Job
+
+Create a weekend launch checklist. The goal is FIRST PAYING CUSTOMER, not perfection.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "quickWins": [
+    {
+      "task": "TODAY: Create simple offer (what you do + price)",
+      "timeframe": "1 hour",
+      "cost": "free"
+    },
+    {
+      "task": "TODAY: List 10 people who might need this",
+      "timeframe": "30 mins",
+      "cost": "free"
+    },
+    {
+      "task": "THIS WEEK: Reach out to 3 people with your offer",
+      "timeframe": "1 hour",
+      "cost": "free"
+    },
+    {
+      "task": "THIS WEEK: Get first paying customer",
+      "timeframe": "Focus of the week",
+      "cost": "free"
+    }
+  ],
+  "phases": [
+    {
+      "name": "This Weekend",
+      "duration": "2 days",
+      "tasks": [
+        {
+          "task": "Define your offer clearly",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        },
+        {
+          "task": "Reach out to potential customers",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "skipList": ["Building a website", "Creating a logo", "Business cards", "Social media strategy"]
+}
+\`\`\`
+
+## Rules
+- ONLY include what's needed for FIRST CUSTOMER
+- Quick wins should be actionable TODAY
+- skipList: things that don't matter for first sale
+- Everything should be FREE or under $50
+- Return ONLY valid JSON`;
+}
+
+function generateSteadyBusinessRoadmapPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You create practical roadmaps for growing side businesses. Focus on customer acquisition and revenue.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Who it serves:** ${idea.audience}
+**Revenue model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value proposition:** ${idea.valueProposition}` : ""}
+${locationContext}
+
+## Your Job
+
+Create a 4-week launch plan focused on getting paying customers. Then outline Month 2-3 growth.
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "quickWins": [
+    {
+      "task": "Define offer and pricing this week",
+      "timeframe": "2 hours",
+      "cost": "free"
+    },
+    {
+      "task": "Reach out to 5 potential customers",
+      "timeframe": "Week 1",
+      "cost": "free"
+    },
+    {
+      "task": "Get first customer",
+      "timeframe": "Week 2",
+      "cost": "free"
+    }
+  ],
+  "phases": [
+    {
+      "name": "Week 1-2: Launch",
+      "duration": "2 weeks",
+      "tasks": [
+        {
+          "task": "Define clear offer and pricing",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        },
+        {
+          "task": "Create simple landing page or social presence",
+          "priority": "high",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Reach out to potential customers",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Week 3-4: First Customers",
+      "duration": "2 weeks",
+      "tasks": [
+        {
+          "task": "Close first paying customer",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        },
+        {
+          "task": "Deliver service and get testimonial",
+          "priority": "critical",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Set up simple payment method",
+          "priority": "high",
+          "cost": "free",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Month 2-3: Growth",
+      "duration": "2 months",
+      "tasks": [
+        {
+          "task": "Scale customer acquisition",
+          "priority": "high",
+          "cost": "medium",
+          "dependencies": []
+        },
+        {
+          "task": "Refine offer based on customer feedback",
+          "priority": "high",
+          "cost": "free",
+          "dependencies": []
+        },
+        {
+          "task": "Build referral system",
+          "priority": "medium",
+          "cost": "low",
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "skipList": ["Complex website", "Paid advertising (until profitable)", "Perfect branding"]
+}
+\`\`\`
+
+## Guidelines
+- Focus on customer acquisition and revenue
+- First two weeks should be about getting first customer
+- Keep costs low (bootstrap mentality)
+- Return ONLY valid JSON`;
+}
+
+function generateAllInBusinessRoadmapPrompt(idea: Idea, profile: UserProfile, category: string): string {
+  const locationContext = getLocationContext(profile);
+
+  return `You create comprehensive business roadmaps. Balance customer acquisition with systems building.
+
+## The Business
+
+**Name:** ${idea.name}
+**Category:** ${category}
+**Tagline:** ${idea.tagline}
+**Problem:** ${idea.problem}
+**Audience:** ${idea.audience}
+**Revenue Model:** ${idea.revenueModel || "To be determined"}
+${idea.valueProposition ? `**Value Proposition:** ${idea.valueProposition}` : ""}
+${idea.competitiveAdvantage ? `**Competitive Advantage:** ${idea.competitiveAdvantage}` : ""}
+${locationContext}
+
+## Roadmap Philosophy
+
+1. **Revenue First** - Get paying customers before building systems
+2. **Validate Before Scaling** - Prove the model works small before going big
+3. **Build Incrementally** - Each phase builds on previous success
+
+## Output Format (JSON)
+
+\`\`\`json
+{
+  "quickWins": [
+    {
+      "task": "Define MVP offer and pricing",
+      "timeframe": "This week",
+      "cost": "free"
+    },
+    {
+      "task": "Reach out to 10 potential customers",
+      "timeframe": "Week 1",
+      "cost": "free"
+    },
+    {
+      "task": "Close first paying customer",
+      "timeframe": "Week 2",
+      "cost": "free"
+    }
+  ],
+  "phases": [
+    {
+      "name": "Phase 1: Validate (Month 1)",
+      "duration": "4 weeks",
+      "tasks": [
+        {
+          "task": "Define MVP offer and pricing",
+          "priority": "critical",
+          "cost": "free",
+          "dependencies": []
+        },
+        {
+          "task": "Build simple sales/landing page",
+          "priority": "high",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Acquire first 5-10 paying customers",
+          "priority": "critical",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Collect feedback and iterate offer",
+          "priority": "high",
+          "cost": "free",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 2: Systemize (Month 2-3)",
+      "duration": "8 weeks",
+      "tasks": [
+        {
+          "task": "Document and streamline delivery",
+          "priority": "high",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Build repeatable customer acquisition",
+          "priority": "critical",
+          "cost": "medium",
+          "dependencies": []
+        },
+        {
+          "task": "Set up basic operations (payments, tracking)",
+          "priority": "high",
+          "cost": "low",
+          "dependencies": []
+        },
+        {
+          "task": "Reach 20+ customers or $5K MRR",
+          "priority": "critical",
+          "cost": "medium",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 3: Scale (Month 4-6)",
+      "duration": "3 months",
+      "tasks": [
+        {
+          "task": "Expand marketing channels",
+          "priority": "high",
+          "cost": "medium",
+          "dependencies": []
+        },
+        {
+          "task": "Build team or contractor relationships",
+          "priority": "medium",
+          "cost": "high",
+          "dependencies": []
+        },
+        {
+          "task": "Launch secondary revenue streams",
+          "priority": "medium",
+          "cost": "medium",
+          "dependencies": []
+        },
+        {
+          "task": "Target: $10K+ MRR",
+          "priority": "high",
+          "cost": "medium",
+          "dependencies": []
+        }
+      ]
+    }
+  ],
+  "skipList": ["Premature hiring", "Complex technology before proving model", "Paid ads before organic works"]
+}
+\`\`\`
+
+## Guidelines
+- Include clear revenue milestones
+- Phase 1 must focus on revenue before systems
+- Dependencies should be realistic
+- skipList should focus on common premature scaling mistakes
+- Return ONLY valid JSON`;
 }
 
 function generateWeekendRoadmapPrompt(idea: Idea, _profile: UserProfile): string {
@@ -1010,7 +2067,7 @@ Create a realistic 4-week plan. Each week should have 3-4 tasks doable in a few 
 
 function generateAllInRoadmapPrompt(idea: Idea, profile: UserProfile): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const budget = profile.budget || "zero";
   const locationContext = getLocationContext(profile);
 
@@ -1124,7 +2181,7 @@ Return ONLY valid JSON, no markdown formatting`;
 // SYSTEM PROMPTS
 // ============================================================================
 
-export const VIABILITY_SYSTEM_PROMPT = `You are SparkGood's viability analyst — rigorous but encouraging.
+export const VIABILITY_SYSTEM_PROMPT = `You are SparkLocal's viability analyst — rigorous but encouraging.
 
 You evaluate social impact ideas honestly, helping founders avoid the #1 reason ventures fail: building something nobody needs.
 
@@ -1138,7 +2195,7 @@ A "refine" verdict with clear direction is more valuable than false optimism.
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const BUSINESS_PLAN_SYSTEM_PROMPT = `You are SparkGood's business planning expert — practical and impact-focused.
+export const BUSINESS_PLAN_SYSTEM_PROMPT = `You are SparkLocal's business planning expert — practical and impact-focused.
 
 You create plans that are:
 - Compelling enough for funders
@@ -1150,7 +2207,7 @@ The best plan is one that actually gets used. Match complexity to the venture's 
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const MARKETING_SYSTEM_PROMPT = `You are SparkGood's copywriter — empowering, specific, and action-oriented.
+export const MARKETING_SYSTEM_PROMPT = `You are SparkLocal's copywriter — empowering, specific, and action-oriented.
 
 Your copy philosophy:
 - Empowerment over pity
@@ -1162,7 +2219,7 @@ Great social impact copy illuminates truth and makes action easy. You're invitin
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const ROADMAP_SYSTEM_PROMPT = `You are SparkGood's launch strategist — practical and momentum-focused.
+export const ROADMAP_SYSTEM_PROMPT = `You are SparkLocal's launch strategist — practical and momentum-focused.
 
 Your philosophy: Done is better than perfect. Analysis paralysis kills more ventures than bad execution.
 

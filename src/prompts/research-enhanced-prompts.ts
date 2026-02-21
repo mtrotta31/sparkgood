@@ -216,7 +216,7 @@ function generateSteadyViabilityWithResearch(
   profile: UserProfile,
   research: ResearchData
 ): string {
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
 
   return `You help people evaluate ongoing volunteer projects using real research data. Give them a simple scorecard with evidence-based insights.
 
@@ -301,7 +301,7 @@ function generateAllInViabilityWithResearch(
   research: ResearchData
 ): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
 
   return `You are a social venture analyst conducting a rigorous viability assessment using real market research data. Your job is to synthesize the research into an honest, evidence-based evaluation.
 
@@ -503,7 +503,7 @@ function generateSteadyPlanWithResearch(
   profile: UserProfile,
   research: ResearchData
 ): string {
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
 
   return `You create 3-page starter plans for ongoing volunteer projects using real research data to inform strategy.
 
@@ -592,7 +592,7 @@ function generateAllInPlanWithResearch(
   research: ResearchData
 ): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const isProject = ventureType === "project";
   const isNonprofit = ventureType === "nonprofit";
   const isBusiness = ventureType === "business";
@@ -844,7 +844,7 @@ function generateAllInMarketingWithResearch(
   research: ResearchData
 ): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
 
   return `You are a direct response copywriter creating marketing assets informed by competitive research.
 
@@ -1088,7 +1088,7 @@ function generateAllInRoadmapWithResearch(
   research: ResearchData
 ): string {
   const ventureType = profile.ventureType || "project";
-  const causes = getCauseLabels(idea.causeAreas);
+  const causes = getCauseLabels(idea.causeAreas || []);
   const budget = profile.budget || "zero";
 
   return `You are a launch strategist creating a roadmap informed by how successful similar ventures launched.
@@ -1191,7 +1191,7 @@ Return ONLY valid JSON, no markdown formatting`;
 // SYSTEM PROMPTS (Enhanced for research-based generation)
 // ============================================================================
 
-export const RESEARCH_ENHANCED_VIABILITY_SYSTEM_PROMPT = `You are SparkGood's viability analyst — rigorous, knowledgeable, and grounded.
+export const RESEARCH_ENHANCED_VIABILITY_SYSTEM_PROMPT = `You are SparkLocal's viability analyst — rigorous, knowledgeable, and grounded.
 
 IMPORTANT: Use YOUR OWN KNOWLEDGE as the primary foundation for your analysis. You have extensive knowledge about social impact, nonprofits, social enterprises, community projects, and market dynamics. The research data provided is SUPPLEMENTARY — use it to add real-world specificity, recent examples, and concrete data points, but don't let weak or incomplete research diminish the quality of your analysis.
 
@@ -1210,7 +1210,7 @@ Your assessments are:
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const RESEARCH_ENHANCED_PLAN_SYSTEM_PROMPT = `You are SparkGood's business planning expert — experienced and practical.
+export const RESEARCH_ENHANCED_PLAN_SYSTEM_PROMPT = `You are SparkLocal's business planning expert — experienced and practical.
 
 IMPORTANT: Use YOUR OWN KNOWLEDGE as the primary foundation. You have deep expertise in social impact business models, nonprofit operations, community organizing, and sustainable revenue strategies. Research data provided is SUPPLEMENTARY — use it to add specificity when strong, but don't let weak research diminish your output.
 
@@ -1223,7 +1223,7 @@ Match plan complexity to the user's commitment level. Weekend warriors need 1-pa
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const RESEARCH_ENHANCED_MARKETING_SYSTEM_PROMPT = `You are SparkGood's copywriter — compelling, authentic, and strategic.
+export const RESEARCH_ENHANCED_MARKETING_SYSTEM_PROMPT = `You are SparkLocal's copywriter — compelling, authentic, and strategic.
 
 IMPORTANT: Use YOUR OWN KNOWLEDGE of direct response copywriting and social impact messaging as the foundation. You understand what makes people take action, how to communicate impact authentically, and what resonates with different audiences. Research data is SUPPLEMENTARY — use it to differentiate from specific competitors when available.
 
@@ -1235,7 +1235,7 @@ You create marketing assets that:
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const RESEARCH_ENHANCED_ROADMAP_SYSTEM_PROMPT = `You are SparkGood's launch strategist — practical and experienced.
+export const RESEARCH_ENHANCED_ROADMAP_SYSTEM_PROMPT = `You are SparkLocal's launch strategist — practical and experienced.
 
 IMPORTANT: Use YOUR OWN KNOWLEDGE of how social ventures launch successfully as the foundation. You know the common patterns, typical timelines, resource constraints, and pitfalls. Research data is SUPPLEMENTARY — use it to add specific examples when strong, but your expertise drives the roadmap.
 

@@ -22,37 +22,38 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "SparkGood — Turn Good Intentions Into Real Impact",
-    template: "%s | SparkGood",
+    default: "SparkLocal — Find Everything You Need to Start a Business",
+    template: "%s | SparkLocal",
   },
   description:
-    "From idea to action: AI-powered tools that help you launch social ventures, community projects, and nonprofits that make a real difference.",
+    "AI-powered business planning tools and 2,400+ local resources to help you start your business. Find coworking spaces, grants, accelerators, and mentors near you.",
   keywords: [
-    "social entrepreneurship",
-    "nonprofit startup",
-    "community project",
-    "social impact",
-    "social enterprise",
-    "purpose-driven business",
+    "start a business",
+    "business planning",
+    "small business resources",
+    "coworking spaces",
+    "business grants",
+    "startup accelerators",
     "AI business planning",
+    "local business resources",
   ],
-  authors: [{ name: "SparkGood" }],
-  creator: "SparkGood",
-  metadataBase: new URL("https://sparkgood.io"),
+  authors: [{ name: "SparkLocal" }],
+  creator: "SparkLocal",
+  metadataBase: new URL("https://sparklocal.co"),
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://sparkgood.io",
-    siteName: "SparkGood",
-    title: "SparkGood — Spark Something Good",
+    url: "https://sparklocal.co",
+    siteName: "SparkLocal",
+    title: "SparkLocal — Start Your Business Today",
     description:
-      "From idea to action: AI-powered tools that help you launch social ventures that make a real difference.",
+      "AI-powered business planning and 2,400+ local resources. Find coworking, grants, accelerators, and mentors near you.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SparkGood — Spark Something Good",
+    title: "SparkLocal — Start Your Business Today",
     description:
-      "From idea to action: AI-powered tools that help you launch social ventures that make a real difference.",
+      "AI-powered business planning and 2,400+ local resources. Find coworking, grants, accelerators, and mentors near you.",
   },
   robots: {
     index: true,

@@ -1,4 +1,4 @@
-// SparkGood Resource Directory - Home Page
+// SparkLocal Resource Directory - Home Page
 // SEO-optimized directory of grants, accelerators, SBA resources, and more
 
 import Link from "next/link";
@@ -14,9 +14,9 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Business Resources Directory | SparkGood",
+  title: "Business Resources Directory | SparkLocal",
   description:
-    "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your social venture. Free directory of business resources for entrepreneurs.",
+    "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your business. Free directory of business resources for entrepreneurs.",
   keywords: [
     "small business grants",
     "startup accelerators",
@@ -28,19 +28,19 @@ export const metadata: Metadata = {
     "coworking spaces",
   ],
   openGraph: {
-    title: "Business Resources Directory | SparkGood",
-    description: "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your social venture. Free directory for entrepreneurs.",
+    title: "Business Resources Directory | SparkLocal",
+    description: "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your business. Free directory for entrepreneurs.",
     type: "website",
-    siteName: "SparkGood",
-    url: "https://sparkgood.io/resources",
+    siteName: "SparkLocal",
+    url: "https://sparklocal.co/resources",
   },
   twitter: {
     card: "summary",
-    title: "Business Resources Directory | SparkGood",
+    title: "Business Resources Directory | SparkLocal",
     description: "Find grants, accelerators, SBA resources, and more for entrepreneurs.",
   },
   alternates: {
-    canonical: "https://sparkgood.io/resources",
+    canonical: "https://sparklocal.co/resources",
   },
 };
 
@@ -361,7 +361,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
               <span className="text-sm">✦</span>
             </div>
             <span className="font-display text-warmwhite font-semibold">
-              SparkGood
+              SparkLocal
             </span>
           </Link>
           <Link
@@ -383,7 +383,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
         </h1>
         <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto mb-8">
           Find grants, accelerators, mentors, and free resources to help launch
-          your social venture. Everything you need in one place.
+          your business. Everything you need in one place.
         </p>
 
         {/* Search */}
@@ -452,7 +452,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
               Not sure where to start?
             </h2>
             <p className="text-warmwhite-muted text-lg max-w-xl mx-auto mb-8">
-              SparkGood matches you with the right resources based on your idea,
+              SparkLocal matches you with the right resources based on your idea,
               location, and budget. Get a personalized launch plan in minutes.
             </p>
             <Link

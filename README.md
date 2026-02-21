@@ -1,8 +1,8 @@
-# SparkGood
+# SparkLocal
 
-**Spark something good.**
+**Find everything you need to start a business.**
 
-SparkGood helps people turn their desire to make a difference into real-world action. Answer a few questions about what matters to you, get personalized social impact ideas, and receive a complete launch package — all powered by AI.
+SparkLocal helps people start businesses by providing AI-powered planning tools and a directory of 2,400+ local resources. Answer a few questions about your business idea, get personalized concepts, and receive a complete launch package — all powered by AI.
 
 ## What It Does
 

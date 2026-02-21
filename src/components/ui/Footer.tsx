@@ -16,11 +16,11 @@ export default function Footer() {
                 <span className="text-sm">✦</span>
               </div>
               <span className="font-display text-warmwhite font-semibold">
-                SparkGood
+                SparkLocal
               </span>
             </Link>
             <p className="text-warmwhite-dim text-sm">
-              Turning good intentions into real impact.
+              Everything you need to start a business.
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-warmwhite/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-warmwhite-dim text-sm">
-            © {new Date().getFullYear()} SparkGood. All rights reserved.
+            © {new Date().getFullYear()} SparkLocal. All rights reserved.
           </p>
           <p className="text-warmwhite-dim text-xs">
             Made with purpose in the USA
