@@ -7,8 +7,17 @@
 //
 // Note: Research-enhanced prompts are in research-enhanced-prompts.ts
 // Supports both Social Enterprise and General Business paths
+//
+// V2 PROMPTS (Sprint 1 Rewrite):
+// New structured JSON prompts for the 4-tab deep dive:
+// - generateChecklistPrompt: Tab 1 - Launch Checklist
+// - generateFoundationPrompt: Tab 2 - Business Foundation (with research)
+// - generateGrowthPrompt: Tab 3 - Growth Plan
+// - generateFinancialPrompt: Tab 4 - Financial Model
 
 import type { UserProfile, Idea, CauseArea, CommitmentLevel, BusinessCategory } from "@/types";
+import type { MatchedResources, MatchedResource } from "@/lib/match-resources";
+import type { ResearchData } from "@/prompts/research-enhanced-prompts";
 import { CAUSE_AREAS, BUSINESS_CATEGORIES } from "@/lib/constants";
 
 // Helper to determine if this is a social enterprise idea
@@ -2230,5 +2239,702 @@ Your roadmaps are:
 - Realistic about what NOT to do yet
 
 Help users ship, not obsess.
+
+CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
+
+// ============================================================================
+// V2 PROMPT GENERATORS (Sprint 1 Rewrite)
+// These output structured JSON for the new 4-tab deep dive
+// ============================================================================
+
+/**
+ * Helper to format matched resources for prompts
+ */
+function formatResourcesForPromptV2(resources: MatchedResources): string {
+  if (resources.totalMatched === 0) {
+    return "No local resources matched for this location.";
+  }
+
+  let formatted = "";
+
+  if (resources.coworking.length > 0) {
+    formatted += "\n### Workspace Options:\n";
+    resources.coworking.forEach((r: MatchedResource) => {
+      const price = r.details.price_monthly_min
+        ? `$${r.details.price_monthly_min}${r.details.price_monthly_max ? `-${r.details.price_monthly_max}` : ""}/month`
+        : "Price varies";
+      const rating = r.rating ? ` (${r.rating}★)` : "";
+      formatted += `- ${r.name}${rating}: ${price}`;
+      if (r.website) formatted += ` — ${r.website}`;
+      formatted += "\n";
+    });
+  }
+
+  if (resources.grants.length > 0) {
+    formatted += "\n### Available Grants:\n";
+    resources.grants.forEach((r: MatchedResource) => {
+      const amount = formatGrantAmountV2(r.details.amount_min, r.details.amount_max);
+      const scope = r.is_nationwide ? "(Nationwide)" : `(${r.city}, ${r.state})`;
+      formatted += `- ${r.name} ${scope}`;
+      if (amount) formatted += `: ${amount}`;
+      if (r.details.deadline) formatted += ` — Deadline: ${r.details.deadline}`;
+      if (r.website) formatted += ` — ${r.website}`;
+      formatted += "\n";
+    });
+  }
+
+  if (resources.accelerators.length > 0) {
+    formatted += "\n### Accelerator Programs:\n";
+    resources.accelerators.forEach((r: MatchedResource) => {
+      const funding = r.details.funding_provided
+        ? `$${(r.details.funding_provided / 1000).toFixed(0)}K funding`
+        : "";
+      const equity = r.details.equity_taken ? `${r.details.equity_taken}% equity` : "";
+      const terms = [funding, equity].filter(Boolean).join(", ");
+      const scope = r.is_nationwide ? "(Nationwide)" : `(${r.city}, ${r.state})`;
+      formatted += `- ${r.name} ${scope}`;
+      if (terms) formatted += `: ${terms}`;
+      if (r.details.next_deadline) formatted += ` — Next deadline: ${r.details.next_deadline}`;
+      if (r.website) formatted += ` — ${r.website}`;
+      formatted += "\n";
+    });
+  }
+
+  if (resources.sba.length > 0) {
+    formatted += "\n### Free SBA Resources:\n";
+    resources.sba.forEach((r: MatchedResource) => {
+      const type = r.details.sba_type ? `(${r.details.sba_type})` : "";
+      formatted += `- ${r.name} ${type}`;
+      if (r.details.services && r.details.services.length > 0) {
+        formatted += `: ${r.details.services.slice(0, 3).join(", ")}`;
+      }
+      if (r.website) formatted += ` — ${r.website}`;
+      formatted += "\n";
+    });
+  }
+
+  return formatted;
+}
+
+/**
+ * Helper to format grant amounts
+ */
+function formatGrantAmountV2(min?: number, max?: number): string | null {
+  if (!min && !max) return null;
+
+  const formatK = (n: number) => {
+    if (n >= 1000000) return `$${(n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1)}M`;
+    if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`;
+    return `$${n}`;
+  };
+
+  if (min && max) return `${formatK(min)} - ${formatK(max)}`;
+  if (max) return `Up to ${formatK(max)}`;
+  if (min) return `From ${formatK(min)}`;
+  return null;
+}
+
+// ============================================================================
+// V2 PROMPT: Launch Checklist (Tab 1)
+// ============================================================================
+
+export function generateChecklistPrompt(
+  profile: UserProfile,
+  idea: Idea,
+  resources: MatchedResources
+): string {
+  const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+  const location = getLocationString(profile);
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
+
+  const budgetContext = profile.budget
+    ? `Budget: ${profile.budget}`
+    : "Budget: Not specified";
+
+  const experienceContext = profile.experience
+    ? `Experience: ${profile.experience}`
+    : "Experience: Not specified";
+
+  const resourcesFormatted = formatResourcesForPromptV2(resources);
+
+  return `Generate a week-by-week launch checklist for this business idea.
+
+## Business Overview
+- **Idea:** ${idea.name}
+- **Description:** ${idea.description}
+- **Category:** ${category}
+- **Location:** ${location || "Not specified"}
+- **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
+- ${budgetContext}
+- ${experienceContext}
+- **Commitment Level:** ${commitment}
+
+## Matched Local Resources
+${resourcesFormatted}
+
+## Output Format
+Return a JSON object with this exact structure:
+
+\`\`\`json
+{
+  "weeks": [
+    {
+      "week_number": 1,
+      "title": "Foundation",
+      "items": [
+        {
+          "id": "unique-id-1",
+          "title": "Short action title (e.g., 'Register your LLC in ${profile.location?.state || "your state"}')",
+          "priority": "critical" | "high" | "medium" | "low",
+          "estimated_time": "1-2 hours",
+          "estimated_cost": "$300",
+          "guide": "Detailed step-by-step markdown with specific links and instructions. For a ${category} in ${profile.location?.state || "your state"}, explain exactly what to do, where to go, what to click. Include actual URLs.",
+          "resources": ["matched-resource-slug-if-relevant"],
+          "links": [
+            {"label": "Secretary of State", "url": "https://actual-state-url.gov"}
+          ]
+        }
+      ]
+    }
+  ],
+  "total_items": 12,
+  "estimated_total_cost": "$1,500-2,000",
+  "estimated_timeline": "4 weeks"
+}
+\`\`\`
+
+## Requirements
+1. Create 4 weeks of tasks (12-16 total items)
+2. Week 1: Foundation (legal, banking, EIN)
+3. Week 2: Setup (workspace, insurance, tools)
+4. Week 3: Build (inventory/services, online presence)
+5. Week 4: Launch (soft launch, marketing, apply for resources)
+6. Each item MUST have a detailed "guide" with step-by-step instructions
+7. Include REAL links (state gov sites, IRS.gov, tool signups)
+8. Reference matched resources where relevant (coworking, grants, accelerators)
+9. Tailor complexity to commitment level:
+   - weekend: Simplest path, minimum viable steps
+   - steady: Balanced approach, proper foundation
+   - all_in: Comprehensive, professional setup
+10. All costs should be realistic for ${profile.location?.state || "the user's state"}
+
+Return ONLY valid JSON, no markdown formatting.`;
+}
+
+// ============================================================================
+// V2 PROMPT: Business Foundation (Tab 2)
+// ============================================================================
+
+export function generateFoundationPrompt(
+  profile: UserProfile,
+  idea: Idea,
+  resources: MatchedResources,
+  researchData?: ResearchData
+): string {
+  const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+  const location = getLocationString(profile);
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
+
+  const budgetContext = profile.budget
+    ? `Budget: ${profile.budget}`
+    : "Budget: Not specified";
+
+  const resourcesFormatted = formatResourcesForPromptV2(resources);
+
+  // Format research data if available
+  let researchContext = "";
+  if (researchData) {
+    researchContext = `
+## Live Market Research (Perplexity-Powered)
+${researchData.marketAnalysis || "No market analysis available."}
+
+### Competitor Data (Firecrawl-Scraped)
+${researchData.competitors?.map(c => `- ${c.name}: ${c.url} — ${c.description || "No description"}`).join("\n") || "No competitors scraped."}
+
+### Sources
+${researchData.sources?.map(s => `- ${s}`).join("\n") || "No sources available."}
+`;
+  }
+
+  return `Generate a comprehensive business foundation analysis for this idea.
+
+## Business Overview
+- **Idea:** ${idea.name}
+- **Description:** ${idea.description}
+- **Category:** ${category}
+- **Location:** ${location || "Not specified"}
+- **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
+- ${budgetContext}
+- **Experience:** ${profile.experience || "Not specified"}
+- **Key Skills:** ${profile.keySkills?.join(", ") || "Not specified"}
+- **Target Customer:** ${profile.targetCustomer || "Not specified"}
+- **Business Model:** ${profile.businessModelPreference || "Not specified"}
+- **Commitment Level:** ${commitment}
+${researchContext}
+
+## Matched Local Resources
+${resourcesFormatted}
+
+## Output Format
+Return a JSON object with this exact structure:
+
+\`\`\`json
+{
+  "viability_score": {
+    "overall": 78,
+    "verdict": "Strong Opportunity" | "Promising" | "Needs Refinement" | "Challenging",
+    "factors": [
+      {"name": "Market Demand", "score": 85, "assessment": "Growing 12% YoY, strong local interest"},
+      {"name": "Competition", "score": 65, "assessment": "4 direct competitors, but none in ${profile.location?.city || "your city"}"},
+      {"name": "Startup Feasibility", "score": 80, "assessment": "Achievable within your budget"},
+      {"name": "Revenue Potential", "score": 75, "assessment": "$3K-8K/month realistic within 6 months"},
+      {"name": "Timing", "score": 82, "assessment": "Market trend favors this, no regulatory barriers"}
+    ]
+  },
+  "market_research": {
+    "market_size": {
+      "tam": "$X billion",
+      "sam": "$X million",
+      "som": "$X thousand",
+      "sources": ["Source 1", "Source 2"]
+    },
+    "growth_rate": "X% annually",
+    "trends": ["Trend 1", "Trend 2", "Trend 3"],
+    "target_demographics": "Description of target customer demographics and psychographics",
+    "demand_signals": ["Signal 1", "Signal 2"],
+    "risks": ["Risk 1", "Risk 2"]
+  },
+  "competitors": [
+    {
+      "name": "Competitor Name",
+      "url": "https://competitor.com",
+      "pricing": "$29-49/month",
+      "positioning": "Premium, enterprise-focused",
+      "strengths": ["Strength 1", "Strength 2"],
+      "weaknesses": ["Weakness 1 - opportunity for you"],
+      "your_advantage": "How you're different/better"
+    }
+  ],
+  "competitive_summary": "Your advantage is X. No competitor in ${profile.location?.city || "your city"} is doing Y.",
+  "legal_structure": {
+    "recommended": "LLC" | "Sole Proprietorship" | "S-Corp" | "Nonprofit",
+    "reasoning": "Why this structure makes sense for your situation",
+    "registration_steps": [
+      {"step": 1, "action": "Action description", "cost": "$X", "link": "https://..."},
+      {"step": 2, "action": "Action description", "cost": "$X", "link": "https://..."}
+    ],
+    "licenses_required": [
+      {"license": "License name", "issuer": "City/State/Federal", "cost": "$X", "link": "https://..."}
+    ],
+    "when_need_lawyer": "Description of when professional help is needed"
+  },
+  "startup_costs": [
+    {"item": "LLC Registration", "cost": 300, "priority": "Week 1", "notes": "File at sos.state.gov"},
+    {"item": "Business Insurance", "cost": 50, "priority": "Week 1", "notes": "General liability minimum", "recurring": "monthly"},
+    {"item": "Website", "cost": 16, "priority": "Week 2", "notes": "Squarespace or Carrd ($19/year)", "recurring": "monthly"}
+  ],
+  "startup_costs_total": {
+    "one_time": 1500,
+    "monthly_recurring": 100,
+    "month_one_total": 1600
+  },
+  "suppliers_vendors": [
+    {
+      "category": "Product sourcing" | "Services" | "Materials",
+      "platforms": ["Platform 1", "Platform 2"],
+      "evaluation_checklist": ["Check 1", "Check 2"],
+      "typical_moq": "Minimum order quantity info",
+      "payment_terms": "Net 30, COD, etc."
+    }
+  ],
+  "tech_stack": [
+    {
+      "category": "E-commerce" | "Payments" | "Scheduling" | "Marketing" | "Operations",
+      "tool": "Tool name",
+      "cost": "$X/month",
+      "why": "Why this tool for their situation",
+      "setup_time": "X hours",
+      "alternatives": ["Alt 1", "Alt 2"]
+    }
+  ],
+  "insurance_compliance": {
+    "required_insurance": [
+      {"type": "General Liability", "estimated_cost": "$50/month", "providers": ["Next Insurance", "Hiscox"]}
+    ],
+    "compliance_requirements": ["Requirement 1", "Requirement 2"],
+    "tax_obligations": "Overview of tax requirements"
+  }
+}
+\`\`\`
+
+## Requirements
+1. Viability score should be honest and evidence-based
+2. Use REAL market data if research was provided, otherwise use industry estimates
+3. Competitors should be REAL companies (from research) or realistic examples
+4. All costs should be specific (not ranges when possible) and realistic for ${profile.location?.state || "the user's state"}
+5. Name ACTUAL tools and platforms — not "consider an e-commerce platform"
+6. Include real URLs for government sites, tools, platforms
+7. Tailor recommendations to their budget (don't suggest expensive options for low budgets)
+8. Reference matched local resources where relevant
+
+Return ONLY valid JSON, no markdown formatting.`;
+}
+
+// ============================================================================
+// V2 PROMPT: Growth Plan (Tab 3)
+// ============================================================================
+
+export function generateGrowthPrompt(
+  profile: UserProfile,
+  idea: Idea,
+  resources: MatchedResources
+): string {
+  const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+  const location = getLocationString(profile);
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
+
+  const resourcesFormatted = formatResourcesForPromptV2(resources);
+
+  return `Generate a complete growth plan with ready-to-use marketing deliverables.
+
+## Business Overview
+- **Idea:** ${idea.name}
+- **Description:** ${idea.description}
+- **Category:** ${category}
+- **Location:** ${location || "Not specified"}
+- **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
+- **Target Customer:** ${profile.targetCustomer || "Not specified"}
+- **Business Model:** ${profile.businessModelPreference || "Not specified"}
+- **Key Skills:** ${profile.keySkills?.join(", ") || "Not specified"}
+- **Commitment:** ${commitment}
+
+## Matched Local Resources
+${resourcesFormatted}
+
+## Output Format
+Return a JSON object with this exact structure:
+
+\`\`\`json
+{
+  "elevator_pitch": {
+    "pitch": "I'm launching [business name], a [one-line description]. We help [target customer] solve [problem] by [solution]. What makes us different is [differentiator]. We're launching in ${profile.location?.city || "[city]"} and I'm looking for [what they need].",
+    "duration": "30 seconds",
+    "tips": ["Tip for delivery 1", "Tip 2"]
+  },
+  "landing_page": {
+    "headline": "Main headline (benefit-focused)",
+    "subheadline": "Supporting statement",
+    "benefit_blocks": [
+      {"title": "Benefit 1", "description": "Explanation"},
+      {"title": "Benefit 2", "description": "Explanation"},
+      {"title": "Benefit 3", "description": "Explanation"}
+    ],
+    "social_proof_placeholder": "Text to show before you have real testimonials",
+    "cta_button": "Get Started" | "Book Now" | "Shop Now" | etc.,
+    "about_section": "About paragraph for landing page",
+    "faq": [
+      {"question": "FAQ 1?", "answer": "Answer 1"},
+      {"question": "FAQ 2?", "answer": "Answer 2"},
+      {"question": "FAQ 3?", "answer": "Answer 3"}
+    ],
+    "setup_guide": "Instructions for setting up with Carrd ($19/year) or Squarespace"
+  },
+  "social_media_posts": [
+    {
+      "platform": "Instagram" | "LinkedIn" | "TikTok" | "Facebook",
+      "post_type": "Launch announcement" | "Behind the scenes" | "Value post" | etc.,
+      "caption": "Full caption text including hashtags",
+      "visual_suggestion": "What image/video to create",
+      "best_time": "Tuesday 10am" or similar,
+      "cta": "Call to action in the post"
+    }
+  ],
+  "email_templates": [
+    {
+      "type": "Launch announcement",
+      "subject_line": "Subject line",
+      "body": "Full email body with [PLACEHOLDER] tags for customization",
+      "cta": "Call to action",
+      "who_to_send": "Friends, family, network"
+    },
+    {
+      "type": "Cold outreach",
+      "subject_line": "Subject line",
+      "body": "Full email body",
+      "cta": "Call to action",
+      "who_to_send": "Potential first customers"
+    },
+    {
+      "type": "Follow-up / Referral ask",
+      "subject_line": "Subject line",
+      "body": "Full email body",
+      "cta": "Call to action",
+      "who_to_send": "Past contacts, early customers"
+    }
+  ],
+  "local_marketing": {
+    "online_communities": [
+      {"name": "r/${profile.location?.city?.toLowerCase().replace(/\s/g, '') || "yourcity"}", "platform": "Reddit", "approach": "How to engage authentically"},
+      {"name": "Facebook group name", "platform": "Facebook", "approach": "How to engage"}
+    ],
+    "partnership_opportunities": [
+      {
+        "business_type": "Complementary business type",
+        "pitch": "Partnership pitch email text",
+        "what_to_offer": "What you bring to the partnership"
+      }
+    ],
+    "local_events": {
+      "event_types": ["Type 1", "Type 2"],
+      "where_to_find": ["meetup.com", "eventbrite.com", "local chamber"],
+      "approach": "How to network effectively"
+    },
+    "pr_opportunities": [
+      {"outlet": "Local news/blog name", "angle": "Story angle to pitch"}
+    ]
+  },
+  "content_calendar": {
+    "week_1": ["Post topic 1", "Post topic 2", "Post topic 3"],
+    "week_2": ["Post topic 1", "Post topic 2", "Post topic 3"],
+    "posting_frequency": "3x per week recommended",
+    "best_platforms": ["Platform 1", "Platform 2"]
+  }
+}
+\`\`\`
+
+## Requirements
+1. All copy should be COMPLETE and ready to use — not suggestions
+2. Email templates should have full body text, not outlines
+3. Social posts should include actual hashtags
+4. Local marketing should reference real platforms (Reddit, Facebook, Meetup)
+5. Tailor tone to their business type:
+   - B2B: Professional, value-focused
+   - B2C: Friendly, benefit-focused
+   - Social Enterprise: Mission-driven, impact-focused
+6. Include 5 social media posts across relevant platforms
+7. Include implementation instructions (where to paste copy, how to set up)
+8. Reference matched local resources in the "apply for resources" guidance
+
+Return ONLY valid JSON, no markdown formatting.`;
+}
+
+// ============================================================================
+// V2 PROMPT: Financial Model (Tab 4)
+// ============================================================================
+
+export function generateFinancialPrompt(
+  profile: UserProfile,
+  idea: Idea,
+  resources: MatchedResources
+): string {
+  const commitment = getCommitment(profile);
+  const isSocialEnterprise = isSocialEnterpriseIdea(idea, profile);
+  const location = getLocationString(profile);
+  const category = profile.businessCategory ? getBusinessCategoryLabel(profile.businessCategory) : "Business";
+
+  const budgetContext = profile.budget
+    ? `Budget: ${profile.budget}`
+    : "Budget: Not specified";
+
+  const resourcesFormatted = formatResourcesForPromptV2(resources);
+
+  // Get coworking cost for reference
+  const coworkingCost = resources.coworking[0]?.details.price_monthly_min || 200;
+
+  return `Generate a complete financial model with real numbers for this business.
+
+## Business Overview
+- **Idea:** ${idea.name}
+- **Description:** ${idea.description}
+- **Category:** ${category}
+- **Location:** ${location || "Not specified"}
+- **Type:** ${isSocialEnterprise ? "Social Enterprise" : "Standard Business"}
+- ${budgetContext}
+- **Business Model:** ${profile.businessModelPreference || "Not specified"}
+- **Target Customer:** ${profile.targetCustomer || "Not specified"}
+- **Commitment:** ${commitment}
+
+## Matched Local Resources
+${resourcesFormatted}
+
+## Reference Costs
+- Coworking space in ${profile.location?.city || "your city"}: ~$${coworkingCost}/month (from matched resources)
+
+## Output Format
+Return a JSON object with this exact structure:
+
+\`\`\`json
+{
+  "startup_costs": {
+    "items": [
+      {"item": "LLC Registration", "cost": 300, "category": "Legal", "notes": "One-time, ${profile.location?.state || "state"} fee"},
+      {"item": "Business Insurance", "cost": 50, "category": "Insurance", "notes": "Monthly, general liability"},
+      {"item": "Website/Domain", "cost": 50, "category": "Technology", "notes": "Year 1"},
+      {"item": "Initial Inventory/Equipment", "cost": 500, "category": "Operations", "notes": "Varies by business"}
+    ],
+    "total_one_time": 1000,
+    "total_monthly_startup": 150,
+    "total_month_one": 1150
+  },
+  "monthly_operating_costs": {
+    "items": [
+      {"expense": "Rent/Coworking", "monthly": ${coworkingCost}, "annual": ${coworkingCost * 12}, "notes": "Based on local options"},
+      {"expense": "Software/Tools", "monthly": 45, "annual": 540, "notes": "Shopify + email marketing"},
+      {"expense": "Insurance", "monthly": 50, "annual": 600, "notes": "General liability"},
+      {"expense": "Marketing", "monthly": 150, "annual": 1800, "notes": "Social ads + content"},
+      {"expense": "Supplies/Inventory", "monthly": 400, "annual": 4800, "notes": "Restock monthly"}
+    ],
+    "total_monthly": 845,
+    "total_annual": 10140
+  },
+  "revenue_projections": {
+    "assumptions": {
+      "average_order_value": 35,
+      "orders_per_customer": 1.5,
+      "customer_acquisition_cost": 15
+    },
+    "scenarios": {
+      "conservative": {
+        "monthly_customers": 20,
+        "monthly_revenue": 700,
+        "monthly_costs": 845,
+        "monthly_profit": -145,
+        "break_even_month": 8
+      },
+      "moderate": {
+        "monthly_customers": 50,
+        "monthly_revenue": 1750,
+        "monthly_costs": 945,
+        "monthly_profit": 805,
+        "break_even_month": 3
+      },
+      "aggressive": {
+        "monthly_customers": 100,
+        "monthly_revenue": 3500,
+        "monthly_costs": 1145,
+        "monthly_profit": 2355,
+        "break_even_month": 1
+      }
+    }
+  },
+  "break_even_analysis": {
+    "units_per_month": 25,
+    "revenue_per_month": 875,
+    "practical_meaning": "You need about 25 customers per month, which means roughly 1 new customer per day",
+    "timeline_estimate": "Most businesses in this category reach break-even within 3-6 months"
+  },
+  "pricing_strategy": {
+    "recommended_price": 35,
+    "price_range": {"min": 25, "max": 49},
+    "competitive_context": "Competitors charge $29-49. Your positioning supports the mid-range.",
+    "pricing_psychology": [
+      "Tip 1 for this business type",
+      "Tip 2 for this business type"
+    ],
+    "how_to_test": "Start at $35, offer a launch discount of 20% for first 50 customers, then test price increases"
+  },
+  "funding_options": {
+    "matched_grants": [
+      {"name": "Grant name from resources", "amount": "Up to $25K", "deadline": "Rolling", "fit": "Why this is relevant"}
+    ],
+    "other_options": [
+      {"type": "SBA Microloan", "amount": "Up to $50K", "notes": "Through local SBA partner"},
+      {"type": "Revenue-based financing", "amount": "Varies", "notes": "After 6 months of revenue"}
+    ]
+  },
+  "financial_milestones": [
+    {"month": 1, "milestone": "Launch and get first 10 paying customers", "revenue_target": 350},
+    {"month": 3, "milestone": "Reach 30 customers/month, break even", "revenue_target": 1050},
+    {"month": 6, "milestone": "Hit $2K/month profit, reinvest in growth", "revenue_target": 3000},
+    {"month": 12, "milestone": "Scale to $5K/month profit, consider hiring", "revenue_target": 7000}
+  ],
+  "key_metrics": {
+    "track_weekly": ["New customers", "Revenue", "Ad spend"],
+    "track_monthly": ["Profit margin", "Customer acquisition cost", "Repeat purchase rate"],
+    "warning_signs": ["CAC exceeding $30", "Profit margin below 20%", "No repeat customers by month 3"]
+  }
+}
+\`\`\`
+
+## Requirements
+1. All numbers should be REALISTIC for a ${category} business
+2. Use actual costs from matched resources (coworking, etc.)
+3. Revenue projections should be conservative — don't oversell
+4. Break-even analysis should be practical ("X customers per day")
+5. Include funding options from matched grants/accelerators
+6. Pricing should reflect competitive research
+7. Financial milestones should be achievable for their commitment level:
+   - weekend: Slower ramp, part-time effort
+   - steady: Moderate growth
+   - all_in: Aggressive targets
+8. Tailor to their budget — don't project $10K/month if they have a $500 budget
+
+Return ONLY valid JSON, no markdown formatting.`;
+}
+
+// ============================================================================
+// V2 SYSTEM PROMPTS
+// ============================================================================
+
+export const CHECKLIST_SYSTEM_PROMPT = `You are SparkLocal's launch strategist — practical, specific, and action-oriented.
+
+Your job is to create a step-by-step launch checklist that transforms "I want to start a business" into "I know exactly what to do this week."
+
+Your checklists are:
+- SPECIFIC: Name actual tools, websites, costs, and timelines
+- ACTIONABLE: Each item can be done TODAY, not "someday"
+- CONTEXTUAL: Tailored to their business type, location, and budget
+- LINKED: Include real URLs for government sites, tools, and resources
+- REALISTIC: Match complexity to their commitment level
+
+Every item should answer: "What exactly do I do, where do I go, and how much does it cost?"
+
+CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
+
+export const FOUNDATION_SYSTEM_PROMPT = `You are SparkLocal's business analyst — rigorous, research-backed, and practical.
+
+Your job is to provide comprehensive business foundation analysis that answers: "Is this a good idea?" and "How do I actually build it?"
+
+Your analysis is:
+- EVIDENCE-BASED: Use real market data, not generic statements
+- SPECIFIC: Name actual competitors, tools, costs, and legal requirements
+- HONEST: Give real viability scores — a "refine" verdict with direction is better than false optimism
+- ACTIONABLE: Every section answers "what do I do with this?"
+- TAILORED: Recommendations match their budget, location, and experience
+
+When research data is provided, synthesize it into clear insights. When competitors are scraped, analyze them specifically.
+
+CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
+
+export const GROWTH_SYSTEM_PROMPT = `You are SparkLocal's growth marketer and copywriter — empowering, specific, and deliverable-focused.
+
+Your job is to provide COMPLETE, READY-TO-USE marketing assets — not advice about marketing.
+
+Your deliverables are:
+- COMPLETE: Full copy, not outlines. Full emails, not bullet points.
+- SPECIFIC: Actual hashtags, actual post times, actual platforms
+- CONTEXTUAL: Tailored to their business type, location, and target customer
+- IMPLEMENTABLE: Each asset includes setup instructions
+- AUTHENTIC: Copy that sounds human, not corporate
+
+Write in their voice for their audience. B2B is professional, B2C is friendly, social enterprise is mission-driven.
+
+CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
+
+export const FINANCIAL_SYSTEM_PROMPT = `You are SparkLocal's financial analyst — realistic, numbers-focused, and practical.
+
+Your job is to make the business REAL with actual numbers. Not "consider your costs" — actual costs in tables.
+
+Your financial models are:
+- REALISTIC: Conservative projections that undersell rather than oversell
+- SPECIFIC: Actual dollar amounts, not ranges when possible
+- CONTEXTUAL: Use local costs, matched resources, and industry benchmarks
+- PRACTICAL: Break-even analysis in terms people understand ("1 customer per day")
+- ACTIONABLE: Clear milestones and metrics to track
+
+The financial model should make someone feel "I can actually see how this works" — not intimidated or confused.
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;

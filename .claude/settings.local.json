@@ -47,7 +47,10 @@
       "mcp__playwright__browser_click",
       "Bash(npx supabase db execute:*)",
       "Bash(curl:*)",
-      "Bash(SparkLocal\" suffix from page titles \\(layout template already adds it\\)\n- Fix homepage city card counts to use LOCAL-ONLY resources \\(is_remote=false, is_nationwide=false/null\\)\n- Update CityHubContent to match homepage query logic for consistent counts\n- Nationwide resources now displayed in separate section, not counted in hero total\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(SparkLocal\" suffix from page titles \\(layout template already adds it\\)\n- Fix homepage city card counts to use LOCAL-ONLY resources \\(is_remote=false, is_nationwide=false/null\\)\n- Update CityHubContent to match homepage query logic for consistent counts\n- Nationwide resources now displayed in separate section, not counted in hero total\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npx supabase db query:*)",
+      "Bash(node analyze-grants.js:*)",
+      "mcp__playwright__browser_evaluate"
     ]
   },
   "enabledMcpjsonServers": [

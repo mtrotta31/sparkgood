@@ -227,7 +227,7 @@ export interface EmailTemplate {
   body: string;
 }
 
-// Action roadmap types
+// Action roadmap types (legacy)
 export interface ActionRoadmap {
   quickWins: QuickWin[];
   phases: Phase[];
@@ -252,6 +252,285 @@ export interface RoadmapTask {
   cost: "free" | "low" | "medium" | "high";
   dependencies: string[];
 }
+
+// ============================================
+// NEW DEEP DIVE TYPES (v2 - Structured JSON)
+// ============================================
+
+// Tab 1: Launch Checklist Types
+export interface LaunchChecklistData {
+  weeks: LaunchWeek[];
+}
+
+export interface LaunchWeek {
+  weekNumber: number;
+  title: string;
+  items: ChecklistItem[];
+}
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  priority: "critical" | "important" | "optional";
+  estimatedTime: string;
+  estimatedCost: string;
+  guide: string; // Markdown content
+  resources?: MatchedResourceRef[];
+  links?: ExternalLink[];
+}
+
+export interface MatchedResourceRef {
+  id: string;
+  name: string;
+  type: "grant" | "accelerator" | "coworking" | "sba";
+  url: string;
+  description?: string;
+}
+
+export interface ExternalLink {
+  label: string;
+  url: string;
+}
+
+// Tab 2: Business Foundation Types
+export interface BusinessFoundationData {
+  marketViability: MarketViabilitySection;
+  legalStructure: LegalStructureSection;
+  startupCosts: StartupCostItem[];
+  suppliers: SupplierSection;
+  techStack: TechStackSection;
+  insurance: InsuranceSection;
+}
+
+export interface MarketViabilitySection {
+  overallScore: number; // 0-100
+  scoreBreakdown: ViabilityScoreItem[];
+  marketResearch: MarketResearchFindings;
+  competitorAnalysis: CompetitorAnalysisItem[];
+  localMarketSize: string;
+}
+
+export interface ViabilityScoreItem {
+  factor: string;
+  score: number;
+  assessment: string;
+}
+
+export interface MarketResearchFindings {
+  tam: string;
+  sam: string;
+  som: string;
+  growthRate: string;
+  trends: string[];
+  demandSignals: string[];
+  risks: string[];
+  sources: string[];
+}
+
+export interface CompetitorAnalysisItem {
+  name: string;
+  url: string;
+  pricing: string;
+  positioning: string;
+  weakness: string;
+}
+
+export interface LegalStructureSection {
+  recommendedStructure: string;
+  reasoning: string;
+  registrationSteps: string[];
+  estimatedCost: string;
+  licensesRequired: string[];
+  whenToGetLawyer: string;
+}
+
+export interface StartupCostItem {
+  item: string;
+  cost: string;
+  priority: "Week 1" | "Week 2" | "Week 3" | "Week 4" | "Month 2" | "Month 3";
+  notes: string;
+}
+
+export interface SupplierSection {
+  platforms: SupplierPlatform[];
+  evaluationChecklist: string[];
+  minimumOrderExpectations: string;
+  paymentTermsInfo: string;
+}
+
+export interface SupplierPlatform {
+  name: string;
+  url: string;
+  description: string;
+  bestFor: string;
+}
+
+export interface TechStackSection {
+  recommendation: string;
+  reasoning: string;
+  tools: TechToolRecommendation[];
+  setupTime: string;
+}
+
+export interface TechToolRecommendation {
+  name: string;
+  purpose: string;
+  cost: string;
+  url: string;
+}
+
+export interface InsuranceSection {
+  required: InsuranceRequirement[];
+  totalEstimatedCost: string;
+  complianceNotes: string[];
+  taxObligations: string;
+}
+
+export interface InsuranceRequirement {
+  type: string;
+  estimatedCost: string;
+  provider: string;
+  url: string;
+}
+
+// Tab 3: Growth Plan Types
+export interface GrowthPlanData {
+  elevatorPitch: string;
+  landingPageCopy: LandingPageCopy;
+  socialMediaPosts: SocialMediaPost[];
+  emailTemplates: GrowthEmailTemplate[];
+  localMarketing: LocalMarketingTactic[];
+}
+
+export interface LandingPageCopy {
+  headline: string;
+  subheadline: string;
+  benefits: BenefitBlock[];
+  socialProofPlaceholder: string;
+  ctaButtonText: string;
+  aboutSection: string;
+  faq: FAQItem[];
+  setupGuide: string;
+}
+
+export interface BenefitBlock {
+  title: string;
+  description: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface SocialMediaPost {
+  platform: "instagram" | "linkedin" | "tiktok" | "twitter" | "facebook" | "nextdoor";
+  caption: string;
+  visualSuggestion: string;
+  bestTimeToPost: string;
+  hashtags: string[];
+}
+
+export interface GrowthEmailTemplate {
+  type: "launch_announcement" | "cold_outreach" | "follow_up";
+  subject: string;
+  body: string;
+}
+
+export interface LocalMarketingTactic {
+  tactic: string;
+  details: string;
+  pitchTemplate?: string;
+}
+
+// Tab 4: Financial Model Types
+export interface FinancialModelData {
+  startupCostsSummary: FinancialTableRow[];
+  monthlyOperatingCosts: FinancialTableRow[];
+  revenueProjections: RevenueProjections;
+  breakEvenAnalysis: BreakEvenAnalysis;
+  pricingStrategy: PricingStrategy;
+}
+
+export interface FinancialTableRow {
+  item: string;
+  monthlyCost?: string;
+  annualCost?: string;
+  cost?: string;
+  notes: string;
+}
+
+export interface RevenueProjections {
+  conservative: RevenueScenario;
+  moderate: RevenueScenario;
+  aggressive: RevenueScenario;
+}
+
+export interface RevenueScenario {
+  monthlyCustomers: number;
+  averageOrder: number;
+  monthlyRevenue: number;
+  monthlyCosts: number;
+  monthlyProfit: number;
+  breakEvenMonth: string;
+}
+
+export interface BreakEvenAnalysis {
+  unitsNeeded: number;
+  description: string;
+}
+
+export interface PricingStrategy {
+  recommendedPrice: string;
+  reasoning: string;
+  psychologyTips: string[];
+  testingApproach: string;
+}
+
+// Checklist Progress (for persistence)
+export interface ChecklistProgress {
+  [itemId: string]: boolean;
+}
+
+// Tab 5: AI Advisor Types
+export interface AdvisorMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export interface AdvisorContext {
+  profile: UserProfile;
+  idea: Idea;
+  checklist?: LaunchChecklistData;
+  foundation?: BusinessFoundationData;
+  growth?: GrowthPlanData;
+  financial?: FinancialModelData;
+}
+
+// Deep Dive V2 Section Types
+export type DeepDiveSectionV2 =
+  | "checklist"
+  | "foundation"
+  | "growth"
+  | "financial"
+  // Legacy support
+  | "viability"
+  | "plan"
+  | "marketing"
+  | "roadmap";
+
+export type DeepDiveResponseV2 =
+  | LaunchChecklistData
+  | BusinessFoundationData
+  | GrowthPlanData
+  | FinancialModelData
+  // Legacy types
+  | ViabilityReport
+  | BusinessPlan
+  | MarketingAssets
+  | ActionRoadmap;
 
 // Combined generated content state
 export interface GeneratedContent {

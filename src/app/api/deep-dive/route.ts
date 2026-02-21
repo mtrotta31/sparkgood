@@ -17,7 +17,17 @@ import {
   BUSINESS_PLAN_SYSTEM_PROMPT,
   MARKETING_SYSTEM_PROMPT,
   ROADMAP_SYSTEM_PROMPT,
+  // V2 prompt generators
+  generateChecklistPrompt,
+  generateFoundationPrompt,
+  generateGrowthPrompt,
+  generateFinancialPrompt,
+  CHECKLIST_SYSTEM_PROMPT,
+  FOUNDATION_SYSTEM_PROMPT,
+  GROWTH_SYSTEM_PROMPT,
+  FINANCIAL_SYSTEM_PROMPT,
 } from "@/prompts/deep-dive";
+import { matchResources, type MatchedResources } from "@/lib/match-resources";
 import {
   generateResearchEnhancedViabilityPrompt,
   generateResearchEnhancedPlanPrompt,
@@ -39,9 +49,18 @@ import type {
   MarketingAssets,
   ActionRoadmap,
   ApiResponse,
+  // V2 types
+  LaunchChecklistData,
+  BusinessFoundationData,
+  GrowthPlanData,
+  FinancialModelData,
 } from "@/types";
 
-type DeepDiveSection = "viability" | "plan" | "marketing" | "roadmap";
+// V2 sections: checklist, foundation, growth, financial
+// Legacy sections: viability, plan, marketing, roadmap (kept for backwards compatibility)
+type DeepDiveSection =
+  | "checklist" | "foundation" | "growth" | "financial"  // V2
+  | "viability" | "plan" | "marketing" | "roadmap";       // Legacy
 
 interface DeepDiveRequest {
   idea: Idea;
@@ -49,7 +68,9 @@ interface DeepDiveRequest {
   section: DeepDiveSection;
 }
 
-type DeepDiveResponse = ViabilityReport | BusinessPlan | MarketingAssets | ActionRoadmap;
+type DeepDiveResponse =
+  | ViabilityReport | BusinessPlan | MarketingAssets | ActionRoadmap  // Legacy
+  | LaunchChecklistData | BusinessFoundationData | GrowthPlanData | FinancialModelData;  // V2
 
 // Cache research data per session to avoid redundant API calls
 // In production, this would be stored in Redis or similar
@@ -388,6 +409,28 @@ export async function POST(request: NextRequest) {
         }
       : undefined;
 
+    // ========================================================================
+    // STEP 3: MATCH LOCAL RESOURCES (for V2 prompts)
+    // ========================================================================
+    let matchedResources: MatchedResources = {
+      coworking: [],
+      grants: [],
+      accelerators: [],
+      sba: [],
+      totalMatched: 0,
+    };
+
+    // Match resources for V2 sections or when we need them for enhanced prompts
+    const v2Sections = ["checklist", "foundation", "growth", "financial"];
+    if (v2Sections.includes(section)) {
+      try {
+        matchedResources = await matchResources(profile, idea);
+        console.log(`Matched ${matchedResources.totalMatched} resources for ${section}`);
+      } catch (matchError) {
+        console.warn("Resource matching failed, continuing without resources:", matchError);
+      }
+    }
+
     try {
       switch (section) {
         case "viability":
@@ -451,6 +494,52 @@ export async function POST(request: NextRequest) {
           });
           break;
 
+        // ====================================================================
+        // V2 SECTIONS (Sprint 1 Rewrite)
+        // ====================================================================
+
+        case "checklist":
+          const checklistPrompt = generateChecklistPrompt(profile, idea, matchedResources);
+          data = await sendMessageForJSON<LaunchChecklistData>(checklistPrompt, {
+            systemPrompt: CHECKLIST_SYSTEM_PROMPT,
+            temperature: 0.7,
+            maxTokens: 6000,
+          });
+          break;
+
+        case "foundation":
+          // Foundation uses research data if available
+          const foundationPrompt = generateFoundationPrompt(
+            profile,
+            idea,
+            matchedResources,
+            formattedResearch
+          );
+          data = await sendMessageForJSON<BusinessFoundationData>(foundationPrompt, {
+            systemPrompt: FOUNDATION_SYSTEM_PROMPT,
+            temperature: 0.7,
+            maxTokens: 8000,
+          });
+          break;
+
+        case "growth":
+          const growthPrompt = generateGrowthPrompt(profile, idea, matchedResources);
+          data = await sendMessageForJSON<GrowthPlanData>(growthPrompt, {
+            systemPrompt: GROWTH_SYSTEM_PROMPT,
+            temperature: 0.8,
+            maxTokens: 6000,
+          });
+          break;
+
+        case "financial":
+          const financialPrompt = generateFinancialPrompt(profile, idea, matchedResources);
+          data = await sendMessageForJSON<FinancialModelData>(financialPrompt, {
+            systemPrompt: FINANCIAL_SYSTEM_PROMPT,
+            temperature: 0.7,
+            maxTokens: 6000,
+          });
+          break;
+
         default:
           return NextResponse.json<ApiResponse<DeepDiveResponse>>({
             success: false,
@@ -488,6 +577,7 @@ function getMockData(
   const commitment = profile.commitment || "steady";
 
   switch (section) {
+    // Legacy sections
     case "viability":
       if (commitment === "weekend") return getMockWeekendViability(idea);
       if (commitment === "steady") return getMockSteadyViability(idea, profile);
@@ -504,7 +594,284 @@ function getMockData(
       if (commitment === "weekend") return getMockWeekendRoadmap();
       if (commitment === "steady") return getMockSteadyRoadmap();
       return getMockRoadmap(profile);
+
+    // V2 sections
+    case "checklist":
+      return getMockChecklist(idea, profile);
+    case "foundation":
+      return getMockFoundation(idea, profile);
+    case "growth":
+      return getMockGrowth(idea, profile);
+    case "financial":
+      return getMockFinancial(idea, profile);
   }
+}
+
+// V2 Mock Data Functions
+function getMockChecklist(_idea: Idea, profile: UserProfile): LaunchChecklistData {
+  const state = profile.location?.state || "TX";
+  return {
+    weeks: [
+      {
+        weekNumber: 1,
+        title: "Foundation",
+        items: [
+          {
+            id: "register-llc",
+            title: `Register your LLC in ${state}`,
+            priority: "critical",
+            estimatedTime: "1-2 hours",
+            estimatedCost: "$300",
+            guide: `To register an LLC in ${state}:\n1. Go to the Secretary of State website\n2. Choose "Form a Business Entity"\n3. Select LLC and fill out the Articles of Organization\n4. Pay the filing fee ($300)\n5. Wait for approval (usually 3-5 business days)`,
+            resources: [],
+            links: [{ label: "Secretary of State", url: `https://sos.${state.toLowerCase()}.gov` }],
+          },
+          {
+            id: "get-ein",
+            title: "Get your EIN (Employer Identification Number)",
+            priority: "critical",
+            estimatedTime: "15 minutes",
+            estimatedCost: "Free",
+            guide: "Go to irs.gov/ein and apply online. It's free and takes about 15 minutes. You'll need your LLC info ready.",
+            resources: [],
+            links: [{ label: "IRS EIN Application", url: "https://www.irs.gov/businesses/small-businesses-self-employed/apply-for-an-employer-identification-number-ein-online" }],
+          },
+          {
+            id: "open-bank",
+            title: "Open a business bank account",
+            priority: "important",
+            estimatedTime: "1 hour",
+            estimatedCost: "Free-$25/month",
+            guide: "Bring your EIN, Articles of Organization, and government ID to a local bank or apply online with Mercury or Relay (both free, online-first banks for small businesses).",
+            resources: [],
+            links: [
+              { label: "Mercury Bank", url: "https://mercury.com" },
+              { label: "Relay Bank", url: "https://relayfi.com" },
+            ],
+          },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Setup",
+        items: [
+          {
+            id: "business-insurance",
+            title: "Get business insurance",
+            priority: "important",
+            estimatedTime: "30 minutes",
+            estimatedCost: "$30-100/month",
+            guide: "Start with general liability insurance. Get quotes from Next Insurance or Hiscox — both offer quick online quotes for small businesses.",
+            resources: [],
+            links: [
+              { label: "Next Insurance", url: "https://nextinsurance.com" },
+              { label: "Hiscox", url: "https://hiscox.com" },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
+
+function getMockFoundation(_idea: Idea, _profile: UserProfile): BusinessFoundationData {
+  return {
+    marketViability: {
+      overallScore: 75,
+      scoreBreakdown: [
+        { factor: "Market Demand", score: 80, assessment: "Growing market with clear demand signals" },
+        { factor: "Competition", score: 70, assessment: "Some competitors exist but room for differentiation" },
+        { factor: "Startup Feasibility", score: 75, assessment: "Achievable within stated budget" },
+        { factor: "Revenue Potential", score: 72, assessment: "Multiple revenue streams possible" },
+        { factor: "Timing", score: 78, assessment: "Market conditions favorable" },
+      ],
+      marketResearch: {
+        tam: "$50 billion",
+        sam: "$5 billion",
+        som: "$500,000",
+        growthRate: "12% annually",
+        trends: ["Growing consumer interest", "Shift to local", "Digital adoption"],
+        demandSignals: ["High search volume", "Social media interest"],
+        risks: ["Economic downturn", "New competitors"],
+        sources: ["Industry Report 2024", "Market Analysis"],
+      },
+      competitorAnalysis: [
+        {
+          name: "Competitor A",
+          url: "https://competitor-a.com",
+          pricing: "$29-99/month",
+          positioning: "Premium, feature-rich",
+          weakness: "Expensive and complex to use",
+        },
+      ],
+      localMarketSize: "Approximately 50,000 potential customers in your metro area",
+    },
+    legalStructure: {
+      recommendedStructure: "LLC",
+      reasoning: "Best balance of liability protection and tax flexibility for small businesses",
+      registrationSteps: [
+        "File Articles of Organization with Secretary of State ($300)",
+        "Get EIN from IRS (free)",
+        "Register for state tax ID if required",
+      ],
+      estimatedCost: "$300-500",
+      licensesRequired: ["General Business License", "Potentially industry-specific licenses"],
+      whenToGetLawyer: "For complex contracts, partnerships, or if raising investment",
+    },
+    startupCosts: [
+      { item: "LLC Registration", cost: "$300", priority: "Week 1", notes: "One-time fee" },
+      { item: "Website/Domain", cost: "$50", priority: "Week 2", notes: "Annual cost" },
+      { item: "Insurance", cost: "$50/month", priority: "Week 1", notes: "Monthly ongoing" },
+    ],
+    suppliers: {
+      platforms: [
+        { name: "Faire", url: "https://faire.com", description: "Wholesale marketplace", bestFor: "Physical products" },
+      ],
+      evaluationChecklist: ["Check minimum order quantities", "Verify shipping costs", "Read reviews"],
+      minimumOrderExpectations: "Typically $100-500 for first orders",
+      paymentTermsInfo: "Most offer Net 30 or Net 60 after relationship established",
+    },
+    techStack: {
+      recommendation: "Start simple with Squarespace or Carrd",
+      reasoning: "Easy to use, professional templates, no coding required",
+      tools: [
+        { name: "Squarespace", purpose: "Website", cost: "$16/month", url: "https://squarespace.com" },
+        { name: "Stripe", purpose: "Payments", cost: "2.9% + $0.30/transaction", url: "https://stripe.com" },
+      ],
+      setupTime: "2-4 hours for basic site",
+    },
+    insurance: {
+      required: [
+        { type: "General Liability", estimatedCost: "$30-50/month", provider: "Next Insurance", url: "https://nextinsurance.com" },
+      ],
+      totalEstimatedCost: "$30-50/month",
+      complianceNotes: ["Register for state tax ID", "Check local business license requirements"],
+      taxObligations: "Quarterly estimated taxes, annual returns",
+    },
+  };
+}
+
+function getMockGrowth(_idea: Idea, _profile: UserProfile): GrowthPlanData {
+  return {
+    elevatorPitch: "I'm launching a business that helps local customers solve their problems in a new way. What makes us different is our focus on community and personalized service. We're launching this month and I'm looking for early customers who want to be part of something new.",
+    landingPageCopy: {
+      headline: "The Smarter Way to Get What You Need",
+      subheadline: "Join hundreds of locals who've discovered a better approach",
+      benefits: [
+        { title: "Save Time", description: "Get what you need faster than ever before" },
+        { title: "Save Money", description: "Affordable options that fit your budget" },
+        { title: "Local Support", description: "Real people in your community ready to help" },
+      ],
+      socialProofPlaceholder: "Trusted by 100+ happy customers in your neighborhood",
+      ctaButtonText: "Get Started Free",
+      aboutSection: "We started this because we saw a better way. As locals ourselves, we understand what our community needs.",
+      faq: [
+        { question: "How does it work?", answer: "Sign up, tell us what you need, and we handle the rest." },
+        { question: "What does it cost?", answer: "We offer free trials and affordable monthly plans." },
+        { question: "How do I get started?", answer: "Click the button above and we'll guide you through!" },
+      ],
+      setupGuide: "Sign up for Carrd ($19/year) or Squarespace, paste in this copy, add your images, and publish.",
+    },
+    socialMediaPosts: [
+      {
+        platform: "instagram",
+        caption: "We're officially launching! 🎉 After months of preparation, we're ready to help you [benefit]. Link in bio to learn more.",
+        visualSuggestion: "Behind-the-scenes photo or celebration image",
+        bestTimeToPost: "Tuesday 10am or Thursday 2pm",
+        hashtags: ["SmallBusiness", "LocalBusiness", "LaunchDay"],
+      },
+      {
+        platform: "linkedin",
+        caption: "Excited to announce the launch of our new venture. We're solving [problem] for [audience] by [solution]. If you know anyone who could benefit, I'd love an introduction.",
+        visualSuggestion: "Professional headshot or product image",
+        bestTimeToPost: "Tuesday-Thursday, 8-10am",
+        hashtags: ["Entrepreneurship", "SmallBusiness", "Startup"],
+      },
+    ],
+    emailTemplates: [
+      {
+        type: "launch_announcement",
+        subject: "Something new for our community",
+        body: "Hi [Name],\n\nI wanted to personally let you know about something I've been working on.\n\n[1-2 sentences about the business]\n\nI think this could really help [target customer], and I'd love your support — whether that's trying it out, sharing with someone who'd benefit, or just giving feedback.\n\n[CTA Button]\n\nThanks for being part of this journey!\n\n[Your name]",
+      },
+      {
+        type: "cold_outreach",
+        subject: "Quick question about [their business/role]",
+        body: "Hi [Name],\n\nI noticed you [something specific about them]. I'm launching [your business] to help [target customer] with [problem].\n\nWould you be open to a quick 10-minute call to get your perspective? I'd genuinely value your insight.\n\nBest,\n[Your name]",
+      },
+    ],
+    localMarketing: [
+      {
+        tactic: "Join local subreddit and Facebook groups",
+        details: "Be helpful first, answer questions in your area of expertise. Mention your business only when directly relevant to solving someone's problem.",
+      },
+      {
+        tactic: "Partner with complementary local businesses",
+        details: "Identify businesses whose customers might need your service. Offer cross-promotion or referral arrangement.",
+        pitchTemplate: "I run [your business] and I think our customers overlap. Would you be open to a cross-promotion?",
+      },
+      {
+        tactic: "Attend local networking events",
+        details: "Check meetup.com, eventbrite, and local chamber of commerce. Bring business cards, be genuinely interested in others, follow up within 24 hours.",
+      },
+    ],
+  };
+}
+
+function getMockFinancial(_idea: Idea, _profile: UserProfile): FinancialModelData {
+  return {
+    startupCostsSummary: [
+      { item: "LLC Registration", cost: "$300", notes: "One-time state fee" },
+      { item: "Business Insurance", cost: "$50/month", notes: "Monthly ongoing" },
+      { item: "Website/Domain", cost: "$50", notes: "First year" },
+      { item: "Initial Marketing", cost: "$200", notes: "Launch campaign" },
+    ],
+    monthlyOperatingCosts: [
+      { item: "Software/Tools", monthlyCost: "$50", annualCost: "$600", notes: "Essential tools" },
+      { item: "Insurance", monthlyCost: "$50", annualCost: "$600", notes: "General liability" },
+      { item: "Marketing", monthlyCost: "$100", annualCost: "$1,200", notes: "Ads and content" },
+      { item: "Miscellaneous", monthlyCost: "$50", annualCost: "$600", notes: "Buffer for unexpected" },
+    ],
+    revenueProjections: {
+      conservative: {
+        monthlyCustomers: 10,
+        averageOrder: 50,
+        monthlyRevenue: 500,
+        monthlyCosts: 250,
+        monthlyProfit: 250,
+        breakEvenMonth: "Month 3",
+      },
+      moderate: {
+        monthlyCustomers: 25,
+        averageOrder: 50,
+        monthlyRevenue: 1250,
+        monthlyCosts: 350,
+        monthlyProfit: 900,
+        breakEvenMonth: "Month 1",
+      },
+      aggressive: {
+        monthlyCustomers: 50,
+        averageOrder: 50,
+        monthlyRevenue: 2500,
+        monthlyCosts: 500,
+        monthlyProfit: 2000,
+        breakEvenMonth: "Month 1",
+      },
+    },
+    breakEvenAnalysis: {
+      unitsNeeded: 10,
+      description: "You need about 10 customers per month (roughly 2-3 per week) to break even. Most similar businesses reach break-even within 2-3 months.",
+    },
+    pricingStrategy: {
+      recommendedPrice: "$49",
+      reasoning: "Similar services charge $40-80. Your pricing is competitive while leaving room for premium positioning.",
+      psychologyTips: [
+        "End prices in 9 (e.g., $49) for perceived value",
+        "Offer a premium tier to make standard seem affordable",
+      ],
+      testingApproach: "Start at $49, offer early-bird 20% discount, test $59 after first 20 customers",
+    },
+  };
 }
 
 function getMockViability(_idea: Idea, _profile: UserProfile): ViabilityReport {
