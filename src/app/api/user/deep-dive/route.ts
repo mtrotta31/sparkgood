@@ -12,6 +12,7 @@ import type {
   BusinessFoundationData,
   GrowthPlanData,
   FinancialModelData,
+  LocalResourcesData,
   ChecklistProgress,
 } from "@/types";
 
@@ -27,6 +28,7 @@ interface DeepDiveUpdate {
   foundation?: BusinessFoundationData;
   growth?: GrowthPlanData;
   financial?: FinancialModelData;
+  matchedResources?: LocalResourcesData;
   checklistProgress?: ChecklistProgress;
 }
 
@@ -62,6 +64,7 @@ export async function POST(request: Request) {
       foundation,
       growth,
       financial,
+      matchedResources,
       checklistProgress,
     } = await request.json() as DeepDiveUpdate;
 
@@ -75,6 +78,7 @@ export async function POST(request: Request) {
       hasFoundation: !!foundation,
       hasGrowth: !!growth,
       hasFinancial: !!financial,
+      hasMatchedResources: !!matchedResources,
       hasChecklistProgress: !!checklistProgress,
     });
 
@@ -108,6 +112,7 @@ export async function POST(request: Request) {
     if (foundation !== undefined) updateData.foundation = foundation;
     if (growth !== undefined) updateData.growth = growth;
     if (financial !== undefined) updateData.financial = financial;
+    if (matchedResources !== undefined) updateData.matched_resources = matchedResources;
     if (checklistProgress !== undefined) updateData.checklist_progress = checklistProgress;
 
     let result;
@@ -228,6 +233,7 @@ export async function GET(request: Request) {
         foundation: data.foundation,
         growth: data.growth,
         financial: data.financial,
+        matchedResources: data.matched_resources,
         checklistProgress: data.checklist_progress,
       },
     });

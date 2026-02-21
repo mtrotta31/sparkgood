@@ -9,6 +9,7 @@ import LaunchChecklist from "@/components/results/LaunchChecklist";
 import BusinessFoundation from "@/components/results/BusinessFoundation";
 import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
+import LocalResources from "@/components/results/LocalResources";
 import AIAdvisorPlaceholder from "@/components/results/AIAdvisorPlaceholder";
 import ConfirmDialog from "./ConfirmDialog";
 import LaunchKitModal from "./LaunchKitModal";
@@ -20,10 +21,11 @@ import type {
   BusinessFoundationData,
   GrowthPlanData,
   FinancialModelData,
+  LocalResourcesData,
   ChecklistProgress,
 } from "@/types";
 
-type TabId = "checklist" | "foundation" | "growth" | "financial" | "advisor";
+type TabId = "foundation" | "checklist" | "growth" | "financial" | "resources" | "advisor";
 
 interface Tab {
   id: TabId;
@@ -33,14 +35,14 @@ interface Tab {
 
 const tabs: Tab[] = [
   {
-    id: "checklist",
-    label: "Launch Checklist",
-    emoji: "🚀",
-  },
-  {
     id: "foundation",
     label: "Business Foundation",
     emoji: "🏗️",
+  },
+  {
+    id: "checklist",
+    label: "Launch Checklist",
+    emoji: "🚀",
   },
   {
     id: "growth",
@@ -51,6 +53,11 @@ const tabs: Tab[] = [
     id: "financial",
     label: "Financial Model",
     emoji: "💰",
+  },
+  {
+    id: "resources",
+    label: "Local Resources",
+    emoji: "📍",
   },
   {
     id: "advisor",
@@ -71,6 +78,7 @@ interface DeepDiveSectionV2Props {
   initialFoundation?: BusinessFoundationData;
   initialGrowth?: GrowthPlanData;
   initialFinancial?: FinancialModelData;
+  initialLocalResources?: LocalResourcesData;
   initialChecklistProgress?: ChecklistProgress;
   // Header customization for project page
   backText?: string; // Customize "Back to Ideas" text
@@ -88,11 +96,12 @@ export default function DeepDiveSectionV2({
   initialFoundation,
   initialGrowth,
   initialFinancial,
+  initialLocalResources,
   initialChecklistProgress,
   backText = "Back to Ideas",
   onDelete,
 }: DeepDiveSectionV2Props) {
-  const [activeTab, setActiveTab] = useState<TabId>("checklist");
+  const [activeTab, setActiveTab] = useState<TabId>("foundation");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(!!initialSavedIdeaId); // Already saved if we have an ID
@@ -119,6 +128,7 @@ export default function DeepDiveSectionV2({
   const [foundation, setFoundation] = useState<BusinessFoundationData | null>(initialFoundation || null);
   const [growth, setGrowth] = useState<GrowthPlanData | null>(initialGrowth || null);
   const [financial, setFinancial] = useState<FinancialModelData | null>(initialFinancial || null);
+  const [localResources, setLocalResources] = useState<LocalResourcesData | null>(initialLocalResources || null);
 
   // Checklist progress state
   const [checklistProgress, setChecklistProgress] = useState<ChecklistProgress>(initialChecklistProgress || {});
@@ -159,7 +169,11 @@ export default function DeepDiveSectionV2({
       fetchedTabs.current.add("financial");
       savedTabs.current.add("financial");
     }
-  }, [initialChecklist, initialFoundation, initialGrowth, initialFinancial]);
+    if (initialLocalResources) {
+      fetchedTabs.current.add("resources");
+      savedTabs.current.add("resources");
+    }
+  }, [initialChecklist, initialFoundation, initialGrowth, initialFinancial, initialLocalResources]);
 
   // User data hook for saving results
   const { isAuthenticated } = useUserData();
@@ -298,9 +312,10 @@ export default function DeepDiveSectionV2({
       case "foundation": return foundation !== null;
       case "growth": return growth !== null;
       case "financial": return financial !== null;
+      case "resources": return localResources !== null;
       case "advisor": return true; // Placeholder always available
     }
-  }, [checklist, foundation, growth, financial]);
+  }, [checklist, foundation, growth, financial, localResources]);
 
   // Fetch content for a specific tab
   const fetchContent = useCallback(async (tabId: TabId) => {
@@ -318,7 +333,10 @@ export default function DeepDiveSectionV2({
     setError(null);
 
     try {
-      const response = await fetch("/api/deep-dive", {
+      // Resources tab uses a different API endpoint
+      const endpoint = tabId === "resources" ? "/api/deep-dive/resources" : "/api/deep-dive";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -348,6 +366,9 @@ export default function DeepDiveSectionV2({
             break;
           case "financial":
             setFinancial(result.data as FinancialModelData);
+            break;
+          case "resources":
+            setLocalResources(result.data as LocalResourcesData);
             break;
         }
       } else {
@@ -399,6 +420,9 @@ export default function DeepDiveSectionV2({
       case "financial":
         setFinancial(null);
         break;
+      case "resources":
+        setLocalResources(null);
+        break;
     }
 
     fetchedTabs.current.delete(tabToRegenerate);
@@ -420,6 +444,7 @@ export default function DeepDiveSectionV2({
       case "foundation": return "business foundation";
       case "growth": return "growth plan";
       case "financial": return "financial model";
+      case "resources": return "local resources";
       case "advisor": return "AI advisor";
     }
   };
@@ -517,6 +542,10 @@ export default function DeepDiveSectionV2({
         updatePayload.financial = financial;
         hasChanges = true;
       }
+      if (localResources && !savedTabs.current.has("resources")) {
+        updatePayload.matchedResources = localResources;
+        hasChanges = true;
+      }
 
       if (!hasChanges) return;
 
@@ -533,6 +562,7 @@ export default function DeepDiveSectionV2({
           if (foundation) savedTabs.current.add("foundation");
           if (growth) savedTabs.current.add("growth");
           if (financial) savedTabs.current.add("financial");
+          if (localResources) savedTabs.current.add("resources");
           setIsSaved(true);
         } else {
           console.error("[DeepDiveV2] Failed to auto-save:", await response.text());
@@ -543,7 +573,7 @@ export default function DeepDiveSectionV2({
     };
 
     saveResults();
-  }, [isAuthenticated, savedIdeaId, checklist, foundation, growth, financial]);
+  }, [isAuthenticated, savedIdeaId, checklist, foundation, growth, financial, localResources]);
 
   // Get content for current tab
   const getCurrentContent = () => {
@@ -552,6 +582,7 @@ export default function DeepDiveSectionV2({
       case "foundation": return foundation;
       case "growth": return growth;
       case "financial": return financial;
+      case "resources": return localResources;
       case "advisor": return true; // Placeholder
     }
   };
@@ -891,6 +922,9 @@ export default function DeepDiveSectionV2({
             )}
             {activeTab === "financial" && financial && (
               <FinancialModel data={financial} />
+            )}
+            {activeTab === "resources" && localResources && (
+              <LocalResources data={localResources} />
             )}
             {activeTab === "advisor" && (
               <AIAdvisorPlaceholder ideaName={idea.name} />

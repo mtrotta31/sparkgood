@@ -99,6 +99,7 @@ export async function GET(
           foundation: deepDive.foundation,
           growth: deepDive.growth,
           financial: deepDive.financial,
+          matchedResources: deepDive.matched_resources,
           checklistProgress: deepDive.checklist_progress,
         } : null,
       },

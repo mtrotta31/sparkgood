@@ -492,7 +492,38 @@ export interface ChecklistProgress {
   [itemId: string]: boolean;
 }
 
-// Tab 5: AI Advisor Types
+// Tab 5: Local Resources Types
+export interface LocalResourcesData {
+  coworking: LocalResourceItem[];
+  grants: LocalResourceItem[];
+  accelerators: LocalResourceItem[];
+  sba: LocalResourceItem[];
+  citySlug: string;
+  cityName: string;
+  state: string;
+  totalMatched: number;
+}
+
+export interface LocalResourceItem {
+  id: string;
+  name: string;
+  slug: string;
+  category: string; // ResourceCategory - coworking, grant, accelerator, sba, etc.
+  city: string | null;
+  state: string | null;
+  isNationwide: boolean;
+  relevanceNote: string; // AI-generated explanation of why this is relevant
+  // Category-specific details
+  rating?: number; // Coworking
+  priceRange?: string; // Coworking
+  amountRange?: string; // Grant
+  deadline?: string; // Grant/Accelerator
+  fundingAmount?: string; // Accelerator
+  services?: string[]; // SBA
+  isFree?: boolean; // SBA
+}
+
+// Tab 6: AI Advisor Types
 export interface AdvisorMessage {
   id: string;
   role: "user" | "assistant";

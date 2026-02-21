@@ -25,6 +25,7 @@ import type {
   BusinessFoundationData,
   GrowthPlanData,
   FinancialModelData,
+  LocalResourcesData,
   ChecklistProgress,
 } from "@/types";
 
@@ -92,6 +93,7 @@ interface Project {
     foundation: BusinessFoundationData | null;
     growth: GrowthPlanData | null;
     financial: FinancialModelData | null;
+    matchedResources: LocalResourcesData | null;
     checklistProgress: ChecklistProgress | null;
   } | null;
 }
@@ -99,7 +101,7 @@ interface Project {
 // Helper to detect if project has V2 data
 function hasV2Data(deepDive: Project["deepDive"]): boolean {
   if (!deepDive) return false;
-  return !!(deepDive.checklist || deepDive.foundation || deepDive.growth || deepDive.financial);
+  return !!(deepDive.checklist || deepDive.foundation || deepDive.growth || deepDive.financial || deepDive.matchedResources);
 }
 
 export default function ProjectPage() {
@@ -613,6 +615,7 @@ export default function ProjectPage() {
           initialFoundation={project.deepDive?.foundation || undefined}
           initialGrowth={project.deepDive?.growth || undefined}
           initialFinancial={project.deepDive?.financial || undefined}
+          initialLocalResources={project.deepDive?.matchedResources || undefined}
           initialChecklistProgress={project.deepDive?.checklistProgress || undefined}
           // Project page customizations
           backText="Back to Projects"
