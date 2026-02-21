@@ -17,6 +17,8 @@ import {
 import ResourceCard from "@/components/resources/ResourceCard";
 import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
 import CopyButton from "@/components/resources/CopyButton";
+import { formatHours } from "@/lib/formatHours";
+import { formatDescription } from "@/lib/format-description";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -296,11 +298,18 @@ export default async function ListingPage({ params }: PageProps) {
               )}
 
               {/* Short description */}
-              {listing.short_description && (
-                <p className="text-gray-600 mt-3 text-lg">
-                  {listing.short_description}
-                </p>
-              )}
+              {(() => {
+                const cleanedDescription = formatDescription(listing.short_description, {
+                  category: listing.category,
+                  city: listing.city || undefined,
+                  state: listing.state || undefined,
+                });
+                return cleanedDescription ? (
+                  <p className="text-gray-600 mt-3 text-lg">
+                    {cleanedDescription}
+                  </p>
+                ) : null;
+              })()}
             </div>
           </div>
         </div>
@@ -313,16 +322,23 @@ export default async function ListingPage({ params }: PageProps) {
             {/* Main Content Column */}
             <div className="lg:col-span-2 space-y-8">
               {/* Description */}
-              {listing.description && (
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
-                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
-                    About
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                    {listing.description}
-                  </p>
-                </div>
-              )}
+              {(() => {
+                const cleanedAbout = formatDescription(listing.description, {
+                  category: listing.category,
+                  city: listing.city || undefined,
+                  state: listing.state || undefined,
+                });
+                return cleanedAbout ? (
+                  <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
+                      About
+                    </h2>
+                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                      {cleanedAbout}
+                    </p>
+                  </div>
+                ) : null;
+              })()}
 
               {/* Accelerator Details */}
               {listing.category === "accelerator" && (
@@ -454,11 +470,11 @@ export default async function ListingPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
-                    {details.hours && (
+                    {details.hours && formatHours(details.hours) && (
                       <div className="p-4 rounded-lg bg-gray-50">
                         <p className="text-gray-500 text-sm mb-1">Hours</p>
                         <p className="text-gray-900 font-semibold text-lg">
-                          {details.hours}
+                          {formatHours(details.hours)}
                         </p>
                       </div>
                     )}

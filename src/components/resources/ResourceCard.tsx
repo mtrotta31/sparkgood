@@ -13,6 +13,8 @@ import {
   type SBADetails,
   type CoworkingDetails,
 } from "@/types/resources";
+import { formatHours } from "@/lib/formatHours";
+import { formatDescription } from "@/lib/format-description";
 
 interface Props {
   listing: ResourceListing;
@@ -154,12 +156,12 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
             From ${details.price_monthly_min}/mo
           </span>
         )}
-        {details.hours && (
+        {details.hours && formatHours(details.hours) && (
           <span className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {details.hours}
+            {formatHours(details.hours)}
           </span>
         )}
       </div>
@@ -419,11 +421,18 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
         </div>
 
         {/* Description */}
-        {listing.short_description && (
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-            {listing.short_description}
-          </p>
-        )}
+        {(() => {
+          const cleanedDescription = formatDescription(listing.short_description, {
+            category: listing.category,
+            city: listing.city || undefined,
+            state: listing.state || undefined,
+          });
+          return cleanedDescription ? (
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+              {cleanedDescription}
+            </p>
+          ) : null;
+        })()}
 
         {/* Category-specific content */}
         {renderCategoryContent()}

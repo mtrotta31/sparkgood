@@ -244,45 +244,70 @@ export default async function ResourcesPage() {
   // Get top 12 cities for the grid
   const topCities = (allLocations || []).slice(0, 12);
 
-  // Get category counts
-  const { data: listings } = await supabase
+  // Get total listing count (using count query to avoid row limits)
+  const { count: totalListingCount } = await supabase
     .from("resource_listings")
-    .select("category")
+    .select("*", { count: "exact", head: true })
     .eq("is_active", true);
 
-  const categoryCounts: Record<string, number> = {};
-  listings?.forEach((l) => {
-    categoryCounts[l.category] = (categoryCounts[l.category] || 0) + 1;
+  // Get category counts using individual count queries to avoid Supabase's 1000 row limit
+  // Each category query uses count: "exact" with head: true for accurate counts
+  const categoryCountPromises = MAIN_CATEGORIES.map(async (category) => {
+    const { count } = await supabase
+      .from("resource_listings")
+      .select("*", { count: "exact", head: true })
+      .eq("is_active", true)
+      .eq("category", category.slug);
+    return { slug: category.slug, count: count || 0 };
   });
 
-  // Get category counts per city for top cities
-  const { data: categoryLocations } = await supabase
-    .from("resource_category_locations")
-    .select("category, location_id, listing_count")
-    .in(
-      "location_id",
-      topCities.map((c) => c.id)
-    );
+  const categoryCountResults = await Promise.all(categoryCountPromises);
+  const categoryCounts: Record<string, number> = {};
+  categoryCountResults.forEach((result) => {
+    categoryCounts[result.slug] = result.count;
+  });
 
-  // Build city category counts map
+  // Get LOCAL resource counts per city (exclude nationwide resources)
+  // Query resource_listings directly to ensure we only count local resources
   const cityCategoryCounts: Record<
     string,
     { grant: number; coworking: number; accelerator: number; sba: number }
   > = {};
+
+  // Initialize all cities with zero counts
   topCities.forEach((city) => {
     cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
   });
-  categoryLocations?.forEach((cl) => {
-    if (cityCategoryCounts[cl.location_id]) {
-      const cat = cl.category as keyof typeof cityCategoryCounts[string];
-      if (cat in cityCategoryCounts[cl.location_id]) {
-        cityCategoryCounts[cl.location_id][cat] = cl.listing_count;
+
+  // Build a map of city+state to location ID for lookup
+  const cityStateToId = new Map<string, string>();
+  topCities.forEach((c) => {
+    cityStateToId.set(`${c.city}|${c.state}`, c.id);
+  });
+
+  // Fetch local listings for all top cities in one query (excluding nationwide/remote)
+  const { data: localListings } = await supabase
+    .from("resource_listings")
+    .select("category, city, state")
+    .eq("is_active", true)
+    .eq("is_nationwide", false)
+    .eq("is_remote", false)
+    .in("city", topCities.map((c) => c.city));
+
+  // Count by category per city
+  localListings?.forEach((listing) => {
+    if (!listing.city || !listing.state) return;
+    const locationId = cityStateToId.get(`${listing.city}|${listing.state}`);
+    if (locationId && cityCategoryCounts[locationId]) {
+      const cat = listing.category as keyof typeof cityCategoryCounts[string];
+      if (cat in cityCategoryCounts[locationId]) {
+        cityCategoryCounts[locationId][cat]++;
       }
     }
   });
 
   // Calculate totals
-  const totalListings = listings?.length || 0;
+  const totalListings = totalListingCount || 0;
   const totalCities = allLocations?.length || 0;
   const totalCategories = Object.keys(CATEGORY_INFO).filter(
     (cat) => categoryCounts[cat] > 0
