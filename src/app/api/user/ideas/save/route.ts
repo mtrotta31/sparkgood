@@ -42,21 +42,41 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if this idea already exists for this user (by idea.id in idea_data)
-    const { data: existing } = await supabase
+    // Check if this idea already exists for this user
+    // First check by idea.id (exact match)
+    const { data: existingById } = await supabase
       .from("saved_ideas")
       .select("id")
       .eq("user_id", user.id)
       .filter("idea_data->id", "eq", idea.id)
       .single();
 
-    console.log("[save-idea] Existing check:", { existing: existing?.id });
+    console.log("[save-idea] Existing by ID check:", { existing: existingById?.id });
 
-    if (existing) {
-      console.log("[save-idea] Idea already saved");
+    if (existingById) {
+      console.log("[save-idea] Idea already saved (by ID)");
       return NextResponse.json({
         success: true,
-        data: { savedId: existing.id, alreadySaved: true },
+        data: { savedId: existingById.id, alreadySaved: true },
+      });
+    }
+
+    // Also check by idea name + tagline to catch duplicates with regenerated IDs
+    const { data: existingByName } = await supabase
+      .from("saved_ideas")
+      .select("id")
+      .eq("user_id", user.id)
+      .filter("idea_data->name", "eq", idea.name)
+      .filter("idea_data->tagline", "eq", idea.tagline)
+      .single();
+
+    console.log("[save-idea] Existing by name check:", { existing: existingByName?.id });
+
+    if (existingByName) {
+      console.log("[save-idea] Idea already saved (by name+tagline)");
+      return NextResponse.json({
+        success: true,
+        data: { savedId: existingByName.id, alreadySaved: true },
       });
     }
 

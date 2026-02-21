@@ -66,13 +66,31 @@ interface DeepDiveSectionV2Props {
   onBack: () => void;
   profileId?: string;
   initialSavedIdeaId?: string; // For pre-saved projects, skip the save step
+  // Initial content for pre-saved projects (avoids regeneration)
+  initialChecklist?: LaunchChecklistData;
+  initialFoundation?: BusinessFoundationData;
+  initialGrowth?: GrowthPlanData;
+  initialFinancial?: FinancialModelData;
+  initialChecklistProgress?: ChecklistProgress;
 }
 
-export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profileId, initialSavedIdeaId }: DeepDiveSectionV2Props) {
+export default function DeepDiveSectionV2({
+  idea,
+  ideas,
+  profile,
+  onBack,
+  profileId,
+  initialSavedIdeaId,
+  initialChecklist,
+  initialFoundation,
+  initialGrowth,
+  initialFinancial,
+  initialChecklistProgress,
+}: DeepDiveSectionV2Props) {
   const [activeTab, setActiveTab] = useState<TabId>("checklist");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(!!initialSavedIdeaId); // Already saved if we have an ID
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   // Credits and access control
@@ -91,14 +109,14 @@ export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profil
   const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
   const [launchKitError, setLaunchKitError] = useState<string | null>(null);
 
-  // Content state for each section
-  const [checklist, setChecklist] = useState<LaunchChecklistData | null>(null);
-  const [foundation, setFoundation] = useState<BusinessFoundationData | null>(null);
-  const [growth, setGrowth] = useState<GrowthPlanData | null>(null);
-  const [financial, setFinancial] = useState<FinancialModelData | null>(null);
+  // Content state for each section (initialized from props if available)
+  const [checklist, setChecklist] = useState<LaunchChecklistData | null>(initialChecklist || null);
+  const [foundation, setFoundation] = useState<BusinessFoundationData | null>(initialFoundation || null);
+  const [growth, setGrowth] = useState<GrowthPlanData | null>(initialGrowth || null);
+  const [financial, setFinancial] = useState<FinancialModelData | null>(initialFinancial || null);
 
   // Checklist progress state
-  const [checklistProgress, setChecklistProgress] = useState<ChecklistProgress>({});
+  const [checklistProgress, setChecklistProgress] = useState<ChecklistProgress>(initialChecklistProgress || {});
 
   // The saved idea ID from Supabase (used for deep dive results)
   // Initialize with initialSavedIdeaId if provided (for pre-saved projects)
@@ -110,8 +128,33 @@ export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profil
   const currentRequestId = useRef<number>(0);
   // Track which tabs have been saved
   const savedTabs = useRef<Set<TabId>>(new Set());
-  // Track if we've attempted to save the idea
-  const hasAttemptedSaveIdea = useRef(false);
+  // Track if we've attempted to save the idea (skip if we already have a saved ID)
+  const hasAttemptedSaveIdea = useRef(!!initialSavedIdeaId);
+  // Track if we've initialized from props
+  const hasInitializedFromProps = useRef(false);
+
+  // Initialize refs with content from props (only once on mount)
+  useEffect(() => {
+    if (hasInitializedFromProps.current) return;
+    hasInitializedFromProps.current = true;
+
+    if (initialChecklist) {
+      fetchedTabs.current.add("checklist");
+      savedTabs.current.add("checklist");
+    }
+    if (initialFoundation) {
+      fetchedTabs.current.add("foundation");
+      savedTabs.current.add("foundation");
+    }
+    if (initialGrowth) {
+      fetchedTabs.current.add("growth");
+      savedTabs.current.add("growth");
+    }
+    if (initialFinancial) {
+      fetchedTabs.current.add("financial");
+      savedTabs.current.add("financial");
+    }
+  }, [initialChecklist, initialFoundation, initialGrowth, initialFinancial]);
 
   // User data hook for saving results
   const { isAuthenticated } = useUserData();

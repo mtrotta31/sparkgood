@@ -645,6 +645,12 @@ export default function ProjectPage() {
           profile={profile}
           onBack={() => router.push("/projects")}
           initialSavedIdeaId={project.id}
+          // Pass saved V2 content to avoid regeneration
+          initialChecklist={project.deepDive?.checklist || undefined}
+          initialFoundation={project.deepDive?.foundation || undefined}
+          initialGrowth={project.deepDive?.growth || undefined}
+          initialFinancial={project.deepDive?.financial || undefined}
+          initialChecklistProgress={project.deepDive?.checklistProgress || undefined}
         />
 
         {/* Delete confirmation modal */}
