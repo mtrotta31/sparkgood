@@ -597,48 +597,11 @@ export default function ProjectPage() {
   // Check if this is a V2 project (has V2 deep dive data)
   const isV2Project = hasV2Data(project.deepDive);
 
-  // V2 Project: Render DeepDiveSectionV2 component
+  // V2 Project: Render DeepDiveSectionV2 component (handles its own header)
   if (isV2Project) {
     return (
       <div className="min-h-screen bg-charcoal-dark">
-        {/* Minimal Header for V2 */}
-        <div className="border-b border-warmwhite/10 bg-charcoal-dark/95 backdrop-blur-sm sticky top-0 z-40">
-          <div className="max-w-5xl mx-auto px-4 py-3 md:py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 md:gap-4">
-                <Link href="/" className="flex items-center gap-2 group">
-                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center transition-transform group-hover:scale-105">
-                    <span className="text-xs md:text-sm">✦</span>
-                  </div>
-                  <span className="font-display text-warmwhite font-semibold hidden sm:inline text-sm">
-                    SparkLocal
-                  </span>
-                </Link>
-                <div className="w-px h-5 bg-warmwhite/20 hidden sm:block" />
-                <Link
-                  href="/projects"
-                  className="flex items-center gap-1.5 text-warmwhite-muted hover:text-warmwhite transition-colors text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span className="hidden sm:inline">Back to Projects</span>
-                </Link>
-              </div>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all duration-200"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                <span className="hidden sm:inline">Delete</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* DeepDiveSectionV2 handles its own tabs, content, and loading */}
+        {/* DeepDiveSectionV2 handles its own header, tabs, content, and loading */}
         <DeepDiveSectionV2
           idea={project.idea}
           ideas={[project.idea]}
@@ -651,6 +614,9 @@ export default function ProjectPage() {
           initialGrowth={project.deepDive?.growth || undefined}
           initialFinancial={project.deepDive?.financial || undefined}
           initialChecklistProgress={project.deepDive?.checklistProgress || undefined}
+          // Project page customizations
+          backText="Back to Projects"
+          onDelete={() => setShowDeleteConfirm(true)}
         />
 
         {/* Delete confirmation modal */}

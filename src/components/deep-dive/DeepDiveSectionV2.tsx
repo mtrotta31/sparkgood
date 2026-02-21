@@ -72,6 +72,9 @@ interface DeepDiveSectionV2Props {
   initialGrowth?: GrowthPlanData;
   initialFinancial?: FinancialModelData;
   initialChecklistProgress?: ChecklistProgress;
+  // Header customization for project page
+  backText?: string; // Customize "Back to Ideas" text
+  onDelete?: () => void; // If provided, show delete button in header
 }
 
 export default function DeepDiveSectionV2({
@@ -86,6 +89,8 @@ export default function DeepDiveSectionV2({
   initialGrowth,
   initialFinancial,
   initialChecklistProgress,
+  backText = "Back to Ideas",
+  onDelete,
 }: DeepDiveSectionV2Props) {
   const [activeTab, setActiveTab] = useState<TabId>("checklist");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
@@ -628,7 +633,7 @@ export default function DeepDiveSectionV2({
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                <span className="hidden sm:inline">Back to Ideas</span>
+                <span className="hidden sm:inline">{backText}</span>
               </button>
             </div>
 
@@ -685,6 +690,17 @@ export default function DeepDiveSectionV2({
               <span className="text-xs font-medium text-spark bg-spark/10 px-2 md:px-3 py-1 rounded-full">
                 Premium
               </span>
+              {onDelete && (
+                <button
+                  onClick={onDelete}
+                  className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all duration-200"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
+              )}
             </div>
           </div>
 
