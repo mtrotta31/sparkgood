@@ -1,22 +1,21 @@
 // SparkLocal Resource Directory - Home Page
-// SEO-optimized directory of grants, accelerators, SBA resources, and more
+// Premium, warm, light-themed directory homepage
+// "Find everything you need to start a business in your city"
 
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
-import ResourceSearch from "@/components/resources/ResourceSearch";
-import SearchResults from "@/components/resources/SearchResults";
-import Footer from "@/components/ui/Footer";
-
-interface PageProps {
-  searchParams: Promise<{ search?: string }>;
-}
+import DirectoryNav from "@/components/resources/DirectoryNav";
+import DirectoryFooter from "@/components/resources/DirectoryFooter";
+import CitySearch from "@/components/resources/CitySearch";
+import AnimatedCounter from "@/components/resources/AnimatedCounter";
+import NewsletterSignupLight from "@/components/resources/NewsletterSignupLight";
 
 export const metadata: Metadata = {
-  title: "Business Resources Directory | SparkLocal",
+  title: "Business Resources Directory | Find Grants, Coworking & More | SparkLocal",
   description:
-    "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your business. Free directory of business resources for entrepreneurs.",
+    "Find 2,400+ business resources across 275 cities. Browse grants, coworking spaces, accelerators, and free SBA mentorship to launch your business.",
   keywords: [
     "small business grants",
     "startup accelerators",
@@ -26,61 +25,40 @@ export const metadata: Metadata = {
     "business grants for women",
     "minority business grants",
     "coworking spaces",
+    "business resources directory",
   ],
   openGraph: {
     title: "Business Resources Directory | SparkLocal",
-    description: "Find grants, accelerators, SBA resources, coworking spaces, and more to launch your business. Free directory for entrepreneurs.",
+    description:
+      "Find 2,400+ resources across 275 cities. Grants, coworking spaces, accelerators, and free mentorship.",
     type: "website",
     siteName: "SparkLocal",
     url: "https://sparklocal.co/resources",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Business Resources Directory | SparkLocal",
-    description: "Find grants, accelerators, SBA resources, and more for entrepreneurs.",
+    description:
+      "Find grants, accelerators, SBA resources, and more for entrepreneurs.",
   },
   alternates: {
     canonical: "https://sparklocal.co/resources",
   },
 };
 
-// Category card component
-function CategoryCard({
-  category,
-  count,
-}: {
-  category: ResourceCategory;
-  count: number;
-}) {
-  const info = CATEGORY_INFO[category];
-
-  return (
-    <Link
-      href={`/resources/${category}`}
-      className="group p-6 rounded-2xl bg-charcoal border border-warmwhite/10 hover:border-spark/30 transition-all hover:shadow-lg hover:shadow-spark/5"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div
-          className={`w-12 h-12 rounded-xl bg-charcoal-light flex items-center justify-center ${info.color}`}
-        >
-          <CategoryIcon category={category} />
-        </div>
-        <span className="text-warmwhite-dim text-sm">{count} listings</span>
-      </div>
-      <h3 className="font-display text-lg font-bold text-warmwhite mb-2 group-hover:text-spark transition-colors">
-        {info.plural}
-      </h3>
-      <p className="text-warmwhite-muted text-sm">{info.description}</p>
-    </Link>
-  );
-}
-
-// Icon component for categories
-function CategoryIcon({ category }: { category: ResourceCategory }) {
-  const icons: Record<ResourceCategory, JSX.Element> = {
-    grant: (
+// Category colors and icons for the 4 main categories
+const MAIN_CATEGORIES = [
+  {
+    slug: "grant" as ResourceCategory,
+    name: "Grants",
+    description: "Funding that doesn't need to be repaid",
+    color: "bg-emerald-600",
+    lightColor: "bg-emerald-50",
+    textColor: "text-emerald-700",
+    borderColor: "border-emerald-200",
+    icon: (
       <svg
-        className="w-6 h-6"
+        className="w-7 h-7"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -93,39 +71,18 @@ function CategoryIcon({ category }: { category: ResourceCategory }) {
         />
       </svg>
     ),
-    accelerator: (
+  },
+  {
+    slug: "coworking" as ResourceCategory,
+    name: "Coworking Spaces",
+    description: "Flexible workspace for entrepreneurs",
+    color: "bg-blue-600",
+    lightColor: "bg-blue-50",
+    textColor: "text-blue-700",
+    borderColor: "border-blue-200",
+    icon: (
       <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
-        />
-      </svg>
-    ),
-    incubator: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
-        />
-      </svg>
-    ),
-    coworking: (
-      <svg
-        className="w-6 h-6"
+        className="w-7 h-7"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -138,9 +95,18 @@ function CategoryIcon({ category }: { category: ResourceCategory }) {
         />
       </svg>
     ),
-    event_space: (
+  },
+  {
+    slug: "accelerator" as ResourceCategory,
+    name: "Accelerators",
+    description: "Intensive programs to fast-track your startup",
+    color: "bg-orange-600",
+    lightColor: "bg-orange-50",
+    textColor: "text-orange-700",
+    borderColor: "border-orange-200",
+    icon: (
       <svg
-        className="w-6 h-6"
+        className="w-7 h-7"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -149,13 +115,22 @@ function CategoryIcon({ category }: { category: ResourceCategory }) {
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+          d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
         />
       </svg>
     ),
-    sba: (
+  },
+  {
+    slug: "sba" as ResourceCategory,
+    name: "SBA Resources",
+    description: "Free government business assistance",
+    color: "bg-red-600",
+    lightColor: "bg-red-50",
+    textColor: "text-red-700",
+    borderColor: "border-red-200",
+    icon: (
       <svg
-        className="w-6 h-6"
+        className="w-7 h-7"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -168,162 +143,106 @@ function CategoryIcon({ category }: { category: ResourceCategory }) {
         />
       </svg>
     ),
-    pitch_competition: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
-        />
-      </svg>
-    ),
-    mentorship: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-        />
-      </svg>
-    ),
-    legal: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"
-        />
-      </svg>
-    ),
-    accounting: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
-        />
-      </svg>
-    ),
-    marketing: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46"
-        />
-      </svg>
-    ),
-    investor: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
-        />
-      </svg>
-    ),
-  };
+  },
+];
 
-  return icons[category] || null;
-}
-
-// Featured listing component
-function FeaturedListing({
-  listing,
+// City card component
+function CityCard({
+  city,
+  state,
+  slug,
+  listingCount,
+  categoryCounts,
 }: {
-  listing: {
-    name: string;
-    slug: string;
-    short_description: string;
-    category: ResourceCategory;
-    logo_url?: string;
-    city?: string;
-    state?: string;
-    is_nationwide: boolean;
-  };
+  city: string;
+  state: string;
+  slug: string;
+  listingCount: number;
+  categoryCounts: { grant: number; coworking: number; accelerator: number; sba: number };
 }) {
-  const categoryInfo = CATEGORY_INFO[listing.category];
-
   return (
     <Link
-      href={`/resources/listing/${listing.slug}`}
-      className="group flex gap-4 p-4 rounded-xl bg-charcoal-light border border-warmwhite/5 hover:border-spark/20 transition-all"
+      href={`/resources/${slug}`}
+      className="group block p-5 rounded-2xl bg-white border border-slate-200 hover:border-spark/30 transition-all shadow-warm hover:shadow-warm-lg hover:-translate-y-0.5"
     >
-      <div className="w-12 h-12 rounded-lg bg-charcoal flex items-center justify-center flex-shrink-0 overflow-hidden">
-        {listing.logo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={listing.logo_url}
-            alt={listing.name}
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <span className={categoryInfo.color}>
-            <CategoryIcon category={listing.category} />
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-spark transition-colors">
+            {city}
+          </h3>
+          <p className="text-slate-500 text-sm">{state}</p>
+        </div>
+        <span className="text-2xl font-bold text-spark">{listingCount}</span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {categoryCounts.grant > 0 && (
+          <span className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full">
+            {categoryCounts.grant} grants
           </span>
         )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span
-            className={`text-xs font-medium ${categoryInfo.color} bg-charcoal px-2 py-0.5 rounded-full`}
-          >
-            {categoryInfo.name}
+        {categoryCounts.coworking > 0 && (
+          <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
+            {categoryCounts.coworking} coworking
           </span>
-          {listing.is_nationwide && (
-            <span className="text-xs text-warmwhite-dim">Nationwide</span>
-          )}
-        </div>
-        <h4 className="font-display text-warmwhite font-semibold group-hover:text-spark transition-colors truncate">
-          {listing.name}
-        </h4>
-        <p className="text-warmwhite-dim text-sm line-clamp-1">
-          {listing.short_description}
-        </p>
+        )}
+        {categoryCounts.accelerator > 0 && (
+          <span className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded-full">
+            {categoryCounts.accelerator} accelerators
+          </span>
+        )}
+        {categoryCounts.sba > 0 && (
+          <span className="text-xs px-2 py-1 bg-red-50 text-red-700 rounded-full">
+            {categoryCounts.sba} SBA
+          </span>
+        )}
       </div>
     </Link>
   );
 }
 
-export default async function ResourcesPage({ searchParams }: PageProps) {
-  const { search: searchQuery } = await searchParams;
+// Category card component
+function CategoryCard({
+  category,
+  count,
+}: {
+  category: (typeof MAIN_CATEGORIES)[number];
+  count: number;
+}) {
+  return (
+    <Link
+      href={`/resources/${category.slug}`}
+      className={`group block p-6 rounded-2xl bg-white border ${category.borderColor} hover:border-spark/30 transition-all shadow-warm hover:shadow-warm-lg hover:-translate-y-0.5`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div
+          className={`w-14 h-14 rounded-xl ${category.lightColor} flex items-center justify-center ${category.textColor}`}
+        >
+          {category.icon}
+        </div>
+        <span className="text-slate-500 text-sm font-medium">
+          {count.toLocaleString()} listings
+        </span>
+      </div>
+      <h3 className="font-display text-xl font-bold text-slate-800 mb-2 group-hover:text-spark transition-colors">
+        {category.name}
+      </h3>
+      <p className="text-slate-600 text-sm">{category.description}</p>
+    </Link>
+  );
+}
+
+export default async function ResourcesPage() {
   const supabase = await createClient();
+
+  // Get all locations for the search autocomplete
+  const { data: allLocations } = await supabase
+    .from("resource_locations")
+    .select("id, city, state, slug, listing_count")
+    .gt("listing_count", 0)
+    .order("listing_count", { ascending: false });
+
+  // Get top 12 cities for the grid
+  const topCities = (allLocations || []).slice(0, 12);
 
   // Get category counts
   const { data: listings } = await supabase
@@ -336,149 +255,230 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
     categoryCounts[l.category] = (categoryCounts[l.category] || 0) + 1;
   });
 
-  // Get featured listings
-  const { data: featuredListings } = await supabase
-    .from("resource_listings")
-    .select(
-      "name, slug, short_description, category, logo_url, city, state, is_nationwide"
-    )
-    .eq("is_active", true)
-    .eq("is_featured", true)
-    .limit(6);
+  // Get category counts per city for top cities
+  const { data: categoryLocations } = await supabase
+    .from("resource_category_locations")
+    .select("category, location_id, listing_count")
+    .in(
+      "location_id",
+      topCities.map((c) => c.id)
+    );
 
-  // Categories to display (only those with listings)
-  const activeCategories = Object.keys(CATEGORY_INFO).filter(
+  // Build city category counts map
+  const cityCategoryCounts: Record<
+    string,
+    { grant: number; coworking: number; accelerator: number; sba: number }
+  > = {};
+  topCities.forEach((city) => {
+    cityCategoryCounts[city.id] = { grant: 0, coworking: 0, accelerator: 0, sba: 0 };
+  });
+  categoryLocations?.forEach((cl) => {
+    if (cityCategoryCounts[cl.location_id]) {
+      const cat = cl.category as keyof typeof cityCategoryCounts[string];
+      if (cat in cityCategoryCounts[cl.location_id]) {
+        cityCategoryCounts[cl.location_id][cat] = cl.listing_count;
+      }
+    }
+  });
+
+  // Calculate totals
+  const totalListings = listings?.length || 0;
+  const totalCities = allLocations?.length || 0;
+  const totalCategories = Object.keys(CATEGORY_INFO).filter(
     (cat) => categoryCounts[cat] > 0
-  ) as ResourceCategory[];
+  ).length;
 
   return (
-    <main className="min-h-screen bg-charcoal-dark">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal-dark/90 backdrop-blur-sm border-b border-warmwhite/5">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-              <span className="text-sm">✦</span>
-            </div>
-            <span className="font-display text-warmwhite font-semibold">
-              SparkLocal
-            </span>
-          </Link>
-          <Link
-            href="/builder"
-            className="px-5 py-2 bg-spark hover:bg-spark-600 text-charcoal-dark font-semibold rounded-full transition-colors text-sm"
-          >
-            Start Building
-          </Link>
-        </div>
-      </nav>
+    <>
+      <DirectoryNav />
 
-      {/* Hero */}
-      <section className="pt-32 pb-16 px-4 text-center">
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-warmwhite mb-4">
-          Business{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-spark to-accent">
-            Resources
-          </span>
-        </h1>
-        <p className="text-warmwhite-muted text-lg max-w-2xl mx-auto mb-8">
-          Find grants, accelerators, mentors, and free resources to help launch
-          your business. Everything you need in one place.
-        </p>
+      <main>
+        {/* Hero Section */}
+        <section className="relative overflow-hidden">
+          {/* Warm gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-50/50 via-cream to-cream pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-spark/5 via-transparent to-transparent pointer-events-none" />
 
-        {/* Search */}
-        <div className="max-w-2xl mx-auto">
-          <ResourceSearch initialQuery={searchQuery} />
-        </div>
-      </section>
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-6 leading-tight">
+                Find everything you need to{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-spark to-accent">
+                  start a business
+                </span>{" "}
+                in your city
+              </h1>
+              <p className="text-lg md:text-xl text-slate-600 mb-10">
+                {totalListings.toLocaleString()}+ resources across{" "}
+                {totalCities.toLocaleString()} cities — coworking spaces,
+                grants, accelerators, and free mentorship.
+              </p>
 
-      {/* Search Results */}
-      {searchQuery && <SearchResults initialQuery={searchQuery} />}
-
-      {/* Categories Grid */}
-      <section className="pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-2xl font-bold text-warmwhite mb-6">
-            Browse by Category
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {activeCategories.map((category) => (
-              <CategoryCard
-                key={category}
-                category={category}
-                count={categoryCounts[category] || 0}
+              {/* City Search */}
+              <CitySearch
+                locations={allLocations || []}
+                placeholder="Search your city..."
+                className="max-w-xl mx-auto"
               />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Listings */}
-      {featuredListings && featuredListings.length > 0 && (
-        <section className="pb-16 px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl font-bold text-warmwhite">
-                Featured Resources
-              </h2>
-              <span className="text-spark text-sm flex items-center gap-1">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                Editor&apos;s picks
-              </span>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {featuredListings.map((listing) => (
-                <FeaturedListing
-                  key={listing.slug}
-                  listing={listing as Parameters<typeof FeaturedListing>[0]["listing"]}
-                />
-              ))}
             </div>
           </div>
         </section>
-      )}
 
-      {/* CTA Banner */}
-      <section className="pb-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl bg-gradient-to-br from-spark/10 to-accent/5 border border-spark/20 p-8 md:p-12 text-center">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-warmwhite mb-4">
-              Not sure where to start?
-            </h2>
-            <p className="text-warmwhite-muted text-lg max-w-xl mx-auto mb-8">
-              SparkLocal matches you with the right resources based on your idea,
-              location, and budget. Get a personalized launch plan in minutes.
-            </p>
-            <Link
-              href="/builder"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/20"
-            >
-              Build Your Launch Plan
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Link>
+        {/* Stats Bar */}
+        <section className="border-y border-slate-200 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+            <div className="grid grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="font-display text-3xl md:text-4xl font-bold text-slate-800">
+                  <AnimatedCounter end={totalListings} suffix="+" />
+                </div>
+                <p className="text-slate-500 mt-1">Resources</p>
+              </div>
+              <div>
+                <div className="font-display text-3xl md:text-4xl font-bold text-slate-800">
+                  <AnimatedCounter end={totalCities} />
+                </div>
+                <p className="text-slate-500 mt-1">Cities</p>
+              </div>
+              <div>
+                <div className="font-display text-3xl md:text-4xl font-bold text-slate-800">
+                  <AnimatedCounter end={totalCategories} />
+                </div>
+                <p className="text-slate-500 mt-1">Categories</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Footer />
-    </main>
+        {/* Top Cities Section */}
+        <section className="py-16 md:py-20 px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-3">
+                Explore top cities
+              </h2>
+              <p className="text-slate-600">
+                Browse business resources in your city
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {topCities.map((city) => (
+                <CityCard
+                  key={city.id}
+                  city={city.city}
+                  state={city.state}
+                  slug={city.slug}
+                  listingCount={city.listing_count}
+                  categoryCounts={cityCategoryCounts[city.id]}
+                />
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <p className="text-slate-500">
+                Don&apos;t see your city?{" "}
+                <span className="text-slate-600">
+                  Search above to find resources anywhere.
+                </span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Categories Section */}
+        <section className="py-16 md:py-20 px-4 sm:px-6 bg-cream-dark">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-3">
+                Browse by category
+              </h2>
+              <p className="text-slate-600">
+                Find the right resources for your business stage
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {MAIN_CATEGORIES.map((category) => (
+                <CategoryCard
+                  key={category.slug}
+                  category={category}
+                  count={categoryCounts[category.slug] || 0}
+                />
+              ))}
+            </div>
+
+            {/* Show other categories link */}
+            <div className="text-center mt-8">
+              <p className="text-slate-500">
+                Also browse:{" "}
+                {Object.entries(CATEGORY_INFO)
+                  .filter(
+                    ([slug]) =>
+                      !MAIN_CATEGORIES.some((c) => c.slug === slug) &&
+                      categoryCounts[slug] > 0
+                  )
+                  .slice(0, 4)
+                  .map(([slug, info], i, arr) => (
+                    <span key={slug}>
+                      <Link
+                        href={`/resources/${slug}`}
+                        className="text-spark hover:text-spark-600 transition-colors"
+                      >
+                        {info.plural}
+                      </Link>
+                      {i < arr.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Builder CTA Section */}
+        <section className="py-16 md:py-20 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 p-8 md:p-12 text-center shadow-warm-xl">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
+                Not sure what business to start?
+              </h2>
+              <p className="text-slate-300 text-lg max-w-xl mx-auto mb-8">
+                SparkLocal helps you discover the perfect business idea based on
+                your skills, budget, and location — then matches you with the
+                right resources to make it happen.
+              </p>
+              <Link
+                href="/builder"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-spark hover:bg-spark-400 text-white font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/30 hover:shadow-xl hover:shadow-spark/40"
+              >
+                Build Your Launch Plan
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Section */}
+        <section className="py-16 md:py-20 px-4 sm:px-6 bg-cream-dark">
+          <div className="max-w-3xl mx-auto">
+            <NewsletterSignupLight variant="hero" />
+          </div>
+        </section>
+      </main>
+
+      <DirectoryFooter />
+    </>
   );
 }

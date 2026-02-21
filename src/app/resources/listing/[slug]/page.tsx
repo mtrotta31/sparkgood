@@ -1,4 +1,4 @@
-// SparkLocal Resource Directory - Individual Listing Page
+// SparkLocal Resource Directory - Individual Listing Page (Light Theme)
 // Detailed view of a single resource
 
 import Link from "next/link";
@@ -12,11 +12,11 @@ import {
   type AcceleratorDetails,
   type GrantDetails,
   type SBADetails,
+  type CoworkingDetails,
 } from "@/types/resources";
-import ResourceListingCard from "@/components/resources/ResourceListingCard";
+import ResourceCard from "@/components/resources/ResourceCard";
 import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
-import NewsletterSignup from "@/components/newsletter/NewsletterSignup";
-import Footer from "@/components/ui/Footer";
+import CopyButton from "@/components/resources/CopyButton";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -41,7 +41,6 @@ export async function generateMetadata({
   const categoryInfo = CATEGORY_INFO[listing.category as ResourceCategory];
   const categoryName = categoryInfo?.name.toLowerCase() || "resource";
 
-  // Build location string
   const location = listing.is_nationwide
     ? "nationwide"
     : listing.city && listing.state
@@ -82,7 +81,7 @@ export async function generateMetadata({
       }),
     },
     twitter: {
-      card: listing.logo_url ? "summary" : "summary",
+      card: "summary",
       title: listing.name,
       description,
       ...(listing.logo_url && { images: [listing.logo_url] }),
@@ -91,6 +90,57 @@ export async function generateMetadata({
       canonical: `https://sparklocal.co/resources/listing/${slug}`,
     },
   };
+}
+
+// Get category accent color
+function getCategoryColor(category: string) {
+  switch (category) {
+    case "grant": return { text: "text-green-600", bg: "bg-green-100", border: "border-green-600" };
+    case "coworking": return { text: "text-blue-600", bg: "bg-blue-100", border: "border-blue-600" };
+    case "accelerator": return { text: "text-orange-600", bg: "bg-orange-100", border: "border-orange-600" };
+    case "sba": return { text: "text-red-600", bg: "bg-red-100", border: "border-red-600" };
+    case "incubator": return { text: "text-emerald-600", bg: "bg-emerald-100", border: "border-emerald-600" };
+    default: return { text: "text-gray-600", bg: "bg-gray-100", border: "border-gray-600" };
+  }
+}
+
+// Star rating component
+function StarRating({ rating, reviewCount }: { rating: number; reviewCount?: number }) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex">
+        {Array.from({ length: fullStars }).map((_, i) => (
+          <svg key={`full-${i}`} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+        {hasHalfStar && (
+          <svg className="w-5 h-5 text-amber-400" viewBox="0 0 20 20">
+            <defs>
+              <linearGradient id="half-star-listing">
+                <stop offset="50%" stopColor="currentColor" />
+                <stop offset="50%" stopColor="#E5E7EB" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#half-star-listing)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        )}
+        {Array.from({ length: emptyStars }).map((_, i) => (
+          <svg key={`empty-${i}`} className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+      <span className="text-lg font-semibold text-gray-900">{rating.toFixed(1)}</span>
+      {reviewCount !== undefined && (
+        <span className="text-gray-500">({reviewCount.toLocaleString()} reviews)</span>
+      )}
+    </div>
+  );
 }
 
 export default async function ListingPage({ params }: PageProps) {
@@ -110,15 +160,20 @@ export default async function ListingPage({ params }: PageProps) {
   }
 
   const categoryInfo = CATEGORY_INFO[listing.category as ResourceCategory];
-  const details = listing.details as AcceleratorDetails & GrantDetails & SBADetails;
+  const categoryColor = getCategoryColor(listing.category);
+  const details = listing.details as AcceleratorDetails & GrantDetails & SBADetails & CoworkingDetails;
 
-  // Get related listings (same category, different listing)
-  const { data: relatedListings } = await supabase
+  // Get similar listings (same category and city/state)
+  const { data: similarListings } = await supabase
     .from("resource_listings")
     .select("*")
     .eq("is_active", true)
     .eq("category", listing.category)
     .neq("id", listing.id)
+    .or(listing.city && listing.state
+      ? `and(city.eq.${listing.city},state.eq.${listing.state}),is_nationwide.eq.true`
+      : "is_nationwide.eq.true"
+    )
     .order("is_featured", { ascending: false })
     .limit(4);
 
@@ -131,59 +186,52 @@ export default async function ListingPage({ params }: PageProps) {
     ? `${listing.city}, ${listing.state}`
     : null;
 
+  // Build breadcrumb path
+  const breadcrumbLocation = listing.city && listing.state
+    ? `${listing.city}, ${listing.state}`
+    : null;
+
   return (
-    <main className="min-h-screen bg-charcoal-dark">
+    <main className="min-h-screen bg-white">
       {/* Schema.org Structured Data */}
       <ResourceStructuredData listing={listing as ResourceListing} />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal-dark/90 backdrop-blur-sm border-b border-warmwhite/5">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkLocal
-              </span>
-            </Link>
-          </div>
-          <Link
-            href="/builder"
-            className="px-5 py-2 bg-spark hover:bg-spark-600 text-charcoal-dark font-semibold rounded-full transition-colors text-sm"
-          >
-            Start Building
-          </Link>
-        </div>
-      </nav>
-
       {/* Breadcrumbs */}
-      <section className="pt-28 px-4">
-        <div className="max-w-4xl mx-auto">
-          <nav className="flex items-center gap-2 text-sm text-warmwhite-muted">
-            <Link href="/resources" className="hover:text-warmwhite">
+      <section className="pt-20 px-4 bg-gray-50 border-b border-gray-200">
+        <div className="max-w-5xl mx-auto py-4">
+          <nav className="flex items-center gap-2 text-sm text-gray-500">
+            <Link href="/resources" className="hover:text-gray-700 transition-colors">
               Resources
             </Link>
-            <span>/</span>
+            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
             <Link
               href={`/resources/${listing.category}`}
-              className="hover:text-warmwhite"
+              className="hover:text-gray-700 transition-colors"
             >
               {categoryInfo.plural}
             </Link>
-            <span>/</span>
-            <span className="text-warmwhite truncate">{listing.name}</span>
+            {breadcrumbLocation && (
+              <>
+                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+                <span className="text-gray-700 truncate max-w-[200px]">
+                  {breadcrumbLocation}
+                </span>
+              </>
+            )}
           </nav>
         </div>
       </section>
 
       {/* Header */}
-      <section className="pt-6 pb-8 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-8 px-4 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-start gap-6">
             {/* Logo */}
-            <div className="w-20 h-20 rounded-2xl bg-charcoal border border-warmwhite/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-24 h-24 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
               {listing.logo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -192,39 +240,64 @@ export default async function ListingPage({ params }: PageProps) {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <span
-                  className={`text-3xl font-bold ${categoryInfo?.color || "text-spark"}`}
-                >
+                <span className={`text-4xl font-bold ${categoryColor.text}`}>
                   {listing.name.charAt(0)}
                 </span>
               )}
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <span
-                  className={`text-xs font-medium ${categoryInfo?.color || "text-spark"} bg-charcoal px-3 py-1 rounded-full`}
-                >
+              {/* Badges row */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor.bg} ${categoryColor.text}`}>
                   {categoryInfo?.name || listing.category}
                 </span>
                 {listing.is_featured && (
-                  <span className="text-xs text-spark flex items-center gap-1">
-                    <svg
-                      className="w-3 h-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                  <span className="flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-sm">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                     Featured
                   </span>
                 )}
+                {listing.category === "sba" && details.sba_type && (
+                  <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                    {details.sba_type}
+                  </span>
+                )}
+                {listing.category === "sba" && (
+                  <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                    Free
+                  </span>
+                )}
               </div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-warmwhite mb-2">
+
+              {/* Title */}
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 {listing.name}
               </h1>
+
+              {/* Rating (for coworking) */}
+              {listing.category === "coworking" && details.rating && (
+                <div className="mb-3">
+                  <StarRating rating={details.rating} reviewCount={details.review_count} />
+                </div>
+              )}
+
+              {/* Location */}
+              {location && (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                  </svg>
+                  <span>{location}</span>
+                </div>
+              )}
+
+              {/* Short description */}
               {listing.short_description && (
-                <p className="text-warmwhite-muted text-lg">
+                <p className="text-gray-600 mt-3 text-lg">
                   {listing.short_description}
                 </p>
               )}
@@ -234,83 +307,71 @@ export default async function ListingPage({ params }: PageProps) {
       </section>
 
       {/* Main Content */}
-      <section className="pb-16 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-8 px-4">
+        <div className="max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Content */}
+            {/* Main Content Column */}
             <div className="lg:col-span-2 space-y-8">
               {/* Description */}
               {listing.description && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     About
                   </h2>
-                  <p className="text-warmwhite-muted leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                     {listing.description}
                   </p>
                 </div>
               )}
 
-              {/* Category-specific details */}
+              {/* Accelerator Details */}
               {listing.category === "accelerator" && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Program Details
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {details.duration_weeks && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Duration
-                        </p>
-                        <p className="text-warmwhite font-semibold">
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Duration</p>
+                        <p className="text-gray-900 font-semibold text-lg">
                           {details.duration_weeks} weeks
                         </p>
                       </div>
                     )}
                     {typeof details.funding_provided === "number" && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Funding
-                        </p>
-                        <p className="text-spark font-bold text-lg">
+                      <div className="p-4 rounded-lg bg-orange-50">
+                        <p className="text-gray-500 text-sm mb-1">Funding</p>
+                        <p className="text-orange-600 font-bold text-xl">
                           ${details.funding_provided.toLocaleString()}
                         </p>
                       </div>
                     )}
                     {typeof details.equity_taken === "number" && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Equity
-                        </p>
-                        <p className="text-warmwhite font-semibold">
-                          {details.equity_taken === 0
-                            ? "No equity taken"
-                            : `${details.equity_taken}%`}
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Equity</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {details.equity_taken === 0 ? "No equity taken" : `${details.equity_taken}%`}
                         </p>
                       </div>
                     )}
                     {details.batch_size && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Batch Size
-                        </p>
-                        <p className="text-warmwhite font-semibold">
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Batch Size</p>
+                        <p className="text-gray-900 font-semibold text-lg">
                           ~{details.batch_size} companies
                         </p>
                       </div>
                     )}
                   </div>
                   {details.notable_alumni && details.notable_alumni.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-warmwhite-dim text-sm mb-2">
-                        Notable Alumni
-                      </p>
+                    <div className="mt-6">
+                      <p className="text-gray-500 text-sm mb-2">Notable Alumni</p>
                       <div className="flex flex-wrap gap-2">
                         {details.notable_alumni.map((alumni) => (
                           <span
                             key={alumni}
-                            className="px-3 py-1 bg-charcoal-light rounded-full text-sm text-warmwhite"
+                            className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
                           >
                             {alumni}
                           </span>
@@ -321,18 +382,17 @@ export default async function ListingPage({ params }: PageProps) {
                 </div>
               )}
 
+              {/* Grant Details */}
               {listing.category === "grant" && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Grant Details
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {(details.amount_min || details.amount_max) && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Grant Amount
-                        </p>
-                        <p className="text-spark font-bold text-lg">
+                      <div className="p-4 rounded-lg bg-green-50">
+                        <p className="text-gray-500 text-sm mb-1">Grant Amount</p>
+                        <p className="text-green-600 font-bold text-xl">
                           {details.amount_min && details.amount_max
                             ? `$${details.amount_min.toLocaleString()} - $${details.amount_max.toLocaleString()}`
                             : details.amount_max
@@ -342,47 +402,96 @@ export default async function ListingPage({ params }: PageProps) {
                       </div>
                     )}
                     {details.deadline && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Deadline
-                        </p>
-                        <p className="text-warmwhite font-semibold">
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Deadline</p>
+                        <p className="text-gray-900 font-semibold text-lg">
                           {details.deadline}
                         </p>
                       </div>
                     )}
                     {details.grant_type && (
-                      <div className="p-4 rounded-lg bg-charcoal-light">
-                        <p className="text-warmwhite-dim text-sm mb-1">
-                          Grant Type
-                        </p>
-                        <p className="text-warmwhite font-semibold capitalize">
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Grant Type</p>
+                        <p className="text-gray-900 font-semibold text-lg capitalize">
                           {details.grant_type}
                         </p>
                       </div>
                     )}
                   </div>
                   {details.eligibility && (
-                    <div className="mt-4">
-                      <p className="text-warmwhite-dim text-sm mb-2">
-                        Eligibility
-                      </p>
-                      <p className="text-warmwhite">{details.eligibility}</p>
+                    <div className="mt-6">
+                      <p className="text-gray-500 text-sm mb-2">Eligibility</p>
+                      <p className="text-gray-700">{details.eligibility}</p>
                     </div>
                   )}
                 </div>
               )}
 
+              {/* Coworking Details */}
+              {listing.category === "coworking" && (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
+                    Space Details
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                    {(details.price_monthly_min || details.price_monthly_max) && (
+                      <div className="p-4 rounded-lg bg-blue-50">
+                        <p className="text-gray-500 text-sm mb-1">Monthly Price</p>
+                        <p className="text-blue-600 font-bold text-xl">
+                          {details.price_monthly_min && details.price_monthly_max
+                            ? `$${details.price_monthly_min} - $${details.price_monthly_max}`
+                            : details.price_monthly_min
+                            ? `From $${details.price_monthly_min}`
+                            : `Up to $${details.price_monthly_max}`}
+                        </p>
+                      </div>
+                    )}
+                    {details.day_pass_price && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Day Pass</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          ${details.day_pass_price}
+                        </p>
+                      </div>
+                    )}
+                    {details.hours && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Hours</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {details.hours}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  {details.amenities && details.amenities.length > 0 && (
+                    <div>
+                      <p className="text-gray-500 text-sm mb-3">Amenities</p>
+                      <div className="flex flex-wrap gap-2">
+                        {details.amenities.map((amenity) => (
+                          <span
+                            key={amenity}
+                            className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm"
+                          >
+                            {amenity}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SBA Services */}
               {listing.category === "sba" && details.services && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Services Offered
                   </h2>
                   <div className="flex flex-wrap gap-2">
                     {details.services.map((service: string) => (
                       <span
                         key={service}
-                        className="px-3 py-1 bg-charcoal-light rounded-full text-sm text-warmwhite"
+                        className="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm"
                       >
                         {service}
                       </span>
@@ -391,22 +500,19 @@ export default async function ListingPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Subcategories / Focus Areas */}
+              {/* Focus Areas / Subcategories */}
               {listing.subcategories && listing.subcategories.length > 0 && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Focus Areas
                   </h2>
                   <div className="flex flex-wrap gap-2">
                     {listing.subcategories.map((sub: string) => (
                       <span
                         key={sub}
-                        className="px-3 py-1 bg-spark/10 text-spark rounded-full text-sm"
+                        className={`px-3 py-1.5 rounded-full text-sm ${categoryColor.bg} ${categoryColor.text}`}
                       >
-                        {sub
-                          .split("-")
-                          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ")}
+                        {sub.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
                       </span>
                     ))}
                   </div>
@@ -415,20 +521,17 @@ export default async function ListingPage({ params }: PageProps) {
 
               {/* Cause Areas */}
               {listing.cause_areas && listing.cause_areas.length > 0 && (
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h2 className="font-display text-xl font-bold text-warmwhite mb-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Impact Areas
                   </h2>
                   <div className="flex flex-wrap gap-2">
                     {listing.cause_areas.map((cause: string) => (
                       <span
                         key={cause}
-                        className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm"
+                        className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm"
                       >
-                        {cause
-                          .split("_")
-                          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ")}
+                        {cause.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
                       </span>
                     ))}
                   </div>
@@ -440,27 +543,18 @@ export default async function ListingPage({ params }: PageProps) {
             <aside className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
                 {/* CTA Card */}
-                <div className="p-6 rounded-xl bg-gradient-to-br from-spark/10 to-accent/5 border border-spark/20">
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                   {listing.website && (
                     <a
                       href={listing.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 bg-spark hover:bg-spark-400 text-charcoal-dark font-bold rounded-full transition-colors mb-4"
+                      className={`flex items-center justify-center gap-2 w-full py-3 ${categoryColor.bg} ${categoryColor.text} font-bold rounded-xl transition-colors hover:opacity-90 mb-4`}
+                      style={{ backgroundColor: getCategoryColorHex(listing.category) }}
                     >
-                      Visit Website
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                        />
+                      <span className="text-white">Visit Website</span>
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
                     </a>
                   )}
@@ -470,142 +564,123 @@ export default async function ListingPage({ params }: PageProps) {
                       href={details.application_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 bg-charcoal hover:bg-charcoal-light text-warmwhite font-semibold rounded-full transition-colors border border-warmwhite/10"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
                     >
                       Apply Now
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                        />
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
                     </a>
                   )}
                 </div>
 
-                {/* Details Card */}
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h3 className="font-display text-lg font-bold text-warmwhite mb-4">
-                    Details
+                {/* Contact Details Card */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h3 className="font-display text-lg font-bold text-gray-900 mb-4">
+                    Contact Information
                   </h3>
                   <dl className="space-y-4">
-                    {location && (
+                    {listing.address && (
                       <div>
-                        <dt className="text-warmwhite-dim text-sm">Location</dt>
-                        <dd className="text-warmwhite">{location}</dd>
+                        <dt className="text-gray-500 text-sm mb-1">Address</dt>
+                        <dd className="text-gray-900 flex items-start">
+                          <span className="flex-1">
+                            {listing.address}
+                            {listing.city && listing.state && (
+                              <>
+                                <br />
+                                {listing.city}, {listing.state} {listing.zip}
+                              </>
+                            )}
+                          </span>
+                          <CopyButton
+                            text={`${listing.address}, ${listing.city}, ${listing.state} ${listing.zip}`}
+                            label="address"
+                          />
+                        </dd>
                       </div>
                     )}
                     {listing.phone && (
                       <div>
-                        <dt className="text-warmwhite-dim text-sm">Phone</dt>
-                        <dd>
+                        <dt className="text-gray-500 text-sm mb-1">Phone</dt>
+                        <dd className="flex items-center">
                           <a
                             href={`tel:${listing.phone}`}
-                            className="text-spark hover:text-spark-400 transition-colors"
+                            className="text-blue-600 hover:text-blue-700 transition-colors"
                           >
                             {listing.phone}
                           </a>
+                          <CopyButton text={listing.phone} label="phone" />
                         </dd>
                       </div>
                     )}
                     {listing.email && (
                       <div>
-                        <dt className="text-warmwhite-dim text-sm">Email</dt>
-                        <dd>
+                        <dt className="text-gray-500 text-sm mb-1">Email</dt>
+                        <dd className="flex items-center">
                           <a
                             href={`mailto:${listing.email}`}
-                            className="text-spark hover:text-spark-400 transition-colors break-all"
+                            className="text-blue-600 hover:text-blue-700 transition-colors break-all"
                           >
                             {listing.email}
                           </a>
+                          <CopyButton text={listing.email} label="email" />
                         </dd>
                       </div>
                     )}
-                    {listing.address && (
+                    {location && !listing.address && (
                       <div>
-                        <dt className="text-warmwhite-dim text-sm">Address</dt>
-                        <dd className="text-warmwhite">
-                          {listing.address}
-                          {listing.city && listing.state && (
-                            <>
-                              <br />
-                              {listing.city}, {listing.state} {listing.zip}
-                            </>
-                          )}
-                        </dd>
+                        <dt className="text-gray-500 text-sm mb-1">Location</dt>
+                        <dd className="text-gray-900">{location}</dd>
                       </div>
                     )}
                   </dl>
                 </div>
 
                 {/* SparkLocal CTA */}
-                <div className="p-6 rounded-xl bg-charcoal border border-warmwhite/10">
-                  <h4 className="font-display text-warmwhite font-semibold mb-2">
-                    Need help applying?
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-6">
+                  <h4 className="font-display text-gray-900 font-semibold mb-2">
+                    Planning to use this resource?
                   </h4>
-                  <p className="text-warmwhite-dim text-sm mb-4">
-                    SparkLocal can help you build a business plan, pitch deck,
-                    and application materials.
+                  <p className="text-gray-600 text-sm mb-4">
+                    Build your complete business plan with SparkLocal and get matched
+                    with more resources like this one.
                   </p>
                   <Link
                     href="/builder"
-                    className="inline-flex items-center gap-1 text-spark text-sm font-semibold hover:text-spark-400 transition-colors"
+                    className="inline-flex items-center gap-1 text-amber-600 text-sm font-semibold hover:text-amber-700 transition-colors"
                   >
-                    Build Your Launch Plan
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
+                    Get Started Free
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
                 </div>
-
-                {/* Newsletter Signup */}
-                <NewsletterSignup
-                  city={listing.city || undefined}
-                  state={listing.state || undefined}
-                  category={categoryInfo?.name.toLowerCase()}
-                />
               </div>
             </aside>
           </div>
         </div>
       </section>
 
-      {/* Related Listings */}
-      {relatedListings && relatedListings.length > 0 && (
-        <section className="pb-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-2xl font-bold text-warmwhite mb-6">
-              Similar {categoryInfo?.plural || "Resources"}
+      {/* Similar Resources */}
+      {similarListings && similarListings.length > 0 && (
+        <section className="py-12 px-4 bg-gray-50">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">
+              Similar {categoryInfo?.plural || "Resources"} Nearby
             </h2>
-            <div className="grid gap-4">
-              {relatedListings.map((related) => (
-                <ResourceListingCard
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {similarListings.map((related) => (
+                <ResourceCard
                   key={related.id}
                   listing={related as ResourceListing}
                 />
               ))}
             </div>
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <Link
                 href={`/resources/${listing.category}`}
-                className="text-spark hover:text-spark-400 transition-colors"
+                className="text-amber-600 hover:text-amber-700 font-medium transition-colors"
               >
                 View all {categoryInfo?.plural.toLowerCase() || "resources"} →
               </Link>
@@ -613,8 +688,18 @@ export default async function ListingPage({ params }: PageProps) {
           </div>
         </section>
       )}
-
-      <Footer />
     </main>
   );
+}
+
+// Helper function to get hex color for buttons
+function getCategoryColorHex(category: string): string {
+  switch (category) {
+    case "grant": return "#16A34A";
+    case "coworking": return "#2563EB";
+    case "accelerator": return "#EA580C";
+    case "sba": return "#DC2626";
+    case "incubator": return "#059669";
+    default: return "#6B7280";
+  }
 }

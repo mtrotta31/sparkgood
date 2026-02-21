@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select("category, location_id")
     .gt("listing_count", 0);
 
-  // Get location slugs for category-location pages
+  // Get location slugs for city hub and category-location pages
   const { data: allLocations } = await supabase
     .from("resource_locations")
     .select("id, slug, updated_at")
@@ -57,6 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locationMap = new Map(
     (allLocations || []).map((loc) => [loc.id, { slug: loc.slug, updated_at: loc.updated_at }])
   );
+
+  // City hub pages (e.g., /resources/austin-tx)
+  const cityHubPages: MetadataRoute.Sitemap = (allLocations || []).map((loc) => ({
+    url: `${BASE_URL}/resources/${loc.slug}`,
+    lastModified: loc.updated_at ? new Date(loc.updated_at) : new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+  }));
 
   // Category + Location pages (e.g., /resources/grant/austin-tx)
   const categoryLocationPages: MetadataRoute.Sitemap = (categoryLocations || [])
@@ -90,6 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...categoryPages,
+    ...cityHubPages,
     ...categoryLocationPages,
     ...listingPages,
   ];

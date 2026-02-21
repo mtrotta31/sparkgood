@@ -52,6 +52,30 @@ const config: Config = {
         // CSS variable fallbacks
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // Light theme colors for resource directory
+        cream: {
+          DEFAULT: "#FAFAF8", // Primary background
+          dark: "#F5F3F0", // Slightly darker for cards/sections
+          warm: "#FBF9F6", // Warmest cream
+        },
+        slate: {
+          dark: "#1E293B", // Dark text on light backgrounds
+        },
+        // Category accent colors
+        directory: {
+          grant: "#166534", // Forest green
+          coworking: "#1D4ED8", // Warm blue
+          accelerator: "#C2410C", // Burnt orange
+          sba: "#991B1B", // Brick red
+        },
+      },
+      boxShadow: {
+        // Warm shadows for light theme
+        "warm-sm": "0 1px 2px 0 rgba(120, 90, 60, 0.05)",
+        "warm": "0 4px 6px -1px rgba(120, 90, 60, 0.08), 0 2px 4px -2px rgba(120, 90, 60, 0.05)",
+        "warm-md": "0 6px 12px -2px rgba(120, 90, 60, 0.10), 0 3px 6px -3px rgba(120, 90, 60, 0.06)",
+        "warm-lg": "0 10px 20px -3px rgba(120, 90, 60, 0.12), 0 4px 8px -4px rgba(120, 90, 60, 0.08)",
+        "warm-xl": "0 20px 40px -4px rgba(120, 90, 60, 0.15), 0 8px 16px -6px rgba(120, 90, 60, 0.10)",
       },
       fontFamily: {
         display: ["var(--font-playfair)", "Georgia", "serif"],

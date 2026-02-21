@@ -81,6 +81,9 @@ export interface CoworkingDetails {
   day_pass_price?: number;
   amenities?: string[];
   hours?: string;
+  rating?: number;
+  review_count?: number;
+  price_level?: number; // 1-4 scale ($-$$$$)
 }
 
 export type ResourceDetails =
@@ -133,7 +136,16 @@ export interface CategoryInfo {
   description: string;
   icon: string;
   color: string;
+  bgColor: string;
+  borderColor: string;
+  lightBgColor: string;
 }
+
+// Light theme category colors
+// Grants: Forest green (#16A34A)
+// Coworking: Warm blue (#2563EB)
+// Accelerators: Burnt orange (#EA580C)
+// SBA: Brick red (#DC2626)
 
 export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
   grant: {
@@ -142,7 +154,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Grants",
     description: "Funding that doesn't need to be repaid",
     icon: "dollar",
-    color: "text-green-400",
+    color: "text-green-600",
+    bgColor: "bg-green-600",
+    borderColor: "border-green-600",
+    lightBgColor: "bg-green-50",
   },
   accelerator: {
     slug: "accelerator",
@@ -150,7 +165,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Accelerators",
     description: "Intensive programs to fast-track your startup",
     icon: "rocket",
-    color: "text-spark",
+    color: "text-orange-600",
+    bgColor: "bg-orange-600",
+    borderColor: "border-orange-600",
+    lightBgColor: "bg-orange-50",
   },
   incubator: {
     slug: "incubator",
@@ -158,7 +176,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Incubators",
     description: "Nurture early-stage ideas into viable ventures",
     icon: "seedling",
-    color: "text-emerald-400",
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-600",
+    borderColor: "border-emerald-600",
+    lightBgColor: "bg-emerald-50",
   },
   coworking: {
     slug: "coworking",
@@ -166,7 +187,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Coworking Spaces",
     description: "Flexible workspace for entrepreneurs",
     icon: "building",
-    color: "text-blue-400",
+    color: "text-blue-600",
+    bgColor: "bg-blue-600",
+    borderColor: "border-blue-600",
+    lightBgColor: "bg-blue-50",
   },
   event_space: {
     slug: "event_space",
@@ -174,7 +198,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Event Spaces",
     description: "Venues for workshops, meetups, and launches",
     icon: "calendar",
-    color: "text-purple-400",
+    color: "text-purple-600",
+    bgColor: "bg-purple-600",
+    borderColor: "border-purple-600",
+    lightBgColor: "bg-purple-50",
   },
   sba: {
     slug: "sba",
@@ -182,7 +209,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "SBA Resources",
     description: "Free government business assistance",
     icon: "flag",
-    color: "text-red-400",
+    color: "text-red-600",
+    bgColor: "bg-red-600",
+    borderColor: "border-red-600",
+    lightBgColor: "bg-red-50",
   },
   pitch_competition: {
     slug: "pitch_competition",
@@ -190,7 +220,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Pitch Competitions",
     description: "Win funding by pitching your idea",
     icon: "microphone",
-    color: "text-yellow-400",
+    color: "text-amber-600",
+    bgColor: "bg-amber-600",
+    borderColor: "border-amber-600",
+    lightBgColor: "bg-amber-50",
   },
   mentorship: {
     slug: "mentorship",
@@ -198,7 +231,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Mentorship Programs",
     description: "Learn from experienced entrepreneurs",
     icon: "users",
-    color: "text-indigo-400",
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-600",
+    borderColor: "border-indigo-600",
+    lightBgColor: "bg-indigo-50",
   },
   legal: {
     slug: "legal",
@@ -206,7 +242,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Legal Services",
     description: "Legal help for startups and nonprofits",
     icon: "scale",
-    color: "text-slate-400",
+    color: "text-slate-600",
+    bgColor: "bg-slate-600",
+    borderColor: "border-slate-600",
+    lightBgColor: "bg-slate-50",
   },
   accounting: {
     slug: "accounting",
@@ -214,7 +253,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Accounting Services",
     description: "Financial services for small businesses",
     icon: "calculator",
-    color: "text-teal-400",
+    color: "text-teal-600",
+    bgColor: "bg-teal-600",
+    borderColor: "border-teal-600",
+    lightBgColor: "bg-teal-50",
   },
   marketing: {
     slug: "marketing",
@@ -222,7 +264,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Marketing Services",
     description: "Help spreading the word about your venture",
     icon: "megaphone",
-    color: "text-pink-400",
+    color: "text-pink-600",
+    bgColor: "bg-pink-600",
+    borderColor: "border-pink-600",
+    lightBgColor: "bg-pink-50",
   },
   investor: {
     slug: "investor",
@@ -230,7 +275,10 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     plural: "Investors",
     description: "Funding partners for your venture",
     icon: "trending-up",
-    color: "text-cyan-400",
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-600",
+    borderColor: "border-cyan-600",
+    lightBgColor: "bg-cyan-50",
   },
 };
 
