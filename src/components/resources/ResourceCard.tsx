@@ -15,6 +15,7 @@ import {
 } from "@/types/resources";
 import { formatHours } from "@/lib/formatHours";
 import { formatDescription } from "@/lib/format-description";
+import { formatAmount, formatAmountRange } from "@/lib/format-amount";
 
 interface Props {
   listing: ResourceListing;
@@ -101,15 +102,6 @@ function getDeadlineInfo(deadline: string): { text: string; urgent: boolean } | 
   }
 }
 
-// Format currency
-function formatCurrency(amount: number): string {
-  if (amount >= 1000000) {
-    return `$${(amount / 1000000).toFixed(1)}M`;
-  } else if (amount >= 1000) {
-    return `$${(amount / 1000).toFixed(0)}K`;
-  }
-  return `$${amount.toLocaleString()}`;
-}
 
 export default function ResourceCard({ listing, variant: _variant = "grid" }: Props) {
   const categoryInfo = CATEGORY_INFO[listing.category as ResourceCategory];
@@ -190,18 +182,15 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
   // Render grant-specific content
   const renderGrantContent = () => {
     const deadlineInfo = details.deadline ? getDeadlineInfo(details.deadline) : null;
+    const amountDisplay = formatAmountRange(details.amount_min, details.amount_max);
 
     return (
       <>
         {/* Amount and deadline row */}
         <div className="flex flex-wrap items-center gap-3 mb-3">
-          {(details.amount_min || details.amount_max) && (
+          {amountDisplay && (
             <span className="text-lg font-bold text-green-600">
-              {details.amount_min && details.amount_max
-                ? `${formatCurrency(details.amount_min)} - ${formatCurrency(details.amount_max)}`
-                : details.amount_max
-                ? `Up to ${formatCurrency(details.amount_max)}`
-                : formatCurrency(details.amount_min!)}
+              {amountDisplay}
             </span>
           )}
           {deadlineInfo && (
@@ -241,13 +230,14 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
   // Render accelerator-specific content
   const renderAcceleratorContent = () => {
     const deadlineInfo = details.next_deadline ? getDeadlineInfo(details.next_deadline) : null;
+    const fundingDisplay = formatAmount(details.funding_provided);
 
     return (
       <>
         <div className="flex flex-wrap items-center gap-3 mb-3">
-          {details.funding_provided && (
+          {fundingDisplay && (
             <span className="text-lg font-bold text-orange-600">
-              {formatCurrency(details.funding_provided)}
+              {fundingDisplay}
             </span>
           )}
           {typeof details.equity_taken === "number" && (
@@ -384,7 +374,7 @@ export default function ResourceCard({ listing, variant: _variant = "grid" }: Pr
             </div>
 
             {/* Name */}
-            <h3 className="font-display text-lg font-bold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-1">
+            <h3 className="font-display text-lg font-bold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-2">
               {listing.name}
             </h3>
 

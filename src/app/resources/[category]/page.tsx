@@ -33,19 +33,70 @@ interface PageProps {
 
 const ITEMS_PER_PAGE = 24;
 
-// Helper to check if param is a valid category
-function isValidCategory(param: string): param is ResourceCategory {
-  return param in CATEGORY_INFO;
+// Slug normalization map - maps common URL variations to canonical slugs
+// This allows /resources/grants, /resources/grant, /resources/sba-resources, etc.
+const SLUG_ALIASES: Record<string, ResourceCategory> = {
+  // Grant variations
+  grants: "grant",
+  grant: "grant",
+  funding: "grant",
+
+  // Coworking variations
+  coworking: "coworking",
+  "coworking-spaces": "coworking",
+  "coworking-space": "coworking",
+  workspace: "coworking",
+  workspaces: "coworking",
+
+  // Accelerator variations
+  accelerator: "accelerator",
+  accelerators: "accelerator",
+  "startup-accelerator": "accelerator",
+  "startup-accelerators": "accelerator",
+
+  // Incubator variations
+  incubator: "incubator",
+  incubators: "incubator",
+  "startup-incubator": "incubator",
+  "startup-incubators": "incubator",
+
+  // SBA variations
+  sba: "sba",
+  "sba-resources": "sba",
+  "sba-resource": "sba",
+  sbdc: "sba",
+  score: "sba",
+
+  // Mentorship variations
+  mentorship: "mentorship",
+  mentors: "mentorship",
+  mentor: "mentorship",
+};
+
+// Normalize a slug to its canonical form
+function normalizeSlug(slug: string): ResourceCategory | null {
+  // First check if it's already a valid category
+  if (slug in CATEGORY_INFO) {
+    return slug as ResourceCategory;
+  }
+  // Then check aliases
+  const normalized = SLUG_ALIASES[slug.toLowerCase()];
+  return normalized || null;
 }
+
+// Note: isValidCategory was replaced by normalizeSlug which handles aliases
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { category: paramValue } = await params;
 
-  // Check if this is a category
-  if (isValidCategory(paramValue)) {
-    const info = CATEGORY_INFO[paramValue];
+  // Try to normalize the slug to a valid category
+  const normalizedCategory = normalizeSlug(paramValue);
+
+  // Check if this is a category (or alias)
+  if (normalizedCategory) {
+    const info = CATEGORY_INFO[normalizedCategory];
     const supabase = await createClient();
 
     // Get count of listings in this category
@@ -53,7 +104,7 @@ export async function generateMetadata({
       .from("resource_listings")
       .select("*", { count: "exact", head: true })
       .eq("is_active", true)
-      .eq("category", paramValue);
+      .eq("category", normalizedCategory);
 
     const listingCount = count || 0;
 
@@ -75,7 +126,7 @@ export async function generateMetadata({
         description,
         type: "website",
         siteName: "SparkLocal",
-        url: `https://sparklocal.co/resources/${paramValue}`,
+        url: `https://sparklocal.co/resources/${normalizedCategory}`,
       },
       twitter: {
         card: "summary",
@@ -83,7 +134,7 @@ export async function generateMetadata({
         description,
       },
       alternates: {
-        canonical: `https://sparklocal.co/resources/${paramValue}`,
+        canonical: `https://sparklocal.co/resources/${normalizedCategory}`,
       },
     };
   }
@@ -190,10 +241,13 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const { category: paramValue } = await params;
   const filters = await searchParams;
 
-  // Check if this is a valid category
-  if (isValidCategory(paramValue)) {
-    // Render category page (existing logic)
-    return renderCategoryPage(paramValue, filters);
+  // Try to normalize the slug to a valid category
+  const normalizedCategory = normalizeSlug(paramValue);
+
+  // Check if this is a valid category (or alias)
+  if (normalizedCategory) {
+    // Render category page with the normalized category
+    return renderCategoryPage(normalizedCategory, filters);
   }
 
   // Otherwise, check if this is a location slug
@@ -303,13 +357,62 @@ async function renderCategoryPage(
     new Set(allListings?.flatMap((l) => l.subcategories || []) || [])
   ).sort() as string[];
 
-  // Get popular locations
-  const { data: locations } = await supabase
-    .from("resource_category_locations")
-    .select("*, location:resource_locations(*)")
+  // Get popular locations with ACCURATE local-only counts
+  // Query listings directly to exclude nationwide/remote from per-city counts
+  const { data: localListingsForCounts } = await supabase
+    .from("resource_listings")
+    .select("city, state")
+    .eq("is_active", true)
     .eq("category", category)
-    .order("listing_count", { ascending: false })
-    .limit(8);
+    .eq("is_nationwide", false)
+    .eq("is_remote", false)
+    .not("city", "is", null);
+
+  // Count listings per city
+  const cityCountMap = new Map<string, { city: string; state: string; count: number }>();
+  localListingsForCounts?.forEach((listing) => {
+    if (listing.city && listing.state) {
+      const key = `${listing.city}-${listing.state}`;
+      const existing = cityCountMap.get(key);
+      if (existing) {
+        existing.count++;
+      } else {
+        cityCountMap.set(key, { city: listing.city, state: listing.state, count: 1 });
+      }
+    }
+  });
+
+  // Get location slugs for the top cities
+  const topCityCounts = Array.from(cityCountMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  const { data: locationSlugs } = await supabase
+    .from("resource_locations")
+    .select("city, state, slug")
+    .in("city", topCityCounts.map((c) => c.city));
+
+  const slugMap = new Map(
+    locationSlugs?.map((l) => [`${l.city}-${l.state}`, l.slug]) || []
+  );
+
+  // Build locations array with correct counts
+  const locations = topCityCounts.map((c) => ({
+    location: {
+      city: c.city,
+      state: c.state,
+      slug: slugMap.get(`${c.city}-${c.state}`) || `${c.city.toLowerCase().replace(/\s+/g, "-")}-${c.state.toLowerCase()}`,
+    },
+    listing_count: c.count,
+  }));
+
+  // Get nationwide/remote count for this category
+  const { count: nationwideCount } = await supabase
+    .from("resource_listings")
+    .select("*", { count: "exact", head: true })
+    .eq("is_active", true)
+    .eq("category", category)
+    .or("is_nationwide.eq.true,is_remote.eq.true");
 
   const totalPages = Math.ceil((totalCount || 0) / ITEMS_PER_PAGE);
   const showPagination = totalPages > 1;

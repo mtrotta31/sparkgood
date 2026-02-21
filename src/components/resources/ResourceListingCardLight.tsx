@@ -10,6 +10,7 @@ import {
   type GrantDetails,
   type SBADetails,
 } from "@/types/resources";
+import { formatAmount } from "@/lib/format-amount";
 
 // Category accent colors for light theme
 const CATEGORY_LIGHT_COLORS: Record<
@@ -101,12 +102,15 @@ export default function ResourceListingCardLight({ listing, compact }: Props) {
     switch (listing.category) {
       case "grant":
         if (details.amount_max) {
-          return `Up to $${(details.amount_max / 1000).toFixed(0)}K`;
+          const formatted = formatAmount(details.amount_max, { prefix: "Up to " });
+          return formatted;
         }
         break;
       case "accelerator":
-        if (details.funding_provided) {
-          return `$${(details.funding_provided / 1000).toFixed(0)}K funding`;
+        // Only show funding if it's a positive value
+        if (details.funding_provided && details.funding_provided > 0) {
+          const formatted = formatAmount(details.funding_provided);
+          return formatted ? `${formatted} funding` : null;
         }
         if (details.equity_taken === 0) {
           return "No equity";
@@ -142,7 +146,7 @@ export default function ResourceListingCardLight({ listing, compact }: Props) {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h4 className="font-semibold text-slate-800 group-hover:text-spark transition-colors truncate">
+          <h4 className="font-semibold text-slate-800 group-hover:text-spark transition-colors line-clamp-2">
             {listing.name}
           </h4>
           {location && <p className="text-slate-500 text-sm">{location}</p>}
@@ -204,7 +208,7 @@ export default function ResourceListingCardLight({ listing, compact }: Props) {
                   </span>
                 )}
               </div>
-              <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-spark transition-colors">
+              <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-spark transition-colors line-clamp-2">
                 {listing.name}
               </h3>
             </div>
