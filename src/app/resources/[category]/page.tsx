@@ -505,9 +505,24 @@ async function renderCategoryPage(
                   Browse by Location
                 </h3>
                 <div className="space-y-2">
+                  {/* Nationwide entry */}
+                  {nationwideCount && nationwideCount > 0 && (
+                    <Link
+                      href={`/resources/${category}?remote=true`}
+                      className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 hover:border-blue-300 hover:shadow-sm transition-all group"
+                    >
+                      <span className="text-blue-700 group-hover:text-blue-900 transition-colors font-medium">
+                        Nationwide / Remote
+                      </span>
+                      <span className="text-blue-500 text-sm font-medium">
+                        {nationwideCount}
+                      </span>
+                    </Link>
+                  )}
+                  {/* City entries */}
                   {locations?.map((loc) => (
                     <Link
-                      key={loc.id}
+                      key={`${loc.location?.city}-${loc.location?.state}`}
                       href={`/resources/${category}/${loc.location?.slug}`}
                       className="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all group"
                     >

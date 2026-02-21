@@ -19,6 +19,7 @@ import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
 import CopyButton from "@/components/resources/CopyButton";
 import { formatHours } from "@/lib/formatHours";
 import { formatDescription } from "@/lib/format-description";
+import { formatAmount, formatAmountRange } from "@/lib/format-amount";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -355,11 +356,11 @@ export default async function ListingPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
-                    {typeof details.funding_provided === "number" && (
+                    {typeof details.funding_provided === "number" && details.funding_provided > 0 && (
                       <div className="p-4 rounded-lg bg-orange-50">
                         <p className="text-gray-500 text-sm mb-1">Funding</p>
                         <p className="text-orange-600 font-bold text-xl">
-                          ${details.funding_provided.toLocaleString()}
+                          {formatAmount(details.funding_provided)}
                         </p>
                       </div>
                     )}
@@ -405,15 +406,11 @@ export default async function ListingPage({ params }: PageProps) {
                     Grant Details
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {(details.amount_min || details.amount_max) && (
+                    {(details.amount_min || details.amount_max) && formatAmountRange(details.amount_min, details.amount_max) && (
                       <div className="p-4 rounded-lg bg-green-50">
                         <p className="text-gray-500 text-sm mb-1">Grant Amount</p>
                         <p className="text-green-600 font-bold text-xl">
-                          {details.amount_min && details.amount_max
-                            ? `$${details.amount_min.toLocaleString()} - $${details.amount_max.toLocaleString()}`
-                            : details.amount_max
-                            ? `Up to $${details.amount_max.toLocaleString()}`
-                            : `$${details.amount_min?.toLocaleString()}`}
+                          {formatAmountRange(details.amount_min, details.amount_max)}
                         </p>
                       </div>
                     )}
