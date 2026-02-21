@@ -71,6 +71,31 @@ export async function sendMessage(
 }
 
 /**
+ * Convert snake_case keys to camelCase recursively
+ */
+function snakeToCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function convertKeysToCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertKeysToCamelCase);
+  }
+  if (obj !== null && typeof obj === "object") {
+    const newObj: Record<string, unknown> = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const camelKey = snakeToCamelCase(key);
+        newObj[camelKey] = convertKeysToCamelCase(obj[key]);
+      }
+    }
+    return newObj;
+  }
+  return obj;
+}
+
+/**
  * Extract JSON from a potentially messy Claude response
  */
 export function extractJSON(response: string): string {
@@ -166,6 +191,7 @@ export function extractJSON(response: string): string {
 
 /**
  * Send a message and parse the response as JSON
+ * Automatically converts snake_case keys to camelCase
  */
 export async function sendMessageForJSON<T>(
   userMessage: string,
@@ -173,13 +199,28 @@ export async function sendMessageForJSON<T>(
 ): Promise<T> {
   const response = await sendMessage(userMessage, options);
 
+  // Log raw response for debugging (in development)
+  if (process.env.NODE_ENV === "development") {
+    console.log("[Claude] Raw response length:", response.length);
+    console.log("[Claude] Raw response preview:", response.substring(0, 500));
+  }
+
   const jsonString = extractJSON(response);
 
   try {
-    return JSON.parse(jsonString) as T;
-  } catch {
-    console.error("Failed to parse JSON response. Raw response:", response);
-    console.error("Extracted JSON string:", jsonString);
+    const parsed = JSON.parse(jsonString);
+    // Convert snake_case keys to camelCase for TypeScript compatibility
+    const converted = convertKeysToCamelCase(parsed);
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[Claude] Parsed and converted JSON keys:", Object.keys(converted));
+    }
+
+    return converted as T;
+  } catch (parseError) {
+    console.error("[Claude] Failed to parse JSON response:", parseError);
+    console.error("[Claude] Raw response:", response);
+    console.error("[Claude] Extracted JSON string:", jsonString);
     throw new Error("Failed to parse Claude response as JSON");
   }
 }

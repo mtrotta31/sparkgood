@@ -925,7 +925,7 @@ export default function ProjectPage() {
                 Generating content...
               </p>
               <p className="text-warmwhite-muted text-sm text-center max-w-md">
-                We&apos;re researching and analyzing your idea. This takes 15-20 seconds because we&apos;re pulling live information.
+                We&apos;re researching and analyzing your idea. This takes 1-2 minutes because we&apos;re pulling live information and building detailed analysis.
               </p>
             </div>
           </FadeIn>

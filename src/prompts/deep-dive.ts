@@ -2374,35 +2374,35 @@ export function generateChecklistPrompt(
 ${resourcesFormatted}
 
 ## Output Format
-Return a JSON object with this exact structure:
+Return a JSON object with this EXACT structure (use camelCase keys):
 
 \`\`\`json
 {
   "weeks": [
     {
-      "week_number": 1,
+      "weekNumber": 1,
       "title": "Foundation",
       "items": [
         {
-          "id": "unique-id-1",
+          "id": "week1-item1",
           "title": "Short action title (e.g., 'Register your LLC in ${profile.location?.state || "your state"}')",
-          "priority": "critical" | "high" | "medium" | "low",
-          "estimated_time": "1-2 hours",
-          "estimated_cost": "$300",
+          "priority": "critical",
+          "estimatedTime": "1-2 hours",
+          "estimatedCost": "$300",
           "guide": "Detailed step-by-step markdown with specific links and instructions. For a ${category} in ${profile.location?.state || "your state"}, explain exactly what to do, where to go, what to click. Include actual URLs.",
-          "resources": ["matched-resource-slug-if-relevant"],
           "links": [
             {"label": "Secretary of State", "url": "https://actual-state-url.gov"}
           ]
         }
       ]
     }
-  ],
-  "total_items": 12,
-  "estimated_total_cost": "$1,500-2,000",
-  "estimated_timeline": "4 weeks"
+  ]
 }
 \`\`\`
+
+IMPORTANT:
+- priority must be one of: "critical", "important", "optional" (NOT "high", "medium", "low")
+- Use camelCase for all keys: weekNumber, estimatedTime, estimatedCost
 
 ## Requirements
 1. Create 4 weeks of tasks (12-16 total items)
@@ -2486,93 +2486,80 @@ ${researchContext}
 ${resourcesFormatted}
 
 ## Output Format
-Return a JSON object with this exact structure:
+Return a JSON object with this EXACT structure (use camelCase keys):
 
 \`\`\`json
 {
-  "viability_score": {
-    "overall": 78,
-    "verdict": "Strong Opportunity" | "Promising" | "Needs Refinement" | "Challenging",
-    "factors": [
-      {"name": "Market Demand", "score": 85, "assessment": "Growing 12% YoY, strong local interest"},
-      {"name": "Competition", "score": 65, "assessment": "4 direct competitors, but none in ${profile.location?.city || "your city"}"},
-      {"name": "Startup Feasibility", "score": 80, "assessment": "Achievable within your budget"},
-      {"name": "Revenue Potential", "score": 75, "assessment": "$3K-8K/month realistic within 6 months"},
-      {"name": "Timing", "score": 82, "assessment": "Market trend favors this, no regulatory barriers"}
-    ]
-  },
-  "market_research": {
-    "market_size": {
-      "tam": "$X billion",
-      "sam": "$X million",
-      "som": "$X thousand",
+  "marketViability": {
+    "overallScore": 78,
+    "scoreBreakdown": [
+      {"factor": "Market Demand", "score": 85, "assessment": "Growing 12% YoY, strong local interest"},
+      {"factor": "Competition", "score": 65, "assessment": "4 direct competitors, but none in ${profile.location?.city || "your city"}"},
+      {"factor": "Startup Feasibility", "score": 80, "assessment": "Achievable within your budget"},
+      {"factor": "Revenue Potential", "score": 75, "assessment": "$3K-8K/month realistic within 6 months"},
+      {"factor": "Timing", "score": 82, "assessment": "Market trend favors this, no regulatory barriers"}
+    ],
+    "marketResearch": {
+      "tam": "$X billion total addressable market",
+      "sam": "$X million serviceable market",
+      "som": "$X thousand target market in ${profile.location?.city || "your city"}",
+      "growthRate": "X% annually",
+      "trends": ["Trend 1", "Trend 2", "Trend 3"],
+      "demandSignals": ["Signal 1", "Signal 2"],
+      "risks": ["Risk 1", "Risk 2"],
       "sources": ["Source 1", "Source 2"]
     },
-    "growth_rate": "X% annually",
-    "trends": ["Trend 1", "Trend 2", "Trend 3"],
-    "target_demographics": "Description of target customer demographics and psychographics",
-    "demand_signals": ["Signal 1", "Signal 2"],
-    "risks": ["Risk 1", "Risk 2"]
+    "competitorAnalysis": [
+      {
+        "name": "Competitor Name",
+        "url": "https://competitor.com",
+        "pricing": "$29-49/month",
+        "positioning": "Premium, enterprise-focused",
+        "weakness": "Key weakness that's an opportunity for you"
+      }
+    ],
+    "localMarketSize": "Description of local market opportunity in ${profile.location?.city || "your city"}"
   },
-  "competitors": [
-    {
-      "name": "Competitor Name",
-      "url": "https://competitor.com",
-      "pricing": "$29-49/month",
-      "positioning": "Premium, enterprise-focused",
-      "strengths": ["Strength 1", "Strength 2"],
-      "weaknesses": ["Weakness 1 - opportunity for you"],
-      "your_advantage": "How you're different/better"
-    }
-  ],
-  "competitive_summary": "Your advantage is X. No competitor in ${profile.location?.city || "your city"} is doing Y.",
-  "legal_structure": {
-    "recommended": "LLC" | "Sole Proprietorship" | "S-Corp" | "Nonprofit",
+  "legalStructure": {
+    "recommendedStructure": "LLC",
     "reasoning": "Why this structure makes sense for your situation",
-    "registration_steps": [
-      {"step": 1, "action": "Action description", "cost": "$X", "link": "https://..."},
-      {"step": 2, "action": "Action description", "cost": "$X", "link": "https://..."}
+    "registrationSteps": [
+      "Step 1: Register at ${profile.location?.state || "your state"} Secretary of State website",
+      "Step 2: Get EIN from IRS.gov",
+      "Step 3: Open business bank account"
     ],
-    "licenses_required": [
-      {"license": "License name", "issuer": "City/State/Federal", "cost": "$X", "link": "https://..."}
-    ],
-    "when_need_lawyer": "Description of when professional help is needed"
+    "estimatedCost": "$300-500 total",
+    "licensesRequired": ["Business license from city", "Any industry-specific licenses"],
+    "whenToGetLawyer": "Description of when professional help is needed"
   },
-  "startup_costs": [
-    {"item": "LLC Registration", "cost": 300, "priority": "Week 1", "notes": "File at sos.state.gov"},
-    {"item": "Business Insurance", "cost": 50, "priority": "Week 1", "notes": "General liability minimum", "recurring": "monthly"},
-    {"item": "Website", "cost": 16, "priority": "Week 2", "notes": "Squarespace or Carrd ($19/year)", "recurring": "monthly"}
+  "startupCosts": [
+    {"item": "LLC Registration", "cost": "$300", "priority": "Week 1", "notes": "File at sos.${profile.location?.state?.toLowerCase() || "state"}.gov"},
+    {"item": "Business Insurance", "cost": "$50/month", "priority": "Week 1", "notes": "General liability minimum"},
+    {"item": "Website", "cost": "$19/year", "priority": "Week 2", "notes": "Carrd or Squarespace"}
   ],
-  "startup_costs_total": {
-    "one_time": 1500,
-    "monthly_recurring": 100,
-    "month_one_total": 1600
-  },
-  "suppliers_vendors": [
-    {
-      "category": "Product sourcing" | "Services" | "Materials",
-      "platforms": ["Platform 1", "Platform 2"],
-      "evaluation_checklist": ["Check 1", "Check 2"],
-      "typical_moq": "Minimum order quantity info",
-      "payment_terms": "Net 30, COD, etc."
-    }
-  ],
-  "tech_stack": [
-    {
-      "category": "E-commerce" | "Payments" | "Scheduling" | "Marketing" | "Operations",
-      "tool": "Tool name",
-      "cost": "$X/month",
-      "why": "Why this tool for their situation",
-      "setup_time": "X hours",
-      "alternatives": ["Alt 1", "Alt 2"]
-    }
-  ],
-  "insurance_compliance": {
-    "required_insurance": [
-      {"type": "General Liability", "estimated_cost": "$50/month", "providers": ["Next Insurance", "Hiscox"]}
+  "suppliers": {
+    "platforms": [
+      {"name": "Platform Name", "url": "https://platform.com", "description": "What it's for", "bestFor": "Best use case"}
     ],
-    "compliance_requirements": ["Requirement 1", "Requirement 2"],
-    "tax_obligations": "Overview of tax requirements"
+    "evaluationChecklist": ["Check supplier reviews", "Request samples", "Compare pricing"],
+    "minimumOrderExpectations": "Typical MOQ info for this industry",
+    "paymentTermsInfo": "Net 30, COD, etc."
+  },
+  "techStack": {
+    "recommendation": "Primary recommendation summary",
+    "reasoning": "Why this tech stack for their situation",
+    "tools": [
+      {"name": "Tool Name", "purpose": "What it does", "cost": "$X/month", "url": "https://tool.com"}
+    ],
+    "setupTime": "X hours total"
+  },
+  "insurance": {
+    "required": [
+      {"type": "General Liability", "estimatedCost": "$50/month", "provider": "Next Insurance", "url": "https://next-insurance.com"}
+    ],
+    "totalEstimatedCost": "$50-100/month",
+    "complianceNotes": ["Note 1", "Note 2"],
+    "taxObligations": "Overview of tax requirements for ${profile.location?.state || "your state"}"
   }
 }
 \`\`\`
@@ -2623,95 +2610,78 @@ export function generateGrowthPrompt(
 ${resourcesFormatted}
 
 ## Output Format
-Return a JSON object with this exact structure:
+Return a JSON object with this EXACT structure (use camelCase keys):
 
 \`\`\`json
 {
-  "elevator_pitch": {
-    "pitch": "I'm launching [business name], a [one-line description]. We help [target customer] solve [problem] by [solution]. What makes us different is [differentiator]. We're launching in ${profile.location?.city || "[city]"} and I'm looking for [what they need].",
-    "duration": "30 seconds",
-    "tips": ["Tip for delivery 1", "Tip 2"]
-  },
-  "landing_page": {
+  "elevatorPitch": "I'm launching [business name], a [one-line description]. We help [target customer] solve [problem] by [solution]. What makes us different is [differentiator]. We're launching in ${profile.location?.city || "[city]"} and I'm looking for [what they need].",
+  "landingPageCopy": {
     "headline": "Main headline (benefit-focused)",
     "subheadline": "Supporting statement",
-    "benefit_blocks": [
+    "benefits": [
       {"title": "Benefit 1", "description": "Explanation"},
       {"title": "Benefit 2", "description": "Explanation"},
       {"title": "Benefit 3", "description": "Explanation"}
     ],
-    "social_proof_placeholder": "Text to show before you have real testimonials",
-    "cta_button": "Get Started" | "Book Now" | "Shop Now" | etc.,
-    "about_section": "About paragraph for landing page",
+    "socialProofPlaceholder": "Text to show before you have real testimonials",
+    "ctaButtonText": "Get Started",
+    "aboutSection": "About paragraph for landing page",
     "faq": [
       {"question": "FAQ 1?", "answer": "Answer 1"},
       {"question": "FAQ 2?", "answer": "Answer 2"},
       {"question": "FAQ 3?", "answer": "Answer 3"}
     ],
-    "setup_guide": "Instructions for setting up with Carrd ($19/year) or Squarespace"
+    "setupGuide": "Instructions for setting up with Carrd ($19/year) or Squarespace"
   },
-  "social_media_posts": [
+  "socialMediaPosts": [
     {
-      "platform": "Instagram" | "LinkedIn" | "TikTok" | "Facebook",
-      "post_type": "Launch announcement" | "Behind the scenes" | "Value post" | etc.,
+      "platform": "instagram",
       "caption": "Full caption text including hashtags",
-      "visual_suggestion": "What image/video to create",
-      "best_time": "Tuesday 10am" or similar,
-      "cta": "Call to action in the post"
+      "visualSuggestion": "What image/video to create",
+      "bestTimeToPost": "Tuesday 10am",
+      "hashtags": ["hashtag1", "hashtag2", "hashtag3"]
     }
   ],
-  "email_templates": [
+  "emailTemplates": [
     {
-      "type": "Launch announcement",
-      "subject_line": "Subject line",
-      "body": "Full email body with [PLACEHOLDER] tags for customization",
-      "cta": "Call to action",
-      "who_to_send": "Friends, family, network"
+      "type": "launch_announcement",
+      "subject": "Subject line",
+      "body": "Full email body with [PLACEHOLDER] tags for customization"
     },
     {
-      "type": "Cold outreach",
-      "subject_line": "Subject line",
-      "body": "Full email body",
-      "cta": "Call to action",
-      "who_to_send": "Potential first customers"
+      "type": "cold_outreach",
+      "subject": "Subject line",
+      "body": "Full email body"
     },
     {
-      "type": "Follow-up / Referral ask",
-      "subject_line": "Subject line",
-      "body": "Full email body",
-      "cta": "Call to action",
-      "who_to_send": "Past contacts, early customers"
+      "type": "follow_up",
+      "subject": "Subject line",
+      "body": "Full email body"
     }
   ],
-  "local_marketing": {
-    "online_communities": [
-      {"name": "r/${profile.location?.city?.toLowerCase().replace(/\s/g, '') || "yourcity"}", "platform": "Reddit", "approach": "How to engage authentically"},
-      {"name": "Facebook group name", "platform": "Facebook", "approach": "How to engage"}
-    ],
-    "partnership_opportunities": [
-      {
-        "business_type": "Complementary business type",
-        "pitch": "Partnership pitch email text",
-        "what_to_offer": "What you bring to the partnership"
-      }
-    ],
-    "local_events": {
-      "event_types": ["Type 1", "Type 2"],
-      "where_to_find": ["meetup.com", "eventbrite.com", "local chamber"],
-      "approach": "How to network effectively"
+  "localMarketing": [
+    {
+      "tactic": "Join local Facebook groups",
+      "details": "Detailed description of how to execute this tactic",
+      "pitchTemplate": "Sample pitch text if applicable"
     },
-    "pr_opportunities": [
-      {"outlet": "Local news/blog name", "angle": "Story angle to pitch"}
-    ]
-  },
-  "content_calendar": {
-    "week_1": ["Post topic 1", "Post topic 2", "Post topic 3"],
-    "week_2": ["Post topic 1", "Post topic 2", "Post topic 3"],
-    "posting_frequency": "3x per week recommended",
-    "best_platforms": ["Platform 1", "Platform 2"]
-  }
+    {
+      "tactic": "Partner with complementary businesses",
+      "details": "Detailed description",
+      "pitchTemplate": "Partnership pitch email text"
+    },
+    {
+      "tactic": "Attend local networking events",
+      "details": "Description of events to attend and how to network"
+    }
+  ]
 }
 \`\`\`
+
+IMPORTANT:
+- platform must be lowercase: "instagram", "linkedin", "tiktok", "twitter", "facebook", "nextdoor"
+- email type must be: "launch_announcement", "cold_outreach", "follow_up"
+- Use camelCase for all keys: elevatorPitch, landingPageCopy, socialMediaPosts, emailTemplates, localMarketing
 
 ## Requirements
 1. All copy should be COMPLETE and ready to use — not suggestions
@@ -2772,100 +2742,69 @@ ${resourcesFormatted}
 - Coworking space in ${profile.location?.city || "your city"}: ~$${coworkingCost}/month (from matched resources)
 
 ## Output Format
-Return a JSON object with this exact structure:
+Return a JSON object with this EXACT structure (use camelCase keys):
 
 \`\`\`json
 {
-  "startup_costs": {
-    "items": [
-      {"item": "LLC Registration", "cost": 300, "category": "Legal", "notes": "One-time, ${profile.location?.state || "state"} fee"},
-      {"item": "Business Insurance", "cost": 50, "category": "Insurance", "notes": "Monthly, general liability"},
-      {"item": "Website/Domain", "cost": 50, "category": "Technology", "notes": "Year 1"},
-      {"item": "Initial Inventory/Equipment", "cost": 500, "category": "Operations", "notes": "Varies by business"}
-    ],
-    "total_one_time": 1000,
-    "total_monthly_startup": 150,
-    "total_month_one": 1150
-  },
-  "monthly_operating_costs": {
-    "items": [
-      {"expense": "Rent/Coworking", "monthly": ${coworkingCost}, "annual": ${coworkingCost * 12}, "notes": "Based on local options"},
-      {"expense": "Software/Tools", "monthly": 45, "annual": 540, "notes": "Shopify + email marketing"},
-      {"expense": "Insurance", "monthly": 50, "annual": 600, "notes": "General liability"},
-      {"expense": "Marketing", "monthly": 150, "annual": 1800, "notes": "Social ads + content"},
-      {"expense": "Supplies/Inventory", "monthly": 400, "annual": 4800, "notes": "Restock monthly"}
-    ],
-    "total_monthly": 845,
-    "total_annual": 10140
-  },
-  "revenue_projections": {
-    "assumptions": {
-      "average_order_value": 35,
-      "orders_per_customer": 1.5,
-      "customer_acquisition_cost": 15
+  "startupCostsSummary": [
+    {"item": "LLC Registration", "cost": "$300", "notes": "One-time, ${profile.location?.state || "state"} fee"},
+    {"item": "Business Insurance", "cost": "$50/month", "notes": "General liability"},
+    {"item": "Website/Domain", "cost": "$50/year", "notes": "Carrd or Squarespace"},
+    {"item": "Initial Inventory/Equipment", "cost": "$500", "notes": "Varies by business"}
+  ],
+  "monthlyOperatingCosts": [
+    {"item": "Rent/Coworking", "monthlyCost": "$${coworkingCost}", "annualCost": "$${coworkingCost * 12}", "notes": "Based on local options"},
+    {"item": "Software/Tools", "monthlyCost": "$45", "annualCost": "$540", "notes": "Essential business tools"},
+    {"item": "Insurance", "monthlyCost": "$50", "annualCost": "$600", "notes": "General liability"},
+    {"item": "Marketing", "monthlyCost": "$150", "annualCost": "$1,800", "notes": "Social ads + content"},
+    {"item": "Supplies/Inventory", "monthlyCost": "$400", "annualCost": "$4,800", "notes": "Restock monthly"}
+  ],
+  "revenueProjections": {
+    "conservative": {
+      "monthlyCustomers": 20,
+      "averageOrder": 35,
+      "monthlyRevenue": 700,
+      "monthlyCosts": 845,
+      "monthlyProfit": -145,
+      "breakEvenMonth": "Month 8"
     },
-    "scenarios": {
-      "conservative": {
-        "monthly_customers": 20,
-        "monthly_revenue": 700,
-        "monthly_costs": 845,
-        "monthly_profit": -145,
-        "break_even_month": 8
-      },
-      "moderate": {
-        "monthly_customers": 50,
-        "monthly_revenue": 1750,
-        "monthly_costs": 945,
-        "monthly_profit": 805,
-        "break_even_month": 3
-      },
-      "aggressive": {
-        "monthly_customers": 100,
-        "monthly_revenue": 3500,
-        "monthly_costs": 1145,
-        "monthly_profit": 2355,
-        "break_even_month": 1
-      }
+    "moderate": {
+      "monthlyCustomers": 50,
+      "averageOrder": 35,
+      "monthlyRevenue": 1750,
+      "monthlyCosts": 945,
+      "monthlyProfit": 805,
+      "breakEvenMonth": "Month 3"
+    },
+    "aggressive": {
+      "monthlyCustomers": 100,
+      "averageOrder": 35,
+      "monthlyRevenue": 3500,
+      "monthlyCosts": 1145,
+      "monthlyProfit": 2355,
+      "breakEvenMonth": "Month 1"
     }
   },
-  "break_even_analysis": {
-    "units_per_month": 25,
-    "revenue_per_month": 875,
-    "practical_meaning": "You need about 25 customers per month, which means roughly 1 new customer per day",
-    "timeline_estimate": "Most businesses in this category reach break-even within 3-6 months"
+  "breakEvenAnalysis": {
+    "unitsNeeded": 25,
+    "description": "You need about 25 customers per month, which means roughly 1 new customer per day. Most businesses in this category reach break-even within 3-6 months."
   },
-  "pricing_strategy": {
-    "recommended_price": 35,
-    "price_range": {"min": 25, "max": 49},
-    "competitive_context": "Competitors charge $29-49. Your positioning supports the mid-range.",
-    "pricing_psychology": [
-      "Tip 1 for this business type",
-      "Tip 2 for this business type"
+  "pricingStrategy": {
+    "recommendedPrice": "$35",
+    "reasoning": "Competitors charge $29-49. Your positioning supports the mid-range. Start at $35, offer a launch discount of 20% for first 50 customers.",
+    "psychologyTips": [
+      "Use charm pricing ($34.99 instead of $35)",
+      "Offer bundles to increase average order value"
     ],
-    "how_to_test": "Start at $35, offer a launch discount of 20% for first 50 customers, then test price increases"
-  },
-  "funding_options": {
-    "matched_grants": [
-      {"name": "Grant name from resources", "amount": "Up to $25K", "deadline": "Rolling", "fit": "Why this is relevant"}
-    ],
-    "other_options": [
-      {"type": "SBA Microloan", "amount": "Up to $50K", "notes": "Through local SBA partner"},
-      {"type": "Revenue-based financing", "amount": "Varies", "notes": "After 6 months of revenue"}
-    ]
-  },
-  "financial_milestones": [
-    {"month": 1, "milestone": "Launch and get first 10 paying customers", "revenue_target": 350},
-    {"month": 3, "milestone": "Reach 30 customers/month, break even", "revenue_target": 1050},
-    {"month": 6, "milestone": "Hit $2K/month profit, reinvest in growth", "revenue_target": 3000},
-    {"month": 12, "milestone": "Scale to $5K/month profit, consider hiring", "revenue_target": 7000}
-  ],
-  "key_metrics": {
-    "track_weekly": ["New customers", "Revenue", "Ad spend"],
-    "track_monthly": ["Profit margin", "Customer acquisition cost", "Repeat purchase rate"],
-    "warning_signs": ["CAC exceeding $30", "Profit margin below 20%", "No repeat customers by month 3"]
+    "testingApproach": "A/B test $29 vs $39 with your first 100 customers to find optimal price point"
   }
 }
 \`\`\`
+
+IMPORTANT:
+- Use camelCase for all keys: startupCostsSummary, monthlyOperatingCosts, revenueProjections, breakEvenAnalysis, pricingStrategy
+- All cost values should be strings with $ prefix (e.g., "$300", "$50/month")
+- breakEvenMonth should be a string like "Month 3"
 
 ## Requirements
 1. All numbers should be REALISTIC for a ${category} business
