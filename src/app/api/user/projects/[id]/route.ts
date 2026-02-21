@@ -89,10 +89,17 @@ export async function GET(
         createdAt: savedIdea.created_at,
         updatedAt: savedIdea.updated_at,
         deepDive: deepDive ? {
+          // V1 fields
           viability: deepDive.viability,
           businessPlan: deepDive.business_plan,
           marketing: deepDive.marketing,
           roadmap: deepDive.roadmap,
+          // V2 fields
+          checklist: deepDive.checklist,
+          foundation: deepDive.foundation,
+          growth: deepDive.growth,
+          financial: deepDive.financial,
+          checklistProgress: deepDive.checklist_progress,
         } : null,
       },
     });

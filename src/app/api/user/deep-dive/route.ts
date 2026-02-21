@@ -3,14 +3,31 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
-import type { ViabilityReport, BusinessPlan, MarketingAssets, ActionRoadmap } from "@/types";
+import type {
+  ViabilityReport,
+  BusinessPlan,
+  MarketingAssets,
+  ActionRoadmap,
+  LaunchChecklistData,
+  BusinessFoundationData,
+  GrowthPlanData,
+  FinancialModelData,
+  ChecklistProgress,
+} from "@/types";
 
 interface DeepDiveUpdate {
   ideaId: string;
+  // Legacy V1 fields
   viability?: ViabilityReport;
   businessPlan?: BusinessPlan;
   marketing?: MarketingAssets;
   roadmap?: ActionRoadmap;
+  // V2 fields
+  checklist?: LaunchChecklistData;
+  foundation?: BusinessFoundationData;
+  growth?: GrowthPlanData;
+  financial?: FinancialModelData;
+  checklistProgress?: ChecklistProgress;
 }
 
 export async function POST(request: Request) {
@@ -35,8 +52,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const { ideaId, viability, businessPlan, marketing, roadmap } =
-      await request.json() as DeepDiveUpdate;
+    const {
+      ideaId,
+      viability,
+      businessPlan,
+      marketing,
+      roadmap,
+      checklist,
+      foundation,
+      growth,
+      financial,
+      checklistProgress,
+    } = await request.json() as DeepDiveUpdate;
 
     console.log("[deep-dive] Received data:", {
       ideaId,
@@ -44,6 +71,11 @@ export async function POST(request: Request) {
       hasBusinessPlan: !!businessPlan,
       hasMarketing: !!marketing,
       hasRoadmap: !!roadmap,
+      hasChecklist: !!checklist,
+      hasFoundation: !!foundation,
+      hasGrowth: !!growth,
+      hasFinancial: !!financial,
+      hasChecklistProgress: !!checklistProgress,
     });
 
     if (!ideaId) {
@@ -66,10 +98,17 @@ export async function POST(request: Request) {
 
     // Build the update object with only provided fields
     const updateData: Record<string, unknown> = {};
+    // Legacy V1 fields
     if (viability !== undefined) updateData.viability = viability;
     if (businessPlan !== undefined) updateData.business_plan = businessPlan;
     if (marketing !== undefined) updateData.marketing = marketing;
     if (roadmap !== undefined) updateData.roadmap = roadmap;
+    // V2 fields
+    if (checklist !== undefined) updateData.checklist = checklist;
+    if (foundation !== undefined) updateData.foundation = foundation;
+    if (growth !== undefined) updateData.growth = growth;
+    if (financial !== undefined) updateData.financial = financial;
+    if (checklistProgress !== undefined) updateData.checklist_progress = checklistProgress;
 
     let result;
     if (existing) {
@@ -179,10 +218,17 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
+        // Legacy V1 fields
         viability: data.viability,
         businessPlan: data.business_plan,
         marketing: data.marketing,
         roadmap: data.roadmap,
+        // V2 fields
+        checklist: data.checklist,
+        foundation: data.foundation,
+        growth: data.growth,
+        financial: data.financial,
+        checklistProgress: data.checklist_progress,
       },
     });
   } catch (error) {

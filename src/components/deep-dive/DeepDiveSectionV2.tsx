@@ -65,9 +65,10 @@ interface DeepDiveSectionV2Props {
   profile: UserProfile;
   onBack: () => void;
   profileId?: string;
+  initialSavedIdeaId?: string; // For pre-saved projects, skip the save step
 }
 
-export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profileId }: DeepDiveSectionV2Props) {
+export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profileId, initialSavedIdeaId }: DeepDiveSectionV2Props) {
   const [activeTab, setActiveTab] = useState<TabId>("checklist");
   const [loadingTab, setLoadingTab] = useState<TabId | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +101,8 @@ export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profil
   const [checklistProgress, setChecklistProgress] = useState<ChecklistProgress>({});
 
   // The saved idea ID from Supabase (used for deep dive results)
-  const [savedIdeaId, setSavedIdeaId] = useState<string | null>(null);
+  // Initialize with initialSavedIdeaId if provided (for pre-saved projects)
+  const [savedIdeaId, setSavedIdeaId] = useState<string | null>(initialSavedIdeaId || null);
 
   // Track which tabs have been fetched to prevent duplicate requests
   const fetchedTabs = useRef<Set<TabId>>(new Set());
@@ -441,20 +443,54 @@ export default function DeepDiveSectionV2({ idea, ideas, profile, onBack, profil
   }, [idea.id, hasLaunchKitAccess, handleGenerateLaunchKit]);
 
   // Auto-save results when logged in
-  // TODO: Update API to support new V2 types before enabling
   useEffect(() => {
     const saveResults = async () => {
       if (!isAuthenticated || !savedIdeaId) {
         return;
       }
 
-      // V2 auto-save - will be implemented when API is updated
-      // For now, just mark as saved if we have any content
-      const hasAnyV2Content = checklist || foundation || growth || financial;
-      const alreadyMarkedSaved = savedTabs.current.size > 0;
-      if (hasAnyV2Content && !alreadyMarkedSaved) {
-        savedTabs.current.add("checklist"); // Use a valid TabId as marker
-        setIsSaved(true);
+      // Build update payload with only changed tabs
+      const updatePayload: Record<string, unknown> = { ideaId: savedIdeaId };
+      let hasChanges = false;
+
+      if (checklist && !savedTabs.current.has("checklist")) {
+        updatePayload.checklist = checklist;
+        hasChanges = true;
+      }
+      if (foundation && !savedTabs.current.has("foundation")) {
+        updatePayload.foundation = foundation;
+        hasChanges = true;
+      }
+      if (growth && !savedTabs.current.has("growth")) {
+        updatePayload.growth = growth;
+        hasChanges = true;
+      }
+      if (financial && !savedTabs.current.has("financial")) {
+        updatePayload.financial = financial;
+        hasChanges = true;
+      }
+
+      if (!hasChanges) return;
+
+      try {
+        const response = await fetch("/api/user/deep-dive", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatePayload),
+        });
+
+        if (response.ok) {
+          // Mark tabs as saved
+          if (checklist) savedTabs.current.add("checklist");
+          if (foundation) savedTabs.current.add("foundation");
+          if (growth) savedTabs.current.add("growth");
+          if (financial) savedTabs.current.add("financial");
+          setIsSaved(true);
+        } else {
+          console.error("[DeepDiveV2] Failed to auto-save:", await response.text());
+        }
+      } catch (error) {
+        console.error("[DeepDiveV2] Auto-save error:", error);
       }
     };
 

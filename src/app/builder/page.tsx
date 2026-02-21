@@ -25,7 +25,7 @@ import {
   GeneratingScreen,
 } from "@/components/steps";
 import { IdeaList } from "@/components/results";
-import { DeepDiveSection } from "@/components/deep-dive";
+import { DeepDiveSectionV2 } from "@/components/deep-dive";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserData } from "@/hooks";
 import { STEP_PROGRESS } from "@/lib/constants";
@@ -280,11 +280,11 @@ function BuilderContent() {
           }
         }
 
-        // Navigate to deep dive (the DeepDiveSection will handle the purchase verification)
-        // For launch_kit, the URL params will tell DeepDiveSection to auto-open the Launch Kit modal
+        // Navigate to deep dive (the DeepDiveSectionV2 will handle the purchase verification)
+        // For launch_kit, the URL params will tell DeepDiveSectionV2 to auto-open the Launch Kit modal
         setCurrentStep("deep_dive");
 
-        // Clear the pending session (but keep URL params for DeepDiveSection to process)
+        // Clear the pending session (but keep URL params for DeepDiveSectionV2 to process)
         clearPendingSession();
       }
     }
@@ -640,7 +640,7 @@ function BuilderContent() {
           return null;
         }
         return (
-          <DeepDiveSection
+          <DeepDiveSectionV2
             idea={selectedIdea}
             ideas={ideas}
             profile={profile}
