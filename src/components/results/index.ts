@@ -7,3 +7,4 @@ export { default as BusinessFoundation } from "./BusinessFoundation";
 export { default as GrowthPlan } from "./GrowthPlan";
 export { default as FinancialModel } from "./FinancialModel";
 export { default as AIAdvisorPlaceholder } from "./AIAdvisorPlaceholder";
+export { default as AIAdvisor } from "./AIAdvisor";

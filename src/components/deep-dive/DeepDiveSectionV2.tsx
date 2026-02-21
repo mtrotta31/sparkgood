@@ -10,7 +10,7 @@ import BusinessFoundation from "@/components/results/BusinessFoundation";
 import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
-import AIAdvisorPlaceholder from "@/components/results/AIAdvisorPlaceholder";
+import AIAdvisor from "@/components/results/AIAdvisor";
 import ConfirmDialog from "./ConfirmDialog";
 import LaunchKitModal from "./LaunchKitModal";
 import type {
@@ -926,8 +926,21 @@ export default function DeepDiveSectionV2({
             {activeTab === "resources" && localResources && (
               <LocalResources data={localResources} />
             )}
-            {activeTab === "advisor" && (
-              <AIAdvisorPlaceholder ideaName={idea.name} />
+            {activeTab === "advisor" && savedIdeaId && (
+              <AIAdvisor projectId={savedIdeaId} ideaName={idea.name} />
+            )}
+            {activeTab === "advisor" && !savedIdeaId && (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-16 h-16 rounded-full bg-spark/10 flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-spark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                </div>
+                <h3 className="font-display text-xl font-bold text-warmwhite mb-2">Sign in to access AI Advisor</h3>
+                <p className="text-warmwhite-muted text-sm max-w-md">
+                  Create an account or sign in to chat with your personalized AI business advisor.
+                </p>
+              </div>
             )}
           </FadeIn>
         )}
