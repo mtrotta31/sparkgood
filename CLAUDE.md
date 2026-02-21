@@ -46,6 +46,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **User Profiles** — Save intake preferences
 - **Saved Ideas** — Persist generated ideas and deep dive results
 - **Auto-save** — Deep dive results save automatically when logged in
+- **Session State Migration** — Old sessions automatically migrate to include new business category fields (`src/lib/sessionState.ts`)
 
 ### Payments & Credits (Fully Functional)
 - **Stripe Integration** — Checkout sessions, webhooks, subscription management
@@ -113,6 +114,22 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Research
 - `POST /api/research` — Perplexity-powered market research
 - `POST /api/analyze-competitors` — Competitor analysis
+
+## Key Types (`src/types/index.ts`)
+
+### Business Path Types
+- `BusinessCategory` — 10 options: food_beverage, health_wellness, education, technology, ecommerce, professional_services, creative_arts, real_estate, social_enterprise, other
+- `BusinessModelPreference` — product, service, subscription, marketplace
+- `TargetCustomer` — b2b, b2c, b2g, other
+- `KeySkill` — sales_marketing, technical, design_creative, finance_accounting, operations, customer_service, leadership, industry_expertise
+
+### Social Enterprise Types
+- `VentureType` — project, nonprofit, business, hybrid
+- `CauseArea` — 12 cause areas (environment, education, health, poverty, etc.)
+
+### Profile & Idea Types
+- `UserProfile` — Contains both path fields; `businessCategory` determines which path
+- `Idea` — Shared fields + optional path-specific fields (`impact`/`causeAreas` for social enterprise, `valueProposition`/`competitiveAdvantage` for general business)
 
 ## Database Schema
 
@@ -251,7 +268,12 @@ sparklocal/
 │   │   └── PurchaseModal.tsx    # Stripe checkout modal
 │   ├── contexts/                # React contexts (Auth)
 │   ├── hooks/                   # Custom hooks (useCredits, useUserData)
-│   ├── lib/                     # Utilities (Supabase, Stripe, etc.)
+│   ├── lib/
+│   │   ├── constants.ts         # BUSINESS_CATEGORIES, BUSINESS_MODELS, etc.
+│   │   ├── sessionState.ts      # Session persistence with migration
+│   │   ├── supabase.ts          # Supabase client
+│   │   ├── stripe.ts            # Stripe utilities
+│   │   └── ...
 │   ├── prompts/                 # AI prompt templates
 │   │   ├── idea-generation.ts   # Supports both business paths
 │   │   ├── deep-dive.ts         # Supports both business paths
@@ -263,7 +285,12 @@ sparklocal/
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   └── ...                      # Data files
 ├── supabase/
-│   └── migrations/              # Database migrations
+│   └── migrations/
+│       ├── 001_initial_schema.sql
+│       ├── 002_resource_directory.sql
+│       ├── 20240220_create_user_credits.sql
+│       ├── 20240221_create_newsletter_subscribers.sql
+│       └── 20240222_add_business_category_fields.sql  # Business category support
 └── public/                      # Static assets
 ```
 
