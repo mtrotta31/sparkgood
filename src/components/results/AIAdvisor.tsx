@@ -25,6 +25,7 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
   const [messageCount, setMessageCount] = useState(0);
   const [maxMessages, setMaxMessages] = useState(20);
   const [limitReached, setLimitReached] = useState(false);
+  const [hasUnlimitedAccess, setHasUnlimitedAccess] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -50,7 +51,8 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
           setMessages(data.data.messages || []);
           setMessageCount(data.data.messageCount || 0);
           setMaxMessages(data.data.maxMessages || 20);
-          setLimitReached(data.data.messageCount >= data.data.maxMessages);
+          setHasUnlimitedAccess(data.data.hasUnlimitedAccess || false);
+          setLimitReached(data.data.limitReached || false);
         }
       } catch (err) {
         console.error("Error loading messages:", err);
@@ -94,7 +96,9 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
         if (errorData.limitReached) {
           setLimitReached(true);
           setMessageCount(errorData.messageCount);
-          setError("You've reached the message limit for this project.");
+          setHasUnlimitedAccess(errorData.hasUnlimitedAccess || false);
+          // Remove the user message we just added since it wasn't sent
+          setMessages((prev) => prev.slice(0, -1));
           return;
         }
         throw new Error(errorData.error || "Failed to send message");
@@ -153,7 +157,11 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
 
               if (data.done) {
                 setMessageCount(data.messageCount);
-                setLimitReached(data.messageCount >= data.maxMessages);
+                setHasUnlimitedAccess(data.hasUnlimitedAccess || false);
+                // Only set limit reached if not unlimited
+                if (!data.hasUnlimitedAccess) {
+                  setLimitReached(data.messageCount >= data.maxMessages);
+                }
               }
             } catch {
               // Ignore parse errors for incomplete chunks
@@ -239,17 +247,23 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
           </div>
         </div>
         <div className="text-right">
-          <span
-            className={`text-xs font-medium px-2 py-1 rounded-full ${
-              limitReached
-                ? "bg-red-500/20 text-red-400"
-                : messageCount > maxMessages * 0.8
-                  ? "bg-yellow-500/20 text-yellow-400"
-                  : "bg-spark/10 text-spark"
-            }`}
-          >
-            {messageCount} of {maxMessages} messages
-          </span>
+          {hasUnlimitedAccess ? (
+            <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-500/20 text-green-400">
+              Unlimited messages
+            </span>
+          ) : (
+            <span
+              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                limitReached
+                  ? "bg-red-500/20 text-red-400"
+                  : messageCount > maxMessages * 0.8
+                    ? "bg-yellow-500/20 text-yellow-400"
+                    : "bg-spark/10 text-spark"
+              }`}
+            >
+              {messageCount} of {maxMessages} messages
+            </span>
+          )}
         </div>
       </div>
 
@@ -349,42 +363,57 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
       </div>
 
       {/* Error message */}
-      {error && (
+      {error && !limitReached && (
         <div className="mx-4 mb-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Limit reached message */}
+      {/* Limit reached upgrade prompt */}
       {limitReached && (
-        <div className="mx-4 mb-2 px-4 py-3 bg-spark/10 border border-spark/20 rounded-lg">
-          <div className="flex items-start gap-3">
-            <svg
-              className="w-5 h-5 text-spark flex-shrink-0 mt-0.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div>
-              <p className="text-warmwhite font-medium text-sm">Message limit reached</p>
-              <p className="text-warmwhite-muted text-xs mt-1">
-                You&apos;ve used all {maxMessages} messages for this project. Upgrade to a
-                subscription for unlimited advisor access.
-              </p>
-              <a
-                href="/pricing"
-                className="inline-block mt-2 text-spark hover:text-spark-light text-sm font-medium"
+        <div className="mx-4 mb-2 p-6 bg-gradient-to-br from-charcoal-light to-charcoal rounded-xl border border-spark/20">
+          <div className="text-center">
+            <div className="w-12 h-12 rounded-full bg-spark/20 flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-6 h-6 text-spark"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                View pricing plans &rarr;
-              </a>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                />
+              </svg>
             </div>
+            <h3 className="font-display text-lg font-bold text-warmwhite mb-2">
+              You&apos;ve reached your message limit
+            </h3>
+            <p className="text-warmwhite-muted text-sm mb-4 max-w-sm mx-auto">
+              Your conversation is saved and you can review it anytime. Upgrade to a subscription
+              for unlimited advisor access across all your projects.
+            </p>
+            <a
+              href="/pricing"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-spark to-accent text-charcoal-dark font-medium rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Upgrade to Spark Plan — $14.99/month
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </a>
           </div>
         </div>
       )}
@@ -400,7 +429,7 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
               onKeyDown={handleKeyDown}
               placeholder={
                 limitReached
-                  ? "Message limit reached"
+                  ? "Upgrade for unlimited messages"
                   : "Ask about your business plan..."
               }
               disabled={isLoading || isStreaming || limitReached}
@@ -433,9 +462,11 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
             )}
           </button>
         </div>
-        <p className="text-warmwhite-dim text-xs mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
-        </p>
+        {!limitReached && (
+          <p className="text-warmwhite-dim text-xs mt-2 text-center">
+            Press Enter to send, Shift+Enter for new line
+          </p>
+        )}
       </form>
     </div>
   );

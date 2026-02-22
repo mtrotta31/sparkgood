@@ -426,9 +426,21 @@ export async function POST(request: Request) {
       .eq("idea_id", projectId)
       .single();
 
-    // Check message limit
+    // Check user subscription status
+    const { data: userCredits } = await supabase
+      .from("user_credits")
+      .select("subscription_tier, subscription_status")
+      .eq("user_id", user.id)
+      .single();
+
+    // Subscribers with active Spark or Ignite plans get unlimited messages
+    const hasUnlimitedAccess =
+      userCredits?.subscription_status === "active" &&
+      (userCredits?.subscription_tier === "spark" || userCredits?.subscription_tier === "ignite");
+
+    // Check message limit (bypass for subscribers)
     const currentCount = deepDive?.advisor_message_count || 0;
-    if (currentCount >= MAX_MESSAGES_PER_PROJECT) {
+    if (!hasUnlimitedAccess && currentCount >= MAX_MESSAGES_PER_PROJECT) {
       return NextResponse.json(
         {
           success: false,
@@ -436,6 +448,7 @@ export async function POST(request: Request) {
           limitReached: true,
           messageCount: currentCount,
           maxMessages: MAX_MESSAGES_PER_PROJECT,
+          hasUnlimitedAccess: false,
         },
         { status: 403 }
       );
@@ -603,6 +616,7 @@ export async function POST(request: Request) {
                 done: true,
                 messageCount: currentCount + 1,
                 maxMessages: MAX_MESSAGES_PER_PROJECT,
+                hasUnlimitedAccess,
               })}\n\n`
             )
           );
@@ -683,12 +697,28 @@ export async function GET(request: Request) {
       .eq("idea_id", projectId)
       .single();
 
+    // Check user subscription status
+    const { data: userCredits } = await supabase
+      .from("user_credits")
+      .select("subscription_tier, subscription_status")
+      .eq("user_id", user.id)
+      .single();
+
+    // Subscribers with active Spark or Ignite plans get unlimited messages
+    const hasUnlimitedAccess =
+      userCredits?.subscription_status === "active" &&
+      (userCredits?.subscription_tier === "spark" || userCredits?.subscription_tier === "ignite");
+
+    const messageCount = deepDive?.advisor_message_count || 0;
+
     return NextResponse.json({
       success: true,
       data: {
         messages: messages || [],
-        messageCount: deepDive?.advisor_message_count || 0,
+        messageCount,
         maxMessages: MAX_MESSAGES_PER_PROJECT,
+        hasUnlimitedAccess,
+        limitReached: !hasUnlimitedAccess && messageCount >= MAX_MESSAGES_PER_PROJECT,
       },
     });
   } catch (error) {
