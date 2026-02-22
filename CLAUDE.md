@@ -508,6 +508,13 @@ The core product is fully functional with payments:
 - Uses Claude Sonnet with streaming responses via Server-Sent Events (SSE)
 - System prompt includes full business context: idea, profile, checklist, foundation, growth, financial, and matched resources
 - Messages persisted to `advisor_messages` table for conversation continuity
-- Usage tracked via `advisor_message_count` on `deep_dive_results` (20 messages per deep dive purchase)
+- Usage tracked via `advisor_message_count` on `deep_dive_results`
 - Advisor persona: practical, specific, references user's actual plan/city/budget/resources by name
 - Requires `savedIdeaId` to function (user must be logged in with saved project)
+- **Message Limits:**
+  - One-time deep dive purchase ($4.99): 20 messages per project
+  - Spark subscription ($14.99/mo): Unlimited messages on all projects
+  - Ignite subscription ($29.99/mo): Unlimited messages on all projects
+- Checks `user_credits.subscription_tier` and `subscription_status` before enforcing limit
+- Shows "Unlimited messages" badge for active subscribers, "X of 20 messages" for others
+- Friendly upgrade prompt when limit reached with CTA to pricing page
