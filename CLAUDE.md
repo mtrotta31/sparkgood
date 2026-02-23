@@ -38,6 +38,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **PDF Export** — Download complete plan as professional PDF
 - **My Projects** (`/projects`) — Dashboard to view and continue saved projects
 - **Individual Project Pages** (`/projects/[id]`) — View saved deep dive results
+- **Example Deep Dive** (`/builder/example`) — Fully interactive example showcasing "Austin Pour Co." mobile cocktail bar with hardcoded data for all 6 tabs. Used as social proof and to help users understand what they'll get. Contextual CTAs when accessed from purchase modal.
 
 ### Resource Directory (Fully Functional)
 - **Main Directory** (`/resources`) — Homepage with hero, city search, animated stats, top cities grid, category cards
@@ -269,12 +270,14 @@ Located in `src/components/`:
 - `ui/` — Reusable primitives (FadeIn, Header, etc.)
 - `steps/` — Builder flow step components
 - `results/` — Idea cards, result displays, V2 tab components
+  - `BusinessOverview.tsx` — Displays idea overview (name, tagline, problem, audience, how it works, differentiation) at top of Business Foundation tab and in PDF
   - `LaunchChecklist.tsx` — Renders V2 checklist with progress tracking
   - `BusinessFoundation.tsx` — Renders V2 market research, legal, costs
   - `GrowthPlan.tsx` — Renders V2 marketing content with copy buttons
   - `FinancialModel.tsx` — Renders V2 financial projections
   - `LocalResources.tsx` — Renders matched local resources by category
   - `AIAdvisor.tsx` — Streaming chat UI with the AI business advisor
+  - `IdeaList.tsx` — Displays generated ideas with "See an example" link
 - `deep-dive/` — Deep dive section components
   - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (5 tabs)
   - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
@@ -312,6 +315,7 @@ sparklocal/
 │   │   │   ├── user/            # Profile, ideas, credits
 │   │   │   └── ...
 │   │   ├── builder/             # Main builder flow
+│   │   │   └── example/         # Example deep dive page (Austin Pour Co.)
 │   │   ├── pricing/             # Pricing page
 │   │   ├── projects/            # User projects
 │   │   ├── resources/           # Resource directory (light theme via layout.tsx)
@@ -337,7 +341,7 @@ sparklocal/
 │   │   ├── resources/           # Directory components (see Design System)
 │   │   ├── seo/                 # SEO components (structured data)
 │   │   ├── auth/                # Auth components
-│   │   └── PurchaseModal.tsx    # Stripe checkout modal
+│   │   └── PurchaseModal.tsx    # Stripe checkout modal with "See an example" link
 │   ├── contexts/                # React contexts (Auth)
 │   ├── hooks/                   # Custom hooks (useCredits, useUserData)
 │   ├── lib/
@@ -467,6 +471,9 @@ The core product is fully functional with payments:
 - ✅ Google Analytics (GA4)
 - ✅ Schema.org structured data
 - ✅ Newsletter signup
+- ✅ Example deep dive page (`/builder/example`) with Austin Pour Co. showcase
+- ✅ "See an example" links at key conversion points
+- ✅ Business Overview component (idea summary at top of Business Foundation tab)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
@@ -518,3 +525,19 @@ The core product is fully functional with payments:
 - Checks `user_credits.subscription_tier` and `subscription_status` before enforcing limit
 - Shows "Unlimited messages" badge for active subscribers, "X of 20 messages" for others
 - Friendly upgrade prompt when limit reached with CTA to pricing page
+
+### Example Deep Dive & Purchase Flow
+- `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
+- All 6 tabs work with hardcoded data matching the real deep dive structure
+- "See an example →" links appear in 3 conversion points:
+  - **PurchaseModal**: Below purchase button ("Not sure? See a full example deep dive →")
+  - **Welcome step**: After "Let's Begin" button ("Or see what a deep dive looks like →")
+  - **IdeaList**: In help text section ("See an example deep dive →")
+- When accessed from PurchaseModal:
+  - URL includes `?from=purchase&ideaId={id}` params
+  - Ideas and selected idea stored in sessionStorage (`PURCHASE_CONTEXT_KEY`)
+  - Example page shows contextual CTAs: "Complete Purchase →" instead of "Generate Your Deep Dive"
+  - "Complete Purchase" navigates back to `/builder?restorePurchase=true&ideaId={id}`
+  - Builder page restores state from sessionStorage and navigates to deep_dive step
+- When accessed from other entry points (Welcome, IdeaList, direct URL):
+  - Generic CTAs pointing to `/builder`
