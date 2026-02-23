@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FadeIn } from "@/components/ui";
 import LaunchChecklist from "@/components/results/LaunchChecklist";
 import BusinessFoundation from "@/components/results/BusinessFoundation";
+import BusinessOverview from "@/components/results/BusinessOverview";
 import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
@@ -33,6 +34,7 @@ const EXAMPLE_IDEA: Idea = {
   businessCategory: "food_beverage",
   valueProposition: "Instagram-worthy bar setups, seasonal custom menus, and professional bartenders",
   competitiveAdvantage: "Premium craft cocktails and curated experiences vs basic beer/wine competitors",
+  mechanism: "Clients book a package online, choose from signature cocktail menus (or request custom creations), and we arrive with a fully-equipped mobile bar, professional bartender, all supplies, and handle setup through breakdown. We serve at weddings, corporate events, private parties, and brand activations across the Austin metro area.",
 };
 
 const EXAMPLE_FOUNDATION: BusinessFoundationData = {
@@ -786,7 +788,10 @@ export default function ExampleDeepDivePage() {
       <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
         <FadeIn duration={400} key={activeTab}>
           {activeTab === "foundation" && (
-            <BusinessFoundation data={EXAMPLE_FOUNDATION} />
+            <>
+              <BusinessOverview idea={EXAMPLE_IDEA} />
+              <BusinessFoundation data={EXAMPLE_FOUNDATION} />
+            </>
           )}
           {activeTab === "checklist" && (
             <LaunchChecklist

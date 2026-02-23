@@ -344,22 +344,44 @@ export function SparkLocalPDF({
           <Text style={styles.date}>Generated {generatedDate}</Text>
         </View>
 
-        {/* Title */}
+        {/* Business Overview */}
         <View style={styles.titleSection}>
           <Text style={styles.title}>{idea.name}</Text>
           <Text style={styles.tagline}>{idea.tagline}</Text>
-          <Text style={styles.ideaDescription}>
-            <Text style={{ fontWeight: "bold" }}>Problem: </Text>
-            {idea.problem}
-          </Text>
-          <Text style={styles.ideaDescription}>
-            <Text style={{ fontWeight: "bold" }}>Audience: </Text>
-            {idea.audience}
-          </Text>
-          <Text style={styles.ideaDescription}>
-            <Text style={{ fontWeight: "bold" }}>Impact: </Text>
-            {idea.impact}
-          </Text>
+        </View>
+
+        {/* Overview Details */}
+        <View style={[styles.subsection, { marginBottom: 16 }]}>
+          {idea.problem && (
+            <Text style={styles.ideaDescription}>
+              <Text style={{ fontWeight: "bold", color: colors.spark }}>The Problem: </Text>
+              {idea.problem}
+            </Text>
+          )}
+          {idea.audience && (
+            <Text style={styles.ideaDescription}>
+              <Text style={{ fontWeight: "bold", color: colors.spark }}>Who It Serves: </Text>
+              {idea.audience}
+            </Text>
+          )}
+          {(idea.mechanism || idea.revenueModel) && (
+            <Text style={styles.ideaDescription}>
+              <Text style={{ fontWeight: "bold", color: colors.spark }}>How It Works: </Text>
+              {idea.mechanism || idea.revenueModel}
+            </Text>
+          )}
+          {(idea.competitiveAdvantage || idea.valueProposition) && (
+            <Text style={styles.ideaDescription}>
+              <Text style={{ fontWeight: "bold", color: colors.spark }}>What Makes It Different: </Text>
+              {idea.competitiveAdvantage || idea.valueProposition}
+            </Text>
+          )}
+          {idea.impact && (
+            <Text style={styles.ideaDescription}>
+              <Text style={{ fontWeight: "bold", color: colors.spark }}>Social Impact: </Text>
+              {idea.impact}
+            </Text>
+          )}
           <Text style={[styles.ideaDescription, { marginTop: 8 }]}>
             <Text style={{ fontWeight: "bold" }}>Plan Type: </Text>
             {commitmentLabel}

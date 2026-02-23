@@ -7,6 +7,7 @@ import { savePendingSession } from "@/lib/sessionState";
 import PurchaseModal from "@/components/PurchaseModal";
 import LaunchChecklist from "@/components/results/LaunchChecklist";
 import BusinessFoundation from "@/components/results/BusinessFoundation";
+import BusinessOverview from "@/components/results/BusinessOverview";
 import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
@@ -914,8 +915,11 @@ export default function DeepDiveSectionV2({
                 onProgressChange={handleChecklistProgressChange}
               />
             )}
-            {activeTab === "foundation" && foundation && (
-              <BusinessFoundation data={foundation} />
+            {activeTab === "foundation" && (
+              <>
+                <BusinessOverview idea={idea} />
+                {foundation && <BusinessFoundation data={foundation} />}
+              </>
             )}
             {activeTab === "growth" && growth && (
               <GrowthPlan data={growth} />
