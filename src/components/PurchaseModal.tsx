@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PRICING } from "@/lib/stripe";
+import type { Idea } from "@/types";
+
+// Key for storing purchase context in sessionStorage
+export const PURCHASE_CONTEXT_KEY = "sparklocal_purchase_context";
 
 interface PurchaseModalProps {
   isOpen: boolean;
@@ -12,6 +17,9 @@ interface PurchaseModalProps {
   purchaseType: "deep_dive" | "launch_kit";
   hasDeepDive?: boolean; // For launch kit, must already have deep dive
   onBeforeRedirect?: () => void; // Called before redirecting to Stripe
+  // Optional: for restoring state when returning from example page
+  ideas?: Idea[];
+  selectedIdeaIndex?: number;
 }
 
 export default function PurchaseModal({
@@ -22,9 +30,31 @@ export default function PurchaseModal({
   purchaseType,
   hasDeepDive = false,
   onBeforeRedirect,
+  ideas,
+  selectedIdeaIndex,
 }: PurchaseModalProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Handle clicking "See an example" - store context for return
+  const handleSeeExample = () => {
+    // Store purchase context in sessionStorage
+    if (ideas && selectedIdeaIndex !== undefined) {
+      sessionStorage.setItem(
+        PURCHASE_CONTEXT_KEY,
+        JSON.stringify({
+          ideas,
+          selectedIdeaIndex,
+          ideaId,
+          ideaName,
+          purchaseType,
+        })
+      );
+    }
+    // Navigate to example with query params
+    router.push(`/builder/example?from=purchase&ideaId=${ideaId}`);
+  };
 
   // Lock body scroll when open
   useEffect(() => {
@@ -183,12 +213,12 @@ export default function PurchaseModal({
 
             {/* Example link */}
             <div className="text-center mb-4">
-              <Link
-                href="/builder/example"
+              <button
+                onClick={handleSeeExample}
                 className="text-spark/80 hover:text-spark text-sm transition-colors"
               >
                 Not sure? See a full example deep dive →
-              </Link>
+              </button>
             </div>
           </>
         )}

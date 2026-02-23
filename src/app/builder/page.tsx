@@ -30,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserData } from "@/hooks";
 import { STEP_PROGRESS } from "@/lib/constants";
 import { loadPendingSession, clearPendingSession } from "@/lib/sessionState";
+import { PURCHASE_CONTEXT_KEY } from "@/components/PurchaseModal";
 import type {
   UserProfile,
   UserLocation,
@@ -327,6 +328,46 @@ function BuilderContent() {
     // Clear the pending session
     clearPendingSession();
   }, [user]);
+
+  // Restore session state when returning from example page (from purchase modal)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const restorePurchase = urlParams.get("restorePurchase");
+    const ideaId = urlParams.get("ideaId");
+
+    if (restorePurchase === "true" && ideaId && !hasRestoredSession.current) {
+      // Load purchase context from sessionStorage
+      const stored = sessionStorage.getItem(PURCHASE_CONTEXT_KEY);
+      if (stored) {
+        try {
+          const context = JSON.parse(stored);
+          if (context.ideas && context.selectedIdeaIndex !== undefined) {
+            // Mark as restored to prevent running again
+            hasRestoredSession.current = true;
+
+            // Restore the ideas and selected idea
+            setIdeas(context.ideas as ExtendedIdea[]);
+            const selectedIdea = context.ideas[context.selectedIdeaIndex];
+            if (selectedIdea) {
+              setSelectedIdea(selectedIdea as ExtendedIdea);
+            }
+
+            // Navigate to deep dive (purchase modal will auto-show due to lack of access)
+            setCurrentStep("deep_dive");
+
+            // Clear the purchase context from sessionStorage
+            sessionStorage.removeItem(PURCHASE_CONTEXT_KEY);
+
+            // Clean up URL params
+            window.history.replaceState({}, "", "/builder");
+          }
+        } catch {
+          // Invalid JSON, ignore
+          sessionStorage.removeItem(PURCHASE_CONTEXT_KEY);
+        }
+      }
+    }
+  }, []); // Run once on mount
 
   // Step navigation logic - branching based on businessCategory
   const isSocialEnterprise = profile.businessCategory === "social_enterprise";

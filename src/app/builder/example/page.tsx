@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { FadeIn } from "@/components/ui";
 import LaunchChecklist from "@/components/results/LaunchChecklist";
@@ -9,6 +10,7 @@ import BusinessOverview from "@/components/results/BusinessOverview";
 import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
+import { PURCHASE_CONTEXT_KEY } from "@/components/PurchaseModal";
 import type {
   Idea,
   LaunchChecklistData,
@@ -641,7 +643,13 @@ function MockAIAdvisor({ messages }: { messages: AdvisorMessage[] }) {
 }
 
 // Example Banner Component
-function ExampleBanner() {
+interface ExampleBannerProps {
+  fromPurchase?: boolean;
+  ideaName?: string;
+  onCompletePurchase?: () => void;
+}
+
+function ExampleBanner({ fromPurchase, ideaName, onCompletePurchase }: ExampleBannerProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -654,7 +662,12 @@ function ExampleBanner() {
                 <span className="text-xl flex-shrink-0">📋</span>
                 <p className="text-warmwhite text-sm md:text-base">
                   <span className="font-medium">This is an example deep dive.</span>{" "}
-                  <span className="text-warmwhite-muted hidden sm:inline">See what you&apos;ll get for your own business idea.</span>
+                  <span className="text-warmwhite-muted hidden sm:inline">
+                    {fromPurchase
+                      ? `See what you'll get for "${ideaName}".`
+                      : "See what you'll get for your own business idea."
+                    }
+                  </span>
                 </p>
               </>
             )}
@@ -663,15 +676,27 @@ function ExampleBanner() {
             )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link
-              href="/builder"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-spark hover:bg-spark-light text-charcoal-dark font-semibold rounded-lg text-sm transition-all hover:scale-105"
-            >
-              Generate Your Deep Dive
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+            {fromPurchase && onCompletePurchase ? (
+              <button
+                onClick={onCompletePurchase}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-spark hover:bg-spark-light text-charcoal-dark font-semibold rounded-lg text-sm transition-all hover:scale-105"
+              >
+                Complete Purchase
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            ) : (
+              <Link
+                href="/builder"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-spark hover:bg-spark-light text-charcoal-dark font-semibold rounded-lg text-sm transition-all hover:scale-105"
+              >
+                Generate Your Deep Dive
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            )}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-1.5 text-warmwhite-muted hover:text-warmwhite transition-colors md:hidden"
@@ -688,10 +713,62 @@ function ExampleBanner() {
   );
 }
 
-// Main Example Page Component
+// Loading fallback for Suspense
+function ExampleLoading() {
+  return (
+    <div className="min-h-screen bg-charcoal-dark flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-2 border-spark border-t-transparent animate-spin" />
+    </div>
+  );
+}
+
+// Main wrapper with Suspense
 export default function ExampleDeepDivePage() {
+  return (
+    <Suspense fallback={<ExampleLoading />}>
+      <ExampleDeepDiveContent />
+    </Suspense>
+  );
+}
+
+// Example Page Content Component
+function ExampleDeepDiveContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("foundation");
   const [checklistProgress, setChecklistProgress] = useState<ChecklistProgress>({});
+  const [purchaseContext, setPurchaseContext] = useState<{
+    ideaName?: string;
+    ideaId?: string;
+  } | null>(null);
+
+  // Check if user came from purchase modal
+  const fromPurchase = searchParams.get("from") === "purchase";
+  const ideaIdParam = searchParams.get("ideaId");
+
+  // Load purchase context from sessionStorage
+  useEffect(() => {
+    if (fromPurchase && ideaIdParam) {
+      const stored = sessionStorage.getItem(PURCHASE_CONTEXT_KEY);
+      if (stored) {
+        try {
+          const context = JSON.parse(stored);
+          setPurchaseContext({
+            ideaName: context.ideaName,
+            ideaId: context.ideaId,
+          });
+        } catch {
+          // Invalid JSON, ignore
+        }
+      }
+    }
+  }, [fromPurchase, ideaIdParam]);
+
+  // Handle "Complete Purchase" - navigate back to builder with params
+  const handleCompletePurchase = useCallback(() => {
+    // Navigate to builder with param to restore state and open purchase modal
+    router.push(`/builder?restorePurchase=true&ideaId=${ideaIdParam}`);
+  }, [router, ideaIdParam]);
 
   // Handle checklist progress (local only, no persistence)
   const handleChecklistProgressChange = useCallback((itemId: string, checked: boolean) => {
@@ -706,7 +783,11 @@ export default function ExampleDeepDivePage() {
   return (
     <div className="min-h-screen bg-charcoal-dark">
       {/* Persistent Example Banner */}
-      <ExampleBanner />
+      <ExampleBanner
+        fromPurchase={fromPurchase}
+        ideaName={purchaseContext?.ideaName}
+        onCompletePurchase={handleCompletePurchase}
+      />
 
       {/* Header */}
       <div className="border-b border-warmwhite/10 bg-charcoal-dark/95 backdrop-blur-sm sticky top-[52px] md:top-[60px] z-40">
@@ -818,24 +899,49 @@ export default function ExampleDeepDivePage() {
       {/* Bottom CTA */}
       <div className="bg-charcoal-light border-t border-warmwhite/10 py-8 md:py-12">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-warmwhite mb-3">
-            Ready to get this for your business idea?
-          </h2>
-          <p className="text-warmwhite-muted mb-6 max-w-lg mx-auto">
-            Answer a few questions about your idea and we&apos;ll generate a complete deep dive tailored to your business and location.
-          </p>
-          <Link
-            href="/builder"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-spark to-accent text-charcoal-dark font-bold rounded-xl text-lg hover:opacity-90 transition-all hover:scale-105"
-          >
-            Generate Your Deep Dive
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
-          <p className="text-warmwhite-dim text-sm mt-4">
-            Free to start • No credit card required
-          </p>
+          {fromPurchase && purchaseContext?.ideaName ? (
+            <>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-warmwhite mb-3">
+                Ready to get this for &ldquo;{purchaseContext.ideaName}&rdquo;?
+              </h2>
+              <p className="text-warmwhite-muted mb-6 max-w-lg mx-auto">
+                You&apos;ll get market research, a launch checklist, growth plan, financial model, local resources, and AI advisor — all personalized to your business and location.
+              </p>
+              <button
+                onClick={handleCompletePurchase}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-spark to-accent text-charcoal-dark font-bold rounded-xl text-lg hover:opacity-90 transition-all hover:scale-105"
+              >
+                Complete Purchase
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+              <p className="text-warmwhite-dim text-sm mt-4">
+                One-time purchase • Instant access
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-warmwhite mb-3">
+                Ready to get this for your business idea?
+              </h2>
+              <p className="text-warmwhite-muted mb-6 max-w-lg mx-auto">
+                Answer a few questions about your idea and we&apos;ll generate a complete deep dive tailored to your business and location.
+              </p>
+              <Link
+                href="/builder"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-spark to-accent text-charcoal-dark font-bold rounded-xl text-lg hover:opacity-90 transition-all hover:scale-105"
+              >
+                Generate Your Deep Dive
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <p className="text-warmwhite-dim text-sm mt-4">
+                Free to start • No credit card required
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

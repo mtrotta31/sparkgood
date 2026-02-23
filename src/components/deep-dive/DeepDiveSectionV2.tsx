@@ -983,6 +983,8 @@ export default function DeepDiveSectionV2({
         ideaId={idea.id}
         ideaName={idea.name}
         purchaseType="deep_dive"
+        ideas={ideas}
+        selectedIdeaIndex={ideas.findIndex((i) => i.id === idea.id)}
         onBeforeRedirect={() => {
           savePendingSession({
             profile,
@@ -1001,6 +1003,8 @@ export default function DeepDiveSectionV2({
         ideaName={idea.name}
         purchaseType="launch_kit"
         hasDeepDive={hasUnlockedAccess}
+        ideas={ideas}
+        selectedIdeaIndex={ideas.findIndex((i) => i.id === idea.id)}
         onBeforeRedirect={() => {
           savePendingSession({
             profile,

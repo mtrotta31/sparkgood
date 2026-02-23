@@ -868,6 +868,8 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
         ideaId={idea.id}
         ideaName={idea.name}
         purchaseType="deep_dive"
+        ideas={ideas}
+        selectedIdeaIndex={ideas.findIndex((i) => i.id === idea.id)}
         onBeforeRedirect={() => {
           // Save session state before redirecting to Stripe
           savePendingSession({
@@ -887,6 +889,8 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
         ideaName={idea.name}
         purchaseType="launch_kit"
         hasDeepDive={hasUnlockedAccess}
+        ideas={ideas}
+        selectedIdeaIndex={ideas.findIndex((i) => i.id === idea.id)}
         onBeforeRedirect={() => {
           // Save session state before redirecting to Stripe
           savePendingSession({
