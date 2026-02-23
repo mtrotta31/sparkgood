@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button, FadeIn } from "@/components/ui";
 
 interface WelcomeProps {
@@ -39,6 +40,15 @@ export default function Welcome({ onNext }: WelcomeProps) {
         <p className="mt-6 md:mt-8 text-warmwhite-dim text-xs md:text-sm">
           Takes about 5 minutes • Free to start
         </p>
+      </FadeIn>
+
+      <FadeIn delay={1000} duration={600}>
+        <Link
+          href="/builder/example"
+          className="mt-4 text-spark/80 hover:text-spark text-sm transition-colors"
+        >
+          Or see what a deep dive looks like →
+        </Link>
       </FadeIn>
     </div>
   );

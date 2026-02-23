@@ -166,7 +166,7 @@ export default function PurchaseModal({
               disabled={loading}
               className="w-full py-3 px-4 font-medium rounded-xl
                 bg-spark text-charcoal hover:bg-spark-light transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                disabled:opacity-50 disabled:cursor-not-allowed mb-3"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -180,6 +180,16 @@ export default function PurchaseModal({
                 `Pay ${pricing.displayPrice}`
               )}
             </button>
+
+            {/* Example link */}
+            <div className="text-center mb-4">
+              <Link
+                href="/builder/example"
+                className="text-spark/80 hover:text-spark text-sm transition-colors"
+              >
+                Not sure? See a full example deep dive →
+              </Link>
+            </div>
           </>
         )}
 

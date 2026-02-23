@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { Button, FadeIn } from "@/components/ui";
 import { AuthModal } from "@/components/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -214,6 +215,14 @@ export default function IdeaList({
               Regenerate
             </button>{" "}
             for fresh concepts, or select an idea to refine it in the next step.
+          </p>
+          <p className="text-center mt-3">
+            <Link
+              href="/builder/example"
+              className="text-spark/80 hover:text-spark text-sm transition-colors"
+            >
+              See an example deep dive →
+            </Link>
           </p>
         </FadeIn>
       </div>
