@@ -20,12 +20,12 @@ const DIMENSIONS = {
   "facebook-cover": { width: 820, height: 312 },
 } as const;
 
-// Font loading - use local .otf files (satori only supports .ttf/.otf, not .woff2)
+// Font loading - use local .ttf files (satori only supports .ttf/.otf, not .woff2)
 function loadFonts(): ArrayBuffer[] {
   const fontsDir = join(process.cwd(), "src/lib/launch-kit/fonts");
 
-  const regularFont = readFileSync(join(fontsDir, "Inter-Regular.otf"));
-  const boldFont = readFileSync(join(fontsDir, "Inter-Bold.otf"));
+  const regularFont = readFileSync(join(fontsDir, "Inter-Regular.ttf"));
+  const boldFont = readFileSync(join(fontsDir, "Inter-Bold.ttf"));
 
   return [regularFont.buffer.slice(regularFont.byteOffset, regularFont.byteOffset + regularFont.byteLength), boldFont.buffer.slice(boldFont.byteOffset, boldFont.byteOffset + boldFont.byteLength)];
 }
