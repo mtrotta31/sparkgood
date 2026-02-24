@@ -246,8 +246,7 @@ function createInstagramPost(
               alignItems: "center",
               justifyContent: "center",
               padding: "80px",
-              zIndex: 10,
-            },
+                          },
             children: [
               // Business name
               {
@@ -432,8 +431,7 @@ function createInstagramStory(
               alignItems: "center",
               justifyContent: "center",
               padding: "80px",
-              zIndex: 10,
-              flex: 1,
+                            flex: 1,
             },
             children: [
               // Business name - in white on colored section
@@ -655,8 +653,7 @@ function createLinkedInPost(
               justifyContent: "center",
               padding: "50px 60px",
               maxWidth: "800px",
-              zIndex: 10,
-            },
+                          },
             children: [
               // Business name
               {
@@ -698,7 +695,6 @@ function createLinkedInPost(
                         padding: "12px 24px",
                         background: colors.primary,
                         borderRadius: "8px",
-                        width: "fit-content",
                       },
                       children: {
                         type: "div",
@@ -815,8 +811,7 @@ function createFacebookCover(
               display: "flex",
               flexDirection: "column",
               flex: 1,
-              zIndex: 10,
-            },
+                          },
             children: [
               // Business name
               {
@@ -858,8 +853,7 @@ function createFacebookCover(
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "flex-end",
-                  zIndex: 10,
-                },
+                                  },
                 children: [
                   {
                     type: "div",

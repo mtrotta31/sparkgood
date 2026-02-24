@@ -1,6 +1,7 @@
 // Business One-Pager PDF Generator for Launch Kit V2
 // Uses @react-pdf/renderer to create a single-page professional PDF
 
+import React from "react";
 import {
   Document,
   Page,
