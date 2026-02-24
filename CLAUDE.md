@@ -34,7 +34,12 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
   - **"Your Game Plan"** — Complete business/project plan with financials
   - **"Spread the Word"** — Marketing assets (pitch, social posts, email templates)
   - **"Start Here"** — Action roadmap with quick wins, phases, and matched real-world resources
-- **Launch Kit** — One-click generation of landing page HTML, social posts, email sequence
+- **Launch Kit V2** — Professional asset generation with 5 downloadable/shareable outputs:
+  - **Landing Page** (HTML) — Hosted at `/sites/[slug]`, uses mailto: links for CTAs
+  - **Pitch Deck** (PPTX) — 7-slide presentation with market data, financials, competitive landscape
+  - **Social Graphics** (PNG) — 4 platform-optimized images (Instagram Post/Story, LinkedIn, Facebook Cover)
+  - **One-Pager** (PDF) — Single-page business summary
+  - **Text Content** — Social posts, email templates, elevator pitch
 - **PDF Export** — Download complete plan as professional PDF
 - **My Projects** (`/projects`) — Dashboard to view and continue saved projects
 - **Individual Project Pages** (`/projects/[id]`) — View saved deep dive results
@@ -99,7 +104,8 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `POST /api/generate-ideas` — Generate 4 ideas from user profile (supports both paths)
 - `POST /api/deep-dive` — Generate viability, plan, marketing, or roadmap content
 - `POST /api/deep-dive/resources` — Match local resources to user's idea
-- `POST /api/launch-kit` — Generate complete launch kit
+- `POST /api/launch-kit` — Generate complete launch kit (legacy V1)
+- `POST /api/launch-kit/v2` — Generate Launch Kit V2 assets (pitch deck, social graphics, landing page, one-pager, text content)
 - `POST /api/build-asset` — Build specific assets (pitch deck, landing page, etc.)
 - `POST /api/export-pdf` — Generate downloadable PDF
 - `GET/POST /api/chat-advisor` — AI Advisor chat (GET: load messages, POST: send message with streaming response)
@@ -159,6 +165,13 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `BusinessPlan` — Mission, revenue streams, impact metrics
 - `MarketingAssets` — Social posts, email templates, landing page copy
 - `ActionRoadmap` — Quick wins, phases, matched resources
+
+### Launch Kit V2 Types (`src/lib/launch-kit/types.ts`)
+- `DeepDiveData` — Combined input for all generators (idea, profile, foundation, growth, financial, checklist, localResources)
+- `CategoryColors` — Color palette (primary, secondary, accent, background, text, textLight)
+- `BusinessOverview` — Extracted business info (name, tagline, problem, audience, howItWorks, differentiation, category, city, state)
+- `GeneratedGraphic` — Social graphic output (name, buffer, width, height, platform)
+- `LaunchKitAssets` — All generated assets with storage paths and URLs
 
 ## Database Schema
 
@@ -279,9 +292,10 @@ Located in `src/components/`:
   - `AIAdvisor.tsx` — Streaming chat UI with the AI business advisor
   - `IdeaList.tsx` — Displays generated ideas with "See an example" link
 - `deep-dive/` — Deep dive section components
-  - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (5 tabs)
+  - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (6 tabs + Launch Kit button)
   - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
-  - `LaunchKitModal.tsx` — Launch kit generation modal
+  - `LaunchKitModalV2.tsx` — Launch Kit V2 modal with 5 asset tabs (Landing Page, Pitch Deck, Social Graphics, One-Pager, Text Content)
+  - `LaunchKitModal.tsx` — Legacy V1 launch kit modal
   - `ConfirmDialog.tsx` — Regeneration confirmation
   - V1 view components: `ViabilityReport.tsx`, `BusinessPlanView.tsx`, etc.
 - `resources/` — Resource directory components (see below)
@@ -325,6 +339,7 @@ sparklocal/
 │   │   │   │   ├── page.tsx     # Handles both category and city-slug routes
 │   │   │   │   └── [location]/  # Category + location pages
 │   │   │   └── listing/[slug]/  # Individual listing pages
+│   │   ├── sites/[slug]/        # Hosted landing pages for Launch Kit
 │   │   ├── sitemap.ts           # Dynamic sitemap
 │   │   └── robots.ts            # Robots.txt
 │   ├── components/
@@ -349,9 +364,18 @@ sparklocal/
 │   │   ├── sessionState.ts      # Session persistence with migration
 │   │   ├── supabase.ts          # Supabase client
 │   │   ├── stripe.ts            # Stripe utilities
+│   │   ├── claude.ts            # Claude API wrapper with retry logic
 │   │   ├── format-amount.ts     # Currency formatting ($5M, $25K, etc.)
 │   │   ├── format-description.ts # Clean up listing descriptions
 │   │   ├── formatHours.ts       # Parse hours JSONB to readable format
+│   │   ├── launch-kit/          # Launch Kit V2 generators
+│   │   │   ├── index.ts         # Main exports
+│   │   │   ├── types.ts         # DeepDiveData, CategoryColors, helpers
+│   │   │   ├── generate-pitch-deck.ts    # 7-slide PPTX generation
+│   │   │   ├── generate-social-graphics.ts # 4 PNG graphics via satori
+│   │   │   ├── generate-landing-page.ts  # Claude-generated HTML
+│   │   │   ├── generate-one-pager.ts     # PDF via @react-pdf/renderer
+│   │   │   └── fonts/           # Inter font files for satori
 │   │   └── ...
 │   ├── prompts/                 # AI prompt templates
 │   │   ├── idea-generation.ts   # Supports both business paths
@@ -398,11 +422,44 @@ Parse hours JSONB from database into readable format:
 Clean up listing descriptions by removing boilerplate text.
 
 ### `claude.ts`
-Claude API wrapper with JSON handling:
+Claude API wrapper with JSON handling and rate limit resilience:
 - `sendMessage(prompt, options)` — Send message to Claude, get text response
 - `sendMessageForJSON<T>(prompt, options)` — Send message, parse JSON response with automatic snake_case to camelCase conversion
 - `extractJSON(response)` — Extract JSON from Claude response (handles markdown code blocks, extra text)
 - Automatic key conversion ensures Claude's snake_case responses match TypeScript camelCase types
+- **Rate Limit Retry:** Set `retryOnRateLimit: true` in options to automatically retry once after 10s on 429 errors
+
+### `launch-kit/types.ts`
+Launch Kit V2 type definitions and helpers:
+- `DeepDiveData` — Combined data from all deep dive tabs (idea, profile, foundation, growth, financial, checklist, localResources)
+- `CategoryColors` — Color palette based on business category (primary, secondary, accent, background, text)
+- `getCategoryColors(category)` — Returns appropriate colors for each business category
+- `extractBusinessOverview(data)` — Extracts key business info (name, tagline, problem, audience, etc.)
+- `formatCurrency(amount)` — Format numbers as currency ($1,234)
+- `parseCurrency(value)` — Parse currency strings to numbers (handles "$1,234", "1234", etc.)
+- `generateSlug(name)` — Generate URL-safe slug from business name
+
+### `launch-kit/generate-pitch-deck.ts`
+Generates 7-slide PPTX presentation using pptxgenjs:
+- Slide 1: Cover (business name, tagline, location)
+- Slide 2: The Opportunity (problem, audience, TAM/SAM/SOM)
+- Slide 3: The Solution (description, differentiation, benefits)
+- Slide 4: Market Validation (viability score, breakdown table, trends)
+- Slide 5: Competitive Landscape (competitor table, positioning)
+- Slide 6: Financial Projections (startup costs, revenue, break-even)
+- Slide 7: Next Steps (funding needs, 4-week timeline)
+- **Smart number formatting:** `formatMarketSize()` converts "$8.99 billion" → "$8.99B"
+- **Word-boundary truncation:** Text truncation never cuts mid-word
+
+### `launch-kit/generate-social-graphics.ts`
+Generates 4 PNG graphics using satori + @resvg/resvg-js:
+- Instagram Post (1080×1080) — Square format
+- Instagram Story (1080×1920) — Vertical format
+- LinkedIn Post (1200×627) — Landscape format
+- Facebook Cover (820×312) — Wide banner
+- **Category-aware colors:** Uses business category for color palette
+- **Responsive font sizing:** Adjusts based on business name length (handles 20+ chars)
+- **No text clipping:** Decorative elements positioned away from text areas
 
 ## Development Commands
 
@@ -451,7 +508,9 @@ The core product is fully functional with payments:
 - ✅ Deep Dive V2 (6 tabs: Foundation, Checklist, Growth, Financial, Local Resources, AI Advisor)
 - ✅ Deep Dive V1 (legacy support for existing projects)
 - ✅ Auto-save deep dive content with proper JSON key conversion
-- ✅ Launch kit generation with payment gates
+- ✅ Launch Kit V2 with 5 professional assets (pitch deck, social graphics, landing page, one-pager, text content)
+- ✅ Hosted landing pages at `/sites/[slug]`
+- ✅ Rate limit resilience with partial results pattern
 - ✅ PDF export
 - ✅ User auth & saved projects
 - ✅ Resource directory with SEO (2,400+ listings)
@@ -525,6 +584,22 @@ The core product is fully functional with payments:
 - Checks `user_credits.subscription_tier` and `subscription_status` before enforcing limit
 - Shows "Unlimited messages" badge for active subscribers, "X of 20 messages" for others
 - Friendly upgrade prompt when limit reached with CTA to pricing page
+
+### Launch Kit V2
+- **API Route:** `POST /api/launch-kit/v2` generates all 5 assets in parallel
+- **Rate Limit Resilience:** Each asset generator wrapped in try/catch; returns partial results if some fail
+- **Failed Assets Tracking:** Response includes `failedAssets` array; modal shows per-tab error messages
+- **Storage:** Assets uploaded to Supabase Storage bucket `launch-kit-assets/{userId}/{ideaId}/`
+- **Landing Page Hosting:** HTML stored in storage and served at `/sites/[slug]` route
+- **Color System:** Uses `getCategoryColors()` from `launch-kit/types.ts` for category-aware styling
+- **Generators:**
+  - `generatePitchDeck()` — pptxgenjs, returns Buffer
+  - `generateSocialGraphics()` — satori + resvg, returns array of PNG Buffers
+  - `generateLandingPage()` — Claude API, returns HTML string
+  - `generateOnePager()` — @react-pdf/renderer, returns Buffer
+  - `generateTextContent()` — Claude API, returns LaunchKit JSON (social posts, emails, pitch)
+- **Button Gating:** Launch Kit button disabled until all 5 deep dive tabs are complete
+- **mailto: Links:** Landing pages use `mailto:{userEmail}` instead of forms
 
 ### Example Deep Dive & Purchase Flow
 - `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
