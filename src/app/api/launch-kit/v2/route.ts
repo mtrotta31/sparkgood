@@ -3,7 +3,7 @@
 // landing page (HTML), one-pager (PDF), and text content
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { hasDeepDiveAccess, hasLaunchKitAccess, type SubscriptionTier } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import {
@@ -179,22 +179,44 @@ export async function POST(request: NextRequest) {
     const storagePath = `${storageId}`;
 
     // Generate all assets in parallel
+    console.log("[Launch Kit V2] Starting asset generation...");
+
     const [textContent, pitchDeckBuffer, socialGraphics, onePagerBuffer, landingPageHtml] = await Promise.all([
       // Generate text content
       anthropicKey
         ? generateTextContent(idea, profile)
         : getMockTextContent(idea),
       // Generate pitch deck PPTX
-      generatePitchDeck(deepDiveData),
+      generatePitchDeck(deepDiveData).catch(err => {
+        console.error("[Launch Kit V2] Pitch deck generation failed:", err);
+        return null;
+      }),
       // Generate social media graphics
-      generateSocialGraphics(deepDiveData),
+      generateSocialGraphics(deepDiveData).catch(err => {
+        console.error("[Launch Kit V2] Social graphics generation failed:", err);
+        return [];
+      }),
       // Generate one-pager PDF
-      generateOnePager(deepDiveData),
+      generateOnePager(deepDiveData).catch(err => {
+        console.error("[Launch Kit V2] One-pager generation failed:", err);
+        return null;
+      }),
       // Generate landing page HTML
       anthropicKey
-        ? generateLandingPage(deepDiveData)
+        ? generateLandingPage(deepDiveData).catch(err => {
+            console.error("[Launch Kit V2] Landing page generation failed:", err);
+            return null;
+          })
         : getMockLandingPageHtml(idea),
     ]);
+
+    console.log("[Launch Kit V2] Asset generation complete:", {
+      hasTextContent: !!textContent,
+      hasPitchDeck: !!pitchDeckBuffer,
+      socialGraphicsCount: socialGraphics?.length || 0,
+      hasOnePager: !!onePagerBuffer,
+      hasLandingPage: !!landingPageHtml,
+    });
 
     // Initialize assets record
     const assets: LaunchKitAssets = {
@@ -203,104 +225,139 @@ export async function POST(request: NextRequest) {
 
     const downloadUrls: LaunchKitV2Response["downloadUrls"] = {};
 
-    // Upload pitch deck
-    const pitchDeckPath = `${storagePath}/pitch-deck.pptx`;
-    const { error: pitchDeckError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(pitchDeckPath, pitchDeckBuffer, {
-        contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        upsert: true,
-      });
+    console.log("[Launch Kit V2] Starting uploads to bucket:", STORAGE_BUCKET);
 
-    if (!pitchDeckError) {
-      const { data: pitchDeckUrl } = supabase.storage
+    // Use service role client for storage uploads (bypasses RLS)
+    const storageClient = createServiceRoleClient();
+
+    // Upload pitch deck
+    if (pitchDeckBuffer) {
+      const pitchDeckPath = `${storagePath}/pitch-deck.pptx`;
+      console.log("[Launch Kit V2] Uploading pitch deck to:", pitchDeckPath);
+
+      const { error: pitchDeckError } = await storageClient.storage
         .from(STORAGE_BUCKET)
-        .getPublicUrl(pitchDeckPath);
-      assets.pitchDeck = { storagePath: pitchDeckPath, url: pitchDeckUrl.publicUrl };
-      downloadUrls.pitchDeck = pitchDeckUrl.publicUrl;
+        .upload(pitchDeckPath, pitchDeckBuffer, {
+          contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          upsert: true,
+        });
+
+      if (!pitchDeckError) {
+        const { data: pitchDeckUrl } = storageClient.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(pitchDeckPath);
+        assets.pitchDeck = { storagePath: pitchDeckPath, url: pitchDeckUrl.publicUrl };
+        downloadUrls.pitchDeck = pitchDeckUrl.publicUrl;
+        console.log("[Launch Kit V2] Pitch deck uploaded successfully:", pitchDeckUrl.publicUrl);
+      } else {
+        console.error("[Launch Kit V2] Error uploading pitch deck:", pitchDeckError);
+      }
     } else {
-      console.error("Error uploading pitch deck:", pitchDeckError);
+      console.log("[Launch Kit V2] Skipping pitch deck upload - no buffer generated");
     }
 
     // Upload one-pager PDF
-    const onePagerPath = `${storagePath}/one-pager.pdf`;
-    const { error: onePagerError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(onePagerPath, onePagerBuffer, {
-        contentType: "application/pdf",
-        upsert: true,
-      });
+    if (onePagerBuffer) {
+      const onePagerPath = `${storagePath}/one-pager.pdf`;
+      console.log("[Launch Kit V2] Uploading one-pager to:", onePagerPath);
 
-    if (!onePagerError) {
-      const { data: onePagerUrl } = supabase.storage
+      const { error: onePagerError } = await storageClient.storage
         .from(STORAGE_BUCKET)
-        .getPublicUrl(onePagerPath);
-      assets.onePager = { storagePath: onePagerPath, url: onePagerUrl.publicUrl };
-      downloadUrls.onePager = onePagerUrl.publicUrl;
+        .upload(onePagerPath, onePagerBuffer, {
+          contentType: "application/pdf",
+          upsert: true,
+        });
+
+      if (!onePagerError) {
+        const { data: onePagerUrl } = storageClient.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(onePagerPath);
+        assets.onePager = { storagePath: onePagerPath, url: onePagerUrl.publicUrl };
+        downloadUrls.onePager = onePagerUrl.publicUrl;
+        console.log("[Launch Kit V2] One-pager uploaded successfully:", onePagerUrl.publicUrl);
+      } else {
+        console.error("[Launch Kit V2] Error uploading one-pager:", onePagerError);
+      }
     } else {
-      console.error("Error uploading one-pager:", onePagerError);
+      console.log("[Launch Kit V2] Skipping one-pager upload - no buffer generated");
     }
 
     // Upload landing page HTML
-    const landingPagePath = `${storagePath}/landing-page.html`;
-    const { error: landingPageError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(landingPagePath, landingPageHtml, {
-        contentType: "text/html",
-        upsert: true,
-      });
+    if (landingPageHtml) {
+      const landingPagePath = `${storagePath}/landing-page.html`;
+      console.log("[Launch Kit V2] Uploading landing page to:", landingPagePath);
 
-    if (!landingPageError) {
-      const { data: landingPageUrl } = supabase.storage
+      const { error: landingPageError } = await storageClient.storage
         .from(STORAGE_BUCKET)
-        .getPublicUrl(landingPagePath);
-      const hostedUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://sparklocal.co"}/sites/${slug}`;
-      assets.landingPage = {
-        slug,
-        url: landingPageUrl.publicUrl, // Download URL for the HTML file
-        hostedUrl, // Hosted page URL
-        storagePath: landingPagePath,
-      };
-      downloadUrls.landingPage = landingPageUrl.publicUrl;
+        .upload(landingPagePath, landingPageHtml, {
+          contentType: "text/html",
+          upsert: true,
+        });
+
+      if (!landingPageError) {
+        const { data: landingPageUrl } = storageClient.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(landingPagePath);
+        const hostedUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://sparklocal.co"}/sites/${slug}`;
+        assets.landingPage = {
+          slug,
+          url: landingPageUrl.publicUrl, // Download URL for the HTML file
+          hostedUrl, // Hosted page URL
+          storagePath: landingPagePath,
+        };
+        downloadUrls.landingPage = landingPageUrl.publicUrl;
+        console.log("[Launch Kit V2] Landing page uploaded successfully:", landingPageUrl.publicUrl);
+      } else {
+        console.error("[Launch Kit V2] Error uploading landing page:", landingPageError);
+      }
     } else {
-      console.error("Error uploading landing page:", landingPageError);
+      console.log("[Launch Kit V2] Skipping landing page upload - no HTML generated");
     }
 
     // Upload social graphics
     assets.socialGraphics = {};
     downloadUrls.socialGraphics = {};
 
-    for (const graphic of socialGraphics) {
-      const graphicPath = `${storagePath}/${graphic.name}`;
-      const { error: graphicError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .upload(graphicPath, graphic.buffer, {
-          contentType: "image/png",
-          upsert: true,
-        });
+    if (socialGraphics && socialGraphics.length > 0) {
+      console.log(`[Launch Kit V2] Uploading ${socialGraphics.length} social graphics...`);
 
-      if (!graphicError) {
-        const keyMap: Record<string, keyof NonNullable<LaunchKitAssets["socialGraphics"]>> = {
-          "instagram-post": "instagramPost",
-          "instagram-story": "instagramStory",
-          "linkedin-post": "linkedinPost",
-          "facebook-cover": "facebookCover",
-        };
+      for (const graphic of socialGraphics) {
+        const graphicPath = `${storagePath}/${graphic.name}`;
+        console.log(`[Launch Kit V2] Uploading ${graphic.platform} graphic to:`, graphicPath);
 
-        const assetKey = keyMap[graphic.platform];
-        if (assetKey) {
-          const { data: graphicUrl } = supabase.storage
-            .from(STORAGE_BUCKET)
-            .getPublicUrl(graphicPath);
-          assets.socialGraphics[assetKey] = {
-            storagePath: graphicPath,
-            url: graphicUrl.publicUrl,
+        const { error: graphicError } = await storageClient.storage
+          .from(STORAGE_BUCKET)
+          .upload(graphicPath, graphic.buffer, {
+            contentType: "image/png",
+            upsert: true,
+          });
+
+        if (!graphicError) {
+          const keyMap: Record<string, keyof NonNullable<LaunchKitAssets["socialGraphics"]>> = {
+            "instagram-post": "instagramPost",
+            "instagram-story": "instagramStory",
+            "linkedin-post": "linkedinPost",
+            "facebook-cover": "facebookCover",
           };
-          downloadUrls.socialGraphics![assetKey] = graphicUrl.publicUrl;
+
+          const assetKey = keyMap[graphic.platform];
+          if (assetKey) {
+            const { data: graphicUrl } = storageClient.storage
+              .from(STORAGE_BUCKET)
+              .getPublicUrl(graphicPath);
+            assets.socialGraphics[assetKey] = {
+              storagePath: graphicPath,
+              url: graphicUrl.publicUrl,
+            };
+            downloadUrls.socialGraphics![assetKey] = graphicUrl.publicUrl;
+            console.log(`[Launch Kit V2] ${graphic.platform} uploaded successfully`);
+          }
+        } else {
+          console.error(`[Launch Kit V2] Error uploading ${graphic.name}:`, graphicError);
         }
-      } else {
-        console.error(`Error uploading ${graphic.name}:`, graphicError);
       }
+    } else {
+      console.log("[Launch Kit V2] Skipping social graphics upload - no graphics generated");
     }
 
     // Save asset references to database (only if we have a savedIdeaId)
@@ -310,6 +367,13 @@ export async function POST(request: NextRequest) {
         .update({ launch_kit_assets: assets })
         .eq("idea_id", savedIdeaId);
     }
+
+    console.log("[Launch Kit V2] Final assets:", {
+      pitchDeck: !!assets.pitchDeck,
+      onePager: !!assets.onePager,
+      landingPage: !!assets.landingPage,
+      socialGraphics: Object.keys(assets.socialGraphics || {}),
+    });
 
     return NextResponse.json<ApiResponse<LaunchKitV2Response>>({
       success: true,
