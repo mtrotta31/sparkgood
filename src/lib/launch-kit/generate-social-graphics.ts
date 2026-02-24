@@ -137,7 +137,8 @@ function createGraphicElement(
   }
 }
 
-// Instagram Post (1080×1080) - Square format with diagonal split design
+// Instagram Post (1080×1080) - Square format with clean gradient design
+// Text is always on a solid background to prevent clipping
 function createInstagramPost(
   overview: ReturnType<typeof extractBusinessOverview>,
   colors: CategoryColors,
@@ -146,6 +147,10 @@ function createInstagramPost(
 ): SatoriElement {
   const location = overview.city && overview.state ? `${overview.city}, ${overview.state}` : "";
   const cta = getCTA(overview.category);
+
+  // Calculate responsive font size based on business name length
+  const nameLength = overview.name.length;
+  const nameFontSize = nameLength > 20 ? 48 : nameLength > 15 ? 56 : 64;
 
   return {
     type: "div",
@@ -156,39 +161,25 @@ function createInstagramPost(
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        background: colors.background,
+        justifyContent: "flex-end",
+        background: `linear-gradient(180deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
         fontFamily: "Inter",
         position: "relative",
         overflow: "hidden",
       },
       children: [
-        // Diagonal colored panel (top-left triangle)
+        // Decorative elements in corners only (away from text)
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary} 45%, transparent 45%)`,
-            },
-          },
-        },
-        // Decorative geometric shapes
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "60px",
-              left: "60px",
-              width: "120px",
-              height: "120px",
+              top: "40px",
+              left: "40px",
+              width: "100px",
+              height: "100px",
               borderRadius: "50%",
-              border: "4px solid rgba(255,255,255,0.3)",
+              border: "4px solid rgba(255,255,255,0.2)",
             },
           },
         },
@@ -197,11 +188,11 @@ function createInstagramPost(
           props: {
             style: {
               position: "absolute",
-              top: "200px",
-              left: "160px",
+              top: "80px",
+              right: "60px",
               width: "60px",
               height: "60px",
-              background: colors.accent,
+              background: "rgba(255,255,255,0.15)",
               transform: "rotate(45deg)",
             },
           },
@@ -211,56 +202,48 @@ function createInstagramPost(
           props: {
             style: {
               position: "absolute",
-              bottom: "100px",
-              right: "80px",
-              width: "180px",
-              height: "180px",
+              top: "180px",
+              left: "120px",
+              width: "24px",
+              height: "24px",
               borderRadius: "50%",
-              border: `6px solid ${colors.primary}`,
-              opacity: 0.3,
+              background: colors.accent,
             },
           },
         },
-        // Small accent dots
+        // Main content area - positioned in bottom portion on solid background
         {
           type: "div",
           props: {
             style: {
-              position: "absolute",
-              bottom: "200px",
-              right: "200px",
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              background: colors.secondary,
-            },
-          },
-        },
-        // Main content container
-        {
-          type: "div",
-          props: {
-            style: {
+              width: "100%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              padding: "80px",
-                          },
+              padding: "60px",
+              paddingTop: "80px",
+              paddingBottom: "80px",
+              background: colors.background,
+              borderTopLeftRadius: "40px",
+              borderTopRightRadius: "40px",
+            },
             children: [
-              // Business name
+              // Business name - fully visible with responsive sizing
               {
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "68px",
+                    fontSize: `${nameFontSize}px`,
                     fontWeight: 700,
                     color: colors.text,
                     textAlign: "center",
-                    lineHeight: 1.1,
-                    marginBottom: "28px",
+                    lineHeight: 1.2,
+                    marginBottom: "20px",
+                    maxWidth: "900px",
+                    wordWrap: "break-word",
                   },
-                  children: truncateText(overview.name, 30),
+                  children: overview.name,
                 },
               },
               // Tagline
@@ -268,15 +251,15 @@ function createInstagramPost(
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "28px",
+                    fontSize: "24px",
                     fontWeight: 400,
                     color: colors.textLight,
                     textAlign: "center",
-                    maxWidth: "700px",
-                    marginBottom: "40px",
+                    maxWidth: "800px",
+                    marginBottom: "36px",
                     lineHeight: 1.4,
                   },
-                  children: truncateText(overview.tagline, 80),
+                  children: truncateText(overview.tagline, 100),
                 },
               },
               // CTA Badge
@@ -287,16 +270,16 @@ function createInstagramPost(
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "18px 48px",
+                    padding: "16px 44px",
                     background: colors.primary,
                     borderRadius: "50px",
-                    marginBottom: "28px",
+                    marginBottom: "24px",
                   },
                   children: {
                     type: "div",
                     props: {
                       style: {
-                        fontSize: "26px",
+                        fontSize: "22px",
                         fontWeight: 700,
                         color: "#FFFFFF",
                       },
@@ -311,7 +294,7 @@ function createInstagramPost(
                     type: "div",
                     props: {
                       style: {
-                        fontSize: "22px",
+                        fontSize: "20px",
                         fontWeight: 500,
                         color: colors.textLight,
                         display: "flex",
@@ -329,14 +312,26 @@ function createInstagramPost(
   };
 }
 
-// Helper to truncate text for graphics
+// Helper to truncate text for graphics - truncate at word boundaries
 function truncateText(text: string | undefined | null, maxLength: number): string {
   if (!text) return "";
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + "...";
+
+  // Find the last space before maxLength
+  const truncated = text.substring(0, maxLength - 3);
+  const lastSpace = truncated.lastIndexOf(" ");
+
+  // If there's a space and it's not too far back, truncate at the word boundary
+  if (lastSpace > maxLength * 0.5) {
+    return truncated.substring(0, lastSpace) + "...";
+  }
+
+  // Otherwise just truncate (for single long words)
+  return truncated + "...";
 }
 
-// Instagram Story (1080×1920) - Vertical format with wave design
+// Instagram Story (1080×1920) - Vertical format with clean sections
+// Text is on solid backgrounds, decorations in corners
 function createInstagramStory(
   overview: ReturnType<typeof extractBusinessOverview>,
   colors: CategoryColors,
@@ -344,6 +339,10 @@ function createInstagramStory(
   _height: number
 ): SatoriElement {
   const location = overview.city && overview.state ? `${overview.city}, ${overview.state}` : "";
+
+  // Calculate responsive font size based on business name length
+  const nameLength = overview.name.length;
+  const nameFontSize = nameLength > 20 ? 56 : nameLength > 15 ? 64 : 72;
 
   return {
     type: "div",
@@ -354,113 +353,93 @@ function createInstagramStory(
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         background: colors.background,
         fontFamily: "Inter",
         position: "relative",
         overflow: "hidden",
       },
       children: [
-        // Top colored wave section
+        // Top colored section with business name
         {
           type: "div",
           props: {
             style: {
-              position: "absolute",
-              top: 0,
-              left: 0,
               width: "100%",
-              height: "45%",
-              background: `linear-gradient(180deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
-              borderBottomLeftRadius: "50% 80px",
-              borderBottomRightRadius: "50% 80px",
-            },
-          },
-        },
-        // Decorative circles on colored section
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "100px",
-              right: "60px",
-              width: "160px",
-              height: "160px",
-              borderRadius: "50%",
-              border: "4px solid rgba(255,255,255,0.2)",
-            },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "200px",
-              left: "80px",
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.15)",
-            },
-          },
-        },
-        // Small geometric accent
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "320px",
-              right: "150px",
-              width: "40px",
-              height: "40px",
-              background: colors.accent,
-              transform: "rotate(45deg)",
-            },
-          },
-        },
-        // Main content container
-        {
-          type: "div",
-          props: {
-            style: {
+              height: "40%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              padding: "80px",
-                            flex: 1,
+              background: `linear-gradient(180deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+              padding: "60px",
+              position: "relative",
             },
             children: [
-              // Business name - in white on colored section
+              // Decorative circles in top corners
               {
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "72px",
+                    position: "absolute",
+                    top: "60px",
+                    right: "40px",
+                    width: "120px",
+                    height: "120px",
+                    borderRadius: "50%",
+                    border: "4px solid rgba(255,255,255,0.2)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "140px",
+                    left: "50px",
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.15)",
+                  },
+                },
+              },
+              // Business name - fully visible
+              {
+                type: "div",
+                props: {
+                  style: {
+                    fontSize: `${nameFontSize}px`,
                     fontWeight: 700,
                     color: "#FFFFFF",
                     textAlign: "center",
-                    lineHeight: 1.1,
-                    marginBottom: "24px",
-                    marginTop: "-200px",
+                    lineHeight: 1.2,
                     textShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                    maxWidth: "900px",
+                    wordWrap: "break-word",
                   },
-                  children: truncateText(overview.name, 25),
+                  children: overview.name,
                 },
               },
-              // Spacer to push content to light section
-              {
-                type: "div",
-                props: {
-                  style: {
-                    height: "180px",
-                  },
-                },
-              },
-              // Tagline - in colored text on light section
+            ],
+          },
+        },
+        // Middle content section on light background
+        {
+          type: "div",
+          props: {
+            style: {
+              flex: 1,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "60px",
+            },
+            children: [
+              // Tagline
               {
                 type: "div",
                 props: {
@@ -485,7 +464,6 @@ function createInstagramStory(
                         fontSize: "26px",
                         fontWeight: 500,
                         color: colors.textLight,
-                        marginBottom: "60px",
                       },
                       children: `📍 ${location}`,
                     },
@@ -499,11 +477,11 @@ function createInstagramStory(
           type: "div",
           props: {
             style: {
-              position: "absolute",
-              bottom: "100px",
+              width: "100%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              paddingBottom: "100px",
             },
             children: [
               {
@@ -550,7 +528,8 @@ function createInstagramStory(
   };
 }
 
-// LinkedIn Post (1200×627) - Professional landscape with geometric design
+// LinkedIn Post (1200×627) - Professional landscape with clean design
+// Text on left side with solid background, accent on right edge
 function createLinkedInPost(
   overview: ReturnType<typeof extractBusinessOverview>,
   colors: CategoryColors,
@@ -558,6 +537,10 @@ function createLinkedInPost(
   _height: number
 ): SatoriElement {
   const location = overview.city && overview.state ? `${overview.city}, ${overview.state}` : "";
+
+  // Calculate responsive font size based on business name length
+  const nameLength = overview.name.length;
+  const nameFontSize = nameLength > 25 ? 40 : nameLength > 18 ? 46 : 52;
 
   return {
     type: "div",
@@ -584,65 +567,7 @@ function createLinkedInPost(
             },
           },
         },
-        // Decorative angled shape on right
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              right: 0,
-              top: 0,
-              width: "350px",
-              height: "100%",
-              background: `linear-gradient(135deg, transparent 0%, ${colors.primary} 0%)`,
-              clipPath: "polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            },
-          },
-        },
-        // Geometric decorations on colored area
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              right: "80px",
-              top: "60px",
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-              border: "4px solid rgba(255,255,255,0.25)",
-            },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              right: "160px",
-              bottom: "80px",
-              width: "60px",
-              height: "60px",
-              background: "rgba(255,255,255,0.15)",
-              transform: "rotate(45deg)",
-            },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              right: "40px",
-              bottom: "120px",
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              background: colors.accent,
-            },
-          },
-        },
-        // Main content area
+        // Main content area - takes most of the width
         {
           type: "div",
           props: {
@@ -652,21 +577,22 @@ function createLinkedInPost(
               flexDirection: "column",
               justifyContent: "center",
               padding: "50px 60px",
-              maxWidth: "800px",
-                          },
+              maxWidth: "750px",
+            },
             children: [
-              // Business name
+              // Business name - fully visible with responsive sizing
               {
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "52px",
+                    fontSize: `${nameFontSize}px`,
                     fontWeight: 700,
                     color: colors.text,
                     marginBottom: "16px",
-                    lineHeight: 1.1,
+                    lineHeight: 1.2,
+                    wordWrap: "break-word",
                   },
-                  children: truncateText(overview.name, 35),
+                  children: overview.name,
                 },
               },
               // One-line description
@@ -674,14 +600,14 @@ function createLinkedInPost(
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "24px",
+                    fontSize: "22px",
                     fontWeight: 400,
                     color: colors.textLight,
                     marginBottom: "28px",
-                    maxWidth: "650px",
+                    maxWidth: "600px",
                     lineHeight: 1.4,
                   },
-                  children: truncateText(overview.tagline, 90),
+                  children: truncateText(overview.tagline, 100),
                 },
               },
               // Launching in location badge
@@ -700,7 +626,7 @@ function createLinkedInPost(
                         type: "div",
                         props: {
                           style: {
-                            fontSize: "20px",
+                            fontSize: "18px",
                             fontWeight: 600,
                             color: "#FFFFFF",
                           },
@@ -713,12 +639,70 @@ function createLinkedInPost(
             ].filter(Boolean),
           },
         },
+        // Right accent panel with decorations (no text overlap)
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "280px",
+              height: "100%",
+              background: `linear-gradient(180deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
+              position: "relative",
+            },
+            children: [
+              // Decorative elements within the accent panel
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    right: "40px",
+                    top: "60px",
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    border: "4px solid rgba(255,255,255,0.25)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    left: "60px",
+                    bottom: "80px",
+                    width: "50px",
+                    height: "50px",
+                    background: "rgba(255,255,255,0.15)",
+                    transform: "rotate(45deg)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    right: "80px",
+                    bottom: "140px",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    background: colors.accent,
+                  },
+                },
+              },
+            ],
+          },
+        },
       ],
     },
   };
 }
 
-// Facebook Cover (820×312) - Wide banner with gradient wave design
+// Facebook Cover (820×312) - Wide banner with clean gradient
+// Text on solid background, decorations at edges only
 function createFacebookCover(
   overview: ReturnType<typeof extractBusinessOverview>,
   colors: CategoryColors,
@@ -726,6 +710,10 @@ function createFacebookCover(
   _height: number
 ): SatoriElement {
   const location = overview.city && overview.state ? `${overview.city}, ${overview.state}` : "";
+
+  // Calculate responsive font size based on business name length
+  const nameLength = overview.name.length;
+  const nameFontSize = nameLength > 25 ? 32 : nameLength > 18 ? 36 : 40;
 
   return {
     type: "div",
@@ -737,23 +725,23 @@ function createFacebookCover(
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 60%, ${colors.primary} 100%)`,
+        background: `linear-gradient(90deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
         fontFamily: "Inter",
         padding: "30px 50px",
         position: "relative",
         overflow: "hidden",
       },
       children: [
-        // Decorative wave shapes
+        // Decorative elements at edges only (away from text)
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              bottom: "-60px",
-              left: "-40px",
-              width: "200px",
-              height: "200px",
+              bottom: "-50px",
+              left: "-30px",
+              width: "140px",
+              height: "140px",
               borderRadius: "50%",
               background: "rgba(255,255,255,0.08)",
             },
@@ -764,46 +752,31 @@ function createFacebookCover(
           props: {
             style: {
               position: "absolute",
-              top: "-40px",
-              right: "200px",
-              width: "120px",
-              height: "120px",
+              top: "-30px",
+              right: "40px",
+              width: "80px",
+              height: "80px",
               borderRadius: "50%",
               border: "3px solid rgba(255,255,255,0.15)",
             },
           },
         },
-        // Small accent squares
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              top: "40px",
-              right: "350px",
-              width: "25px",
-              height: "25px",
+              bottom: "30px",
+              right: "60px",
+              width: "20px",
+              height: "20px",
               background: colors.accent,
               transform: "rotate(45deg)",
               opacity: 0.6,
             },
           },
         },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              bottom: "50px",
-              right: "150px",
-              width: "15px",
-              height: "15px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.3)",
-            },
-          },
-        },
-        // Left content
+        // Left content - business name and tagline
         {
           type: "div",
           props: {
@@ -811,20 +784,23 @@ function createFacebookCover(
               display: "flex",
               flexDirection: "column",
               flex: 1,
-                          },
+              maxWidth: "550px",
+            },
             children: [
-              // Business name
+              // Business name - fully visible with responsive sizing
               {
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "40px",
+                    fontSize: `${nameFontSize}px`,
                     fontWeight: 700,
                     color: "#FFFFFF",
                     marginBottom: "10px",
                     textShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    lineHeight: 1.2,
+                    wordWrap: "break-word",
                   },
-                  children: truncateText(overview.name, 30),
+                  children: overview.name,
                 },
               },
               // Tagline
@@ -832,13 +808,13 @@ function createFacebookCover(
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "18px",
+                    fontSize: "16px",
                     fontWeight: 400,
                     color: "rgba(255,255,255,0.9)",
                     maxWidth: "450px",
                     lineHeight: 1.3,
                   },
-                  children: truncateText(overview.tagline, 70),
+                  children: truncateText(overview.tagline, 80),
                 },
               },
             ],
@@ -853,7 +829,7 @@ function createFacebookCover(
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "flex-end",
-                                  },
+                },
                 children: [
                   {
                     type: "div",
@@ -869,7 +845,7 @@ function createFacebookCover(
                         type: "div",
                         props: {
                           style: {
-                            fontSize: "18px",
+                            fontSize: "16px",
                             fontWeight: 600,
                             color: "#FFFFFF",
                           },

@@ -5,6 +5,10 @@ import { sendMessage } from "@/lib/claude";
 import type { DeepDiveData } from "./types";
 import { getCategoryColors, extractBusinessOverview } from "./types";
 
+export interface LandingPageOptions {
+  userEmail?: string; // User's email for contact mailto: link
+}
+
 const LANDING_PAGE_SYSTEM_PROMPT = `You are an expert web designer who creates beautiful, distinctive landing pages. You generate complete, standalone HTML files with inline CSS.
 
 Your design principles:
@@ -17,7 +21,7 @@ Your design principles:
 
 Your output is ALWAYS a complete HTML file starting with <!DOCTYPE html> and nothing else before or after. No markdown code blocks. No explanations. Just the HTML.`;
 
-export async function generateLandingPage(data: DeepDiveData): Promise<string> {
+export async function generateLandingPage(data: DeepDiveData, options?: LandingPageOptions): Promise<string> {
   const overview = extractBusinessOverview(data);
   const colors = getCategoryColors(overview.category);
   const { growth } = data;
@@ -29,7 +33,13 @@ export async function generateLandingPage(data: DeepDiveData): Promise<string> {
   const benefits = landingCopy?.benefits || [];
   const about = landingCopy?.aboutSection || overview.description;
   const faq = landingCopy?.faq || [];
-  const cta = landingCopy?.ctaButtonText || "Get Started";
+  const cta = landingCopy?.ctaButtonText || "Get in Touch";
+
+  // Generate email for mailto link
+  const contactEmail = options?.userEmail || "hello@yourbusiness.com";
+  const emailPlaceholderNote = !options?.userEmail
+    ? " <!-- TODO: Replace hello@yourbusiness.com with your actual email address -->"
+    : "";
 
   const prompt = `Create a beautiful, standalone landing page for this business.
 
@@ -39,13 +49,14 @@ export async function generateLandingPage(data: DeepDiveData): Promise<string> {
 **Tagline:** ${overview.tagline}
 **Location:** ${overview.city}${overview.state ? `, ${overview.state}` : ""}
 **Category:** ${formatCategory(overview.category)}
+**Contact Email:** ${contactEmail}
 
 ## Content to Include
 
 **Hero Section:**
 - Headline: "${headline}"
 - Subheadline: "${subheadline}"
-- CTA Button: "${cta}"
+- CTA Button: Link to mailto:${contactEmail} with text "${cta}" or "Get in Touch" or "Email Us"
 
 **Problem/Solution Section:**
 - Problem: ${overview.problem}
@@ -63,7 +74,7 @@ ${faq.slice(0, 3).map(f => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n")}
 **Footer:**
 - Business name
 - Location: ${overview.city}${overview.state ? `, ${overview.state}` : ""}
-- "Contact Us" placeholder
+- Contact link: mailto:${contactEmail}${emailPlaceholderNote}
 - Copyright line
 
 ## Design Requirements
@@ -94,6 +105,9 @@ ${faq.slice(0, 3).map(f => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n")}
 - No JavaScript required (pure CSS interactions)
 - Smooth transitions and hover effects
 - Professional, premium feel
+- IMPORTANT: Do NOT include any contact forms, order forms, or input fields that require backend functionality
+- All CTAs should use mailto:${contactEmail} links instead of forms
+- Button text can be "Get in Touch", "Email Us", "Contact Us", or similar
 
 Generate the complete HTML file now.`;
 

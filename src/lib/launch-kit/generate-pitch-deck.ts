@@ -5,11 +5,39 @@ import PptxGenJS from "pptxgenjs";
 import type { DeepDiveData, CategoryColors } from "./types";
 import { getCategoryColors, extractBusinessOverview, formatCurrency, parseCurrency } from "./types";
 
-// Helper to truncate text
+// Helper to truncate text at word boundaries (never mid-word)
 function truncateText(text: string | undefined | null, maxLength: number): string {
   if (!text) return "";
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + "...";
+
+  // Find the last space before maxLength
+  const truncated = text.substring(0, maxLength - 3);
+  const lastSpace = truncated.lastIndexOf(" ");
+
+  // If there's a space and it's not too far back, truncate at the word boundary
+  if (lastSpace > maxLength * 0.4) {
+    return truncated.substring(0, lastSpace) + "...";
+  }
+
+  // Otherwise just truncate (for single long words)
+  return truncated + "...";
+}
+
+// Helper to format market size values (e.g., "$8.99 billion" → "$8.99B")
+function formatMarketSize(value: string | undefined | null): string {
+  if (!value) return "N/A";
+
+  // Convert "billion" to "B" and "million" to "M"
+  let formatted = value
+    .replace(/\s*billion/gi, "B")
+    .replace(/\s*million/gi, "M")
+    .replace(/\s*thousand/gi, "K")
+    .replace(/\s*trillion/gi, "T");
+
+  // Clean up any extra spaces
+  formatted = formatted.replace(/\s+/g, " ").trim();
+
+  return formatted;
 }
 
 // Color scheme for dark slides (cover, closing)
@@ -230,62 +258,62 @@ function createOpportunitySlide(
   // Market size callout boxes (right side) - stacked vertically with proper spacing
   const marketResearch = foundation?.marketViability?.marketResearch;
 
-  // TAM callout (large box at top right)
+  // TAM callout (large box at top right) - wider to fit formatted values
   slide.addShape("roundRect", {
-    x: 6.2,
+    x: 6.0,
     y: 1.1,
-    w: 3.3,
+    w: 3.5,
     h: 1.3,
     fill: { color: opts.colors.primary.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("TAM (Total Market)", {
-    x: 6.2,
+    x: 6.0,
     y: 1.15,
-    w: 3.3,
+    w: 3.5,
     fontSize: 10,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  slide.addText(truncateText(marketResearch?.tam, 15) || "N/A", {
-    x: 6.2,
+  slide.addText(formatMarketSize(marketResearch?.tam), {
+    x: 6.0,
     y: 1.5,
-    w: 3.3,
-    fontSize: 24,
+    w: 3.5,
+    fontSize: 22,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  // SAM box (left of pair)
+  // SAM box (left of pair) - wider boxes
   slide.addShape("roundRect", {
-    x: 6.2,
+    x: 6.0,
     y: 2.55,
-    w: 1.55,
+    w: 1.65,
     h: 1.0,
     fill: { color: opts.colors.secondary.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("SAM", {
-    x: 6.2,
+    x: 6.0,
     y: 2.6,
-    w: 1.55,
+    w: 1.65,
     fontSize: 9,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  slide.addText(truncateText(marketResearch?.sam, 12) || "N/A", {
-    x: 6.2,
+  slide.addText(formatMarketSize(marketResearch?.sam), {
+    x: 6.0,
     y: 2.85,
-    w: 1.55,
-    fontSize: 14,
+    w: 1.65,
+    fontSize: 13,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
@@ -294,41 +322,42 @@ function createOpportunitySlide(
 
   // SOM box (right of pair)
   slide.addShape("roundRect", {
-    x: 7.95,
+    x: 7.85,
     y: 2.55,
-    w: 1.55,
+    w: 1.65,
     h: 1.0,
     fill: { color: opts.colors.accent.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("SOM", {
-    x: 7.95,
+    x: 7.85,
     y: 2.6,
-    w: 1.55,
+    w: 1.65,
     fontSize: 9,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
     align: "center",
   });
 
-  slide.addText(truncateText(marketResearch?.som, 12) || "N/A", {
-    x: 7.95,
+  slide.addText(formatMarketSize(marketResearch?.som), {
+    x: 7.85,
     y: 2.85,
-    w: 1.55,
-    fontSize: 14,
+    w: 1.65,
+    fontSize: 13,
     bold: true,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
     align: "center",
   });
 
-  // Growth rate (below market boxes)
-  slide.addText(`Growth: ${truncateText(marketResearch?.growthRate, 20) || "N/A"}`, {
-    x: 6.2,
+  // Growth rate (below market boxes) - truncate at word boundary
+  const growthText = marketResearch?.growthRate || "N/A";
+  slide.addText(`Growth: ${truncateText(growthText, 25)}`, {
+    x: 6.0,
     y: 3.7,
-    w: 3.3,
-    fontSize: 12,
+    w: 3.5,
+    fontSize: 11,
     color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
     bold: true,

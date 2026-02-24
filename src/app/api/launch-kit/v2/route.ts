@@ -233,8 +233,9 @@ export async function POST(request: NextRequest) {
         return null;
       }),
       // Generate landing page HTML (with retry on rate limit)
+      // Pass user email for mailto: links instead of forms
       (anthropicKey
-        ? generateLandingPage(deepDiveData)
+        ? generateLandingPage(deepDiveData, { userEmail: user.email })
         : Promise.resolve(getMockLandingPageHtml(idea))
       ).catch(err => {
         console.error("[Launch Kit V2] Landing page generation failed:", err);
