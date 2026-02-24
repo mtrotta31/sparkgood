@@ -59,9 +59,18 @@ export async function GET(
 
       if (profileData) {
         profile = {
+          // Business category fields (new general path)
+          businessCategory: profileData.business_category,
+          targetCustomer: profileData.target_customer,
+          businessModelPreference: profileData.business_model_preference,
+          keySkills: profileData.key_skills || [],
+          // Location
+          location: profileData.location,
+          // Social enterprise fields (legacy path)
           ventureType: profileData.venture_type,
           format: profileData.format,
           causes: profileData.causes || [],
+          // Common fields
           experience: profileData.experience,
           budget: profileData.budget,
           commitment: profileData.commitment,
