@@ -152,13 +152,13 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
             {/* Market Opportunity Box */}
             <View style={styles.infoBox}>
               <Text style={styles.boxTitle}>Market Opportunity</Text>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Market Size</Text>
-                <Text style={styles.statValue}>{truncate(marketSize || "N/A", 35)}</Text>
+              <View style={styles.statBlock}>
+                <Text style={styles.statBlockLabel}>Market Size</Text>
+                <Text style={styles.statBlockValue}>{truncate(marketSize || "N/A", 50)}</Text>
               </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Growth Rate</Text>
-                <Text style={styles.statValue}>{truncate(growthRate || "N/A", 35)}</Text>
+              <View style={styles.statBlock}>
+                <Text style={styles.statBlockLabel}>Growth Rate</Text>
+                <Text style={styles.statBlockValue}>{truncate(growthRate || "N/A", 50)}</Text>
               </View>
             </View>
 
@@ -385,6 +385,23 @@ function createStyles(colors: CategoryColors) {
       color: "#1E293B",
       width: "63%",
       textAlign: "right",
+    },
+    // Vertical stacked layout for variable-length text (Market Opportunity)
+    statBlock: {
+      marginBottom: 8,
+    },
+    statBlockLabel: {
+      fontSize: 7,
+      color: "#64748B",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginBottom: 2,
+    },
+    statBlockValue: {
+      fontSize: 9,
+      fontWeight: "bold",
+      color: "#1E293B",
+      lineHeight: 1.3,
     },
     pricingMain: {
       fontSize: 14,
