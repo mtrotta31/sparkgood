@@ -19,6 +19,15 @@ function hexToRgb(hex: string): string {
 }
 
 export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
+  // Debug: Log financial data received
+  console.log("[One-Pager] Financial data:", {
+    hasFinancial: !!data.financial,
+    startupCostsSummaryLength: data.financial?.startupCostsSummary?.length,
+    firstStartupItem: data.financial?.startupCostsSummary?.[0],
+    hasRevenueProjections: !!data.financial?.revenueProjections,
+    moderateRevenue: data.financial?.revenueProjections?.moderate,
+  });
+
   const overview = extractBusinessOverview(data);
   const colors = getCategoryColors(overview.category);
   const { foundation, financial, growth } = data;

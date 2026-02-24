@@ -178,6 +178,21 @@ export async function POST(request: NextRequest) {
     console.log("[Launch Kit V2] Profile businessCategory:", profile.businessCategory);
     console.log("[Launch Kit V2] Profile location:", profile.location);
 
+    // Debug logging for financial data
+    console.log("[Launch Kit V2] Financial data present:", !!financial);
+    if (financial) {
+      console.log("[Launch Kit V2] Financial data structure:", {
+        hasStartupCostsSummary: !!financial.startupCostsSummary,
+        startupCostsSummaryLength: financial.startupCostsSummary?.length,
+        firstStartupItem: financial.startupCostsSummary?.[0],
+        hasMonthlyOperatingCosts: !!financial.monthlyOperatingCosts,
+        monthlyOperatingCostsLength: financial.monthlyOperatingCosts?.length,
+        firstMonthlyItem: financial.monthlyOperatingCosts?.[0],
+        hasRevenueProjections: !!financial.revenueProjections,
+        moderateProjection: financial.revenueProjections?.moderate,
+      });
+    }
+
     // Generate slug for landing page
     const slug = generateSlug(idea.name);
     const storagePath = `${storageId}`;
@@ -364,11 +379,16 @@ export async function POST(request: NextRequest) {
       console.log("[Launch Kit V2] Skipping social graphics upload - no graphics generated");
     }
 
-    // Save asset references to database (only if we have a savedIdeaId)
+    // Save asset references AND text content to database (only if we have a savedIdeaId)
     if (savedIdeaId) {
+      // Store both assets and textContent in the launch_kit_assets column
+      const fullLaunchKitData = {
+        ...assets,
+        textContent,
+      };
       await supabase
         .from("deep_dive_results")
-        .update({ launch_kit_assets: assets })
+        .update({ launch_kit_assets: fullLaunchKitData })
         .eq("idea_id", savedIdeaId);
     }
 
@@ -566,7 +586,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: "No launch kit found" });
   }
 
-  const assets = data.launch_kit_assets as LaunchKitAssets;
+  // Extract assets and textContent from the saved data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const savedData = data.launch_kit_assets as LaunchKitAssets & { textContent?: any };
+  const { textContent, ...assets } = savedData;
+
   const downloadUrls: LaunchKitV2Response["downloadUrls"] = {};
 
   if (assets.pitchDeck?.storagePath) {
@@ -605,6 +629,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     success: true,
     data: {
+      textContent,
       assets,
       downloadUrls,
       landingPageUrl: assets.landingPage?.url,

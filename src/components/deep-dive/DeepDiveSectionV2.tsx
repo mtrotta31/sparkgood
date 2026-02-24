@@ -496,16 +496,83 @@ export default function DeepDiveSectionV2({
     }
   }, [checklistProgress, savedIdeaId, isAuthenticated]);
 
-  // Generate Launch Kit
+  // Helper function to transform API response to modal format
+  const transformLaunchKitResponse = useCallback((result: { assets: Record<string, unknown>; textContent?: Record<string, unknown> }) => {
+    const { textContent, assets } = result;
+
+    // Convert socialGraphics from object to array format
+    type GraphicValue = { url?: string; storagePath: string };
+    const socialGraphicsArray = assets?.socialGraphics ? Object.entries(assets.socialGraphics as Record<string, GraphicValue>).map(([key, value]) => {
+      const platformMap: Record<string, { name: string; width: number; height: number }> = {
+        instagramPost: { name: "instagram-post", width: 1080, height: 1080 },
+        instagramStory: { name: "instagram-story", width: 1080, height: 1920 },
+        linkedinPost: { name: "linkedin-post", width: 1200, height: 627 },
+        facebookCover: { name: "facebook-cover", width: 820, height: 312 },
+      };
+      const platformInfo = platformMap[key] || { name: key, width: 1080, height: 1080 };
+      return {
+        platform: platformInfo.name,
+        url: value.url || "",
+        storagePath: value.storagePath,
+        dimensions: { width: platformInfo.width, height: platformInfo.height },
+      };
+    }) : [];
+
+    // Build the transformed V2 assets object
+    const transformedAssets = {
+      textContent,
+      landingPage: assets?.landingPage,
+      pitchDeck: assets?.pitchDeck,
+      socialGraphics: socialGraphicsArray,
+      onePager: assets?.onePager,
+    };
+
+    setLaunchKitV2(transformedAssets);
+
+    // Also set V1 launchKit for backwards compatibility if textContent exists
+    if (textContent) {
+      setLaunchKit({
+        elevatorPitch: textContent.elevatorPitch as string,
+        socialPosts: textContent.socialPosts as LaunchKit["socialPosts"],
+        emailSequence: textContent.emailSequence as LaunchKit["emailSequence"],
+        landingPage: textContent.landingPageCopy ? {
+          headline: (textContent.landingPageCopy as { headline: string }).headline,
+          subheadline: (textContent.landingPageCopy as { subheadline: string }).subheadline,
+          html: "",
+        } : { headline: "", subheadline: "", html: "" },
+      });
+    }
+  }, []);
+
+  // Generate Launch Kit (or load saved assets)
   const handleGenerateLaunchKit = useCallback(async () => {
     setShowLaunchKit(true);
     setLaunchKitError(null);
 
-    // Skip if we already have V2 assets
+    // Skip if we already have V2 assets loaded in memory
     if (launchKitV2) {
       return;
     }
 
+    // FIRST: Check if we have saved assets in the database
+    if (savedIdeaId) {
+      console.log("[LaunchKit] Checking for saved assets...");
+      try {
+        const checkResponse = await fetch(`/api/launch-kit/v2?savedIdeaId=${savedIdeaId}`);
+        const checkResult = await checkResponse.json();
+
+        if (checkResult.success && checkResult.data?.assets) {
+          console.log("[LaunchKit] Found saved assets, loading...");
+          transformLaunchKitResponse(checkResult.data);
+          return; // Don't generate, we loaded saved assets
+        }
+        console.log("[LaunchKit] No saved assets found, will generate...");
+      } catch (err) {
+        console.log("[LaunchKit] Error checking saved assets, will generate:", err);
+      }
+    }
+
+    // No saved assets, generate new ones
     setIsGeneratingLaunchKit(true);
 
     try {
@@ -526,51 +593,7 @@ export default function DeepDiveSectionV2({
       const result = await response.json();
 
       if (result.success && result.data) {
-        // Transform API response to modal-expected format
-        const { textContent, assets } = result.data;
-
-        // Convert socialGraphics from object to array format
-        type GraphicValue = { url?: string; storagePath: string };
-        const socialGraphicsArray = assets?.socialGraphics ? Object.entries(assets.socialGraphics as Record<string, GraphicValue>).map(([key, value]) => {
-          const platformMap: Record<string, { name: string; width: number; height: number }> = {
-            instagramPost: { name: "instagram-post", width: 1080, height: 1080 },
-            instagramStory: { name: "instagram-story", width: 1080, height: 1920 },
-            linkedinPost: { name: "linkedin-post", width: 1200, height: 627 },
-            facebookCover: { name: "facebook-cover", width: 820, height: 312 },
-          };
-          const platformInfo = platformMap[key] || { name: key, width: 1080, height: 1080 };
-          return {
-            platform: platformInfo.name,
-            url: value.url || "",
-            storagePath: value.storagePath,
-            dimensions: { width: platformInfo.width, height: platformInfo.height },
-          };
-        }) : [];
-
-        // Build the transformed V2 assets object
-        const transformedAssets = {
-          textContent,
-          landingPage: assets?.landingPage,
-          pitchDeck: assets?.pitchDeck,
-          socialGraphics: socialGraphicsArray,
-          onePager: assets?.onePager,
-        };
-
-        setLaunchKitV2(transformedAssets);
-
-        // Also set V1 launchKit for backwards compatibility if textContent exists
-        if (textContent) {
-          setLaunchKit({
-            elevatorPitch: textContent.elevatorPitch,
-            socialPosts: textContent.socialPosts,
-            emailSequence: textContent.emailSequence,
-            landingPage: textContent.landingPageCopy ? {
-              headline: textContent.landingPageCopy.headline,
-              subheadline: textContent.landingPageCopy.subheadline,
-              html: "",
-            } : { headline: "", subheadline: "", html: "" },
-          });
-        }
+        transformLaunchKitResponse(result.data);
       } else {
         setLaunchKitError(result.error || "Failed to generate launch kit");
       }
@@ -580,7 +603,7 @@ export default function DeepDiveSectionV2({
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, launchKitV2]);
+  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, launchKitV2, transformLaunchKitResponse]);
 
   // Handle Launch Kit button click
   const handleLaunchKitClick = useCallback(() => {

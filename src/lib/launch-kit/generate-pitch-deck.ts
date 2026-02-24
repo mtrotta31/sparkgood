@@ -27,6 +27,17 @@ interface SlideOptions {
 }
 
 export async function generatePitchDeck(data: DeepDiveData): Promise<Buffer> {
+  // Debug: Log financial data received
+  console.log("[Pitch Deck] Financial data:", {
+    hasFinancial: !!data.financial,
+    startupCostsSummaryLength: data.financial?.startupCostsSummary?.length,
+    firstStartupItem: data.financial?.startupCostsSummary?.[0],
+    monthlyOperatingCostsLength: data.financial?.monthlyOperatingCosts?.length,
+    firstMonthlyItem: data.financial?.monthlyOperatingCosts?.[0],
+    hasRevenueProjections: !!data.financial?.revenueProjections,
+    moderateRevenue: data.financial?.revenueProjections?.moderate,
+  });
+
   const pptx = new PptxGenJS();
   const overview = extractBusinessOverview(data);
   const colors = getCategoryColors(overview.category);

@@ -3,6 +3,58 @@
 import { useState, useEffect } from "react";
 import type { LaunchKit } from "@/types";
 
+// Component to fetch and render landing page HTML via srcdoc to avoid iframe blocking
+function LandingPagePreview({ url }: { url: string }) {
+  const [html, setHtml] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHtml = async () => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Failed to fetch landing page");
+        }
+        const text = await response.text();
+        setHtml(text);
+      } catch (err) {
+        console.error("Error fetching landing page HTML:", err);
+        setError("Could not load preview");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHtml();
+  }, [url]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-100">
+        <div className="text-gray-500">Loading preview...</div>
+      </div>
+    );
+  }
+
+  if (error || !html) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-100">
+        <div className="text-gray-500">{error || "Preview unavailable"}</div>
+      </div>
+    );
+  }
+
+  return (
+    <iframe
+      srcDoc={html}
+      className="w-full h-full border-0"
+      title="Landing Page Preview"
+      sandbox="allow-scripts allow-same-origin"
+    />
+  );
+}
+
 type TabId = "landing" | "deck" | "graphics" | "onepager" | "text";
 
 // V2 Launch Kit Assets structure from API
@@ -350,7 +402,7 @@ export default function LaunchKitModalV2({
                     </div>
                   </div>
 
-                  {/* Preview iframe */}
+                  {/* Preview - render HTML directly to avoid iframe issues */}
                   <div className="bg-charcoal-light rounded-xl overflow-hidden">
                     <div className="flex items-center justify-between p-3 border-b border-warmwhite/10">
                       <span className="text-sm text-warmwhite-muted">Preview</span>
@@ -360,12 +412,10 @@ export default function LaunchKitModalV2({
                         label="Download HTML"
                       />
                     </div>
-                    <div className="relative h-[400px] bg-white">
-                      <iframe
-                        src={assets.landingPage.hostedUrl}
-                        className="w-full h-full border-0"
-                        title="Landing Page Preview"
-                      />
+                    <div className="relative h-[400px] bg-white overflow-auto">
+                      {/* Use an iframe with srcdoc to render the landing page HTML directly */}
+                      {/* This avoids X-Frame-Options issues since we're not loading from a URL */}
+                      <LandingPagePreview url={assets.landingPage.url} />
                     </div>
                   </div>
                 </div>
