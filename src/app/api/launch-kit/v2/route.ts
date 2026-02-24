@@ -174,6 +174,10 @@ export async function POST(request: NextRequest) {
       matchedResources: matchedResources || null,
     };
 
+    // Debug logging for color selection
+    console.log("[Launch Kit V2] Profile businessCategory:", profile.businessCategory);
+    console.log("[Launch Kit V2] Profile location:", profile.location);
+
     // Generate slug for landing page
     const slug = generateSlug(idea.name);
     const storagePath = `${storageId}`;

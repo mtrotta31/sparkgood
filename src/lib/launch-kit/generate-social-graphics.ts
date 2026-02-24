@@ -45,6 +45,9 @@ export async function generateSocialGraphics(data: DeepDiveData): Promise<Genera
   const colors = getCategoryColors(overview.category);
   const fonts = getFonts();
 
+  console.log("[Social Graphics] Category:", overview.category);
+  console.log("[Social Graphics] Colors:", colors.primary, colors.secondary);
+
   const graphics: GeneratedGraphic[] = [];
 
   // Generate all 4 graphics
