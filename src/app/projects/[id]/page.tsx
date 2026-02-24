@@ -7,7 +7,7 @@ import { FadeIn } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCredits } from "@/hooks";
 import PurchaseModal from "@/components/PurchaseModal";
-import LaunchKitModal from "@/components/deep-dive/LaunchKitModal";
+import LaunchKitModalV2 from "@/components/deep-dive/LaunchKitModalV2";
 import ViabilityReport from "@/components/deep-dive/ViabilityReport";
 import BusinessPlanView from "@/components/deep-dive/BusinessPlanView";
 import MarketingAssetsView from "@/components/deep-dive/MarketingAssetsView";
@@ -128,6 +128,9 @@ export default function ProjectPage() {
   // Launch Kit state
   const [showLaunchKit, setShowLaunchKit] = useState(false);
   const [launchKit, setLaunchKit] = useState<LaunchKit | null>(null);
+  // V2 assets from new API
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [launchKitV2, setLaunchKitV2] = useState<any | null>(null);
   const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
   const [launchKitError, setLaunchKitError] = useState<string | null>(null);
   const [showLaunchKitPurchaseModal, setShowLaunchKitPurchaseModal] = useState(false);
@@ -426,8 +429,8 @@ export default function ProjectPage() {
     setShowLaunchKit(true);
     setLaunchKitError(null);
 
-    // If we already have a launch kit, just show it
-    if (launchKit) {
+    // If we already have V2 assets, just show them
+    if (launchKitV2) {
       return;
     }
 
@@ -452,16 +455,37 @@ export default function ProjectPage() {
     };
 
     try {
-      const response = await fetch("/api/launch-kit", {
+      const response = await fetch("/api/launch-kit/v2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea: project.idea, profile: projectProfile }),
+        body: JSON.stringify({
+          idea: project.idea,
+          profile: projectProfile,
+          savedIdeaId: project.id,
+          foundation: project.deepDive?.foundation,
+          growth: project.deepDive?.growth,
+          financial: project.deepDive?.financial,
+          checklist: project.deepDive?.checklist,
+        }),
       });
 
       const result = await response.json();
 
       if (result.success && result.data) {
-        setLaunchKit(result.data);
+        setLaunchKitV2(result.data);
+        // Also set V1 launchKit for backwards compatibility
+        if (result.data.textContent) {
+          setLaunchKit({
+            elevatorPitch: result.data.textContent.elevatorPitch,
+            socialPosts: result.data.textContent.socialPosts,
+            emailSequence: result.data.textContent.emailSequence,
+            landingPage: result.data.textContent.landingPageCopy ? {
+              headline: result.data.textContent.landingPageCopy.headline,
+              subheadline: result.data.textContent.landingPageCopy.subheadline,
+              html: "",
+            } : { headline: "", subheadline: "", html: "" },
+          });
+        }
       } else {
         setLaunchKitError(result.error || "Failed to generate launch kit");
       }
@@ -471,7 +495,7 @@ export default function ProjectPage() {
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [project, launchKit]);
+  }, [project, launchKitV2]);
 
   // Handle Launch Kit button click
   const handleLaunchKitClick = useCallback(() => {
@@ -1014,10 +1038,11 @@ export default function ProjectPage() {
       />
 
       {/* Launch Kit Modal */}
-      <LaunchKitModal
+      <LaunchKitModalV2
         isOpen={showLaunchKit}
         onClose={() => setShowLaunchKit(false)}
         launchKit={launchKit}
+        launchKitV2={launchKitV2}
         isLoading={isGeneratingLaunchKit}
         error={launchKitError}
         ideaName={project.idea.name}

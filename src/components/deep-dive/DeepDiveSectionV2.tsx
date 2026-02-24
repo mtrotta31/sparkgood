@@ -13,7 +13,7 @@ import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
 import AIAdvisor from "@/components/results/AIAdvisor";
 import ConfirmDialog from "./ConfirmDialog";
-import LaunchKitModal from "./LaunchKitModal";
+import LaunchKitModalV2 from "./LaunchKitModalV2";
 import type {
   Idea,
   UserProfile,
@@ -121,6 +121,9 @@ export default function DeepDiveSectionV2({
   // Launch Kit modal state
   const [showLaunchKit, setShowLaunchKit] = useState(false);
   const [launchKit, setLaunchKit] = useState<LaunchKit | null>(null);
+  // V2 assets from new API
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [launchKitV2, setLaunchKitV2] = useState<any | null>(null);
   const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
   const [launchKitError, setLaunchKitError] = useState<string | null>(null);
 
@@ -260,15 +263,36 @@ export default function DeepDiveSectionV2({
         setIsGeneratingLaunchKit(true);
         setLaunchKitError(null);
 
-        fetch("/api/launch-kit", {
+        fetch("/api/launch-kit/v2", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idea, profile }),
+          body: JSON.stringify({
+            idea,
+            profile,
+            savedIdeaId,
+            foundation,
+            growth,
+            financial,
+            checklist,
+          }),
         })
           .then((response) => response.json())
           .then((result) => {
             if (result.success && result.data) {
-              setLaunchKit(result.data);
+              setLaunchKitV2(result.data);
+              // Also set V1 launchKit for backwards compatibility if textContent exists
+              if (result.data.textContent) {
+                setLaunchKit({
+                  elevatorPitch: result.data.textContent.elevatorPitch,
+                  socialPosts: result.data.textContent.socialPosts,
+                  emailSequence: result.data.textContent.emailSequence,
+                  landingPage: result.data.textContent.landingPageCopy ? {
+                    headline: result.data.textContent.landingPageCopy.headline,
+                    subheadline: result.data.textContent.landingPageCopy.subheadline,
+                    html: "",
+                  } : { headline: "", subheadline: "", html: "" },
+                });
+              }
             } else {
               setLaunchKitError(result.error || "Failed to generate launch kit");
             }
@@ -477,23 +501,45 @@ export default function DeepDiveSectionV2({
     setShowLaunchKit(true);
     setLaunchKitError(null);
 
-    if (launchKit) {
+    // Skip if we already have V2 assets
+    if (launchKitV2) {
       return;
     }
 
     setIsGeneratingLaunchKit(true);
 
     try {
-      const response = await fetch("/api/launch-kit", {
+      const response = await fetch("/api/launch-kit/v2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea, profile }),
+        body: JSON.stringify({
+          idea,
+          profile,
+          savedIdeaId,
+          foundation,
+          growth,
+          financial,
+          checklist,
+        }),
       });
 
       const result = await response.json();
 
       if (result.success && result.data) {
-        setLaunchKit(result.data);
+        setLaunchKitV2(result.data);
+        // Also set V1 launchKit for backwards compatibility if textContent exists
+        if (result.data.textContent) {
+          setLaunchKit({
+            elevatorPitch: result.data.textContent.elevatorPitch,
+            socialPosts: result.data.textContent.socialPosts,
+            emailSequence: result.data.textContent.emailSequence,
+            landingPage: result.data.textContent.landingPageCopy ? {
+              headline: result.data.textContent.landingPageCopy.headline,
+              subheadline: result.data.textContent.landingPageCopy.subheadline,
+              html: "",
+            } : { headline: "", subheadline: "", html: "" },
+          });
+        }
       } else {
         setLaunchKitError(result.error || "Failed to generate launch kit");
       }
@@ -503,7 +549,7 @@ export default function DeepDiveSectionV2({
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [idea, profile, launchKit]);
+  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, launchKitV2]);
 
   // Handle Launch Kit button click
   const handleLaunchKitClick = useCallback(() => {
@@ -962,10 +1008,11 @@ export default function DeepDiveSectionV2({
       />
 
       {/* Launch Kit Modal */}
-      <LaunchKitModal
+      <LaunchKitModalV2
         isOpen={showLaunchKit}
         onClose={() => setShowLaunchKit(false)}
         launchKit={launchKit}
+        launchKitV2={launchKitV2}
         isLoading={isGeneratingLaunchKit}
         error={launchKitError}
         ideaName={idea.name}
