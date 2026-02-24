@@ -75,7 +75,7 @@ ${faq.slice(0, 3).map(f => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n")}
 - Business name
 - Location: ${overview.city}${overview.state ? `, ${overview.state}` : ""}
 - Contact link: mailto:${contactEmail}${emailPlaceholderNote}
-- Copyright line
+- Copyright line with year ${new Date().getFullYear()} (use ${new Date().getFullYear()}, never 2024 or 2025)
 
 ## Design Requirements
 

@@ -560,7 +560,7 @@ function createSolutionSlide(
     });
 
     // Benefit description INSIDE card with sentence-aware truncation
-    slide.addText(truncateText(benefit.description, 120), {
+    slide.addText(truncateText(benefit.description, 150), {
       x: xPos + 0.15,
       y: cardY + 0.6,
       w: 2.6,
@@ -652,7 +652,7 @@ function createMarketValidationSlide(
       tableData.push([
         { text: item.factor },
         { text: `${item.score}/100`, options: { align: "center" } },
-        { text: truncateText(item.assessment, 70) },
+        { text: truncateText(item.assessment, 100) },
       ]);
     });
 
@@ -853,7 +853,7 @@ function createFinancialProjectionsSlide(
   if (breakEven) {
     const breakEvenText = breakEven.description || (breakEven.unitsNeeded ? `${breakEven.unitsNeeded} units needed` : "");
     if (breakEvenText) {
-      slide.addText(truncateText(breakEvenText, 50), {
+      slide.addText(truncateText(breakEvenText, 200), {
         x: 0.5,
         y: 3.0,
         w: 3.2,

@@ -514,7 +514,10 @@ export default function LaunchKitModalV2({
               {activeTab === "deck" && !isTabFailed("deck") && assets?.pitchDeck && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-lg font-bold text-warmwhite">Investor Pitch Deck</h3>
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-warmwhite">Investor Pitch Deck</h3>
+                      <p className="text-sm text-zinc-400 mt-1">We recommend reviewing your deck and making minor formatting adjustments before presenting.</p>
+                    </div>
                     <DownloadButton
                       url={assets.pitchDeck.url}
                       filename={`${slugify(ideaName)}-pitch-deck.pptx`}

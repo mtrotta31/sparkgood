@@ -186,7 +186,7 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
                 <Text style={styles.pricingMain}>{pricingStrategy.recommendedPrice}</Text>
                 {pricingStrategy.reasoning ? (
                   <Text style={styles.pricingNote}>
-                    {truncate(pricingStrategy.reasoning, 80)}
+                    {truncate(pricingStrategy.reasoning, 120)}
                   </Text>
                 ) : null}
               </View>
@@ -481,9 +481,45 @@ function formatCategory(category: string): string {
   return labels[category] || "";
 }
 
-// Helper to truncate text
+// Helper to truncate text at sentence boundaries (never mid-thought)
 function truncate(text: string, maxLength: number): string {
   if (!text) return "";
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + "...";
+
+  const truncated = text.substring(0, maxLength);
+
+  // Find the last sentence boundary (. ! ?) before maxLength
+  const sentenceEnders = ['. ', '! ', '? ', '.\n', '!\n', '?\n'];
+  let lastSentenceEnd = -1;
+
+  for (const ender of sentenceEnders) {
+    const idx = truncated.lastIndexOf(ender);
+    if (idx > lastSentenceEnd) {
+      lastSentenceEnd = idx + 1; // Include the punctuation
+    }
+  }
+
+  // Also check for end-of-string punctuation
+  if (truncated.endsWith('.') || truncated.endsWith('!') || truncated.endsWith('?')) {
+    lastSentenceEnd = truncated.length;
+  }
+
+  // If we found a sentence boundary and it's not too far back (at least 40% of content)
+  if (lastSentenceEnd > maxLength * 0.4) {
+    return truncated.substring(0, lastSentenceEnd).trim();
+  }
+
+  // No good sentence boundary - try to cut at last comma
+  const lastComma = truncated.lastIndexOf(', ');
+  if (lastComma > maxLength * 0.4) {
+    return truncated.substring(0, lastComma) + ".";
+  }
+
+  // Last resort: cut at word boundary with ellipsis
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLength * 0.4) {
+    return truncated.substring(0, lastSpace).trim() + "...";
+  }
+
+  return truncated.trim() + "...";
 }
