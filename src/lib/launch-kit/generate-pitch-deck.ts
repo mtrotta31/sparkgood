@@ -5,25 +5,51 @@ import PptxGenJS from "pptxgenjs";
 import type { DeepDiveData, CategoryColors } from "./types";
 import { getCategoryColors, extractBusinessOverview, formatCurrency, parseCurrency } from "./types";
 
-// Helper to truncate text at word boundaries (never mid-word)
+// Helper to truncate text at sentence boundaries (never mid-thought)
 function truncateText(text: string | undefined | null, maxLength: number): string {
   if (!text) return "";
   if (text.length <= maxLength) return text;
 
-  // Find the last space before maxLength
-  const truncated = text.substring(0, maxLength - 3);
-  const lastSpace = truncated.lastIndexOf(" ");
+  const truncated = text.substring(0, maxLength);
 
-  // If there's a space and it's not too far back, truncate at the word boundary
-  if (lastSpace > maxLength * 0.4) {
-    return truncated.substring(0, lastSpace) + "...";
+  // Find the last sentence boundary (. ! ?) before maxLength
+  const sentenceEnders = ['. ', '! ', '? ', '.\n', '!\n', '?\n'];
+  let lastSentenceEnd = -1;
+
+  for (const ender of sentenceEnders) {
+    const idx = truncated.lastIndexOf(ender);
+    if (idx > lastSentenceEnd) {
+      lastSentenceEnd = idx + 1; // Include the punctuation
+    }
   }
 
-  // Otherwise just truncate (for single long words)
-  return truncated + "...";
+  // Also check for end-of-string punctuation
+  if (truncated.endsWith('.') || truncated.endsWith('!') || truncated.endsWith('?')) {
+    lastSentenceEnd = truncated.length;
+  }
+
+  // If we found a sentence boundary and it's not too far back (at least 40% of content)
+  if (lastSentenceEnd > maxLength * 0.4) {
+    return truncated.substring(0, lastSentenceEnd).trim();
+  }
+
+  // No good sentence boundary - try to cut at last comma
+  const lastComma = truncated.lastIndexOf(', ');
+  if (lastComma > maxLength * 0.4) {
+    return truncated.substring(0, lastComma) + ".";
+  }
+
+  // Last resort: cut at word boundary with ellipsis
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLength * 0.4) {
+    return truncated.substring(0, lastSpace).trim() + "...";
+  }
+
+  return truncated.trim() + "...";
 }
 
 // Helper to format market size values (e.g., "$8.99 billion" → "$8.99B")
+// Also extracts just the numeric portion if needed
 function formatMarketSize(value: string | undefined | null): string {
   if (!value) return "N/A";
 
@@ -38,6 +64,51 @@ function formatMarketSize(value: string | undefined | null): string {
   formatted = formatted.replace(/\s+/g, " ").trim();
 
   return formatted;
+}
+
+// Helper to extract just the number from market size (e.g., "$4.2B US market" → "$4.2B")
+function extractMarketNumber(value: string | undefined | null): string {
+  if (!value) return "N/A";
+
+  // First format it (billion → B, etc.)
+  const formatted = formatMarketSize(value);
+
+  // Extract the first monetary value pattern ($X.XXB, $XXM, etc.)
+  const match = formatted.match(/\$[\d.,]+\s*[BMKT]?/i);
+  if (match) {
+    return match[0].trim();
+  }
+
+  // If no dollar sign, try to find just numbers with suffix
+  const numMatch = formatted.match(/[\d.,]+\s*[BMKT]/i);
+  if (numMatch) {
+    return "$" + numMatch[0].trim();
+  }
+
+  return formatted;
+}
+
+// Helper to extract market description (everything after the number)
+function extractMarketDescription(value: string | undefined | null): string {
+  if (!value) return "";
+
+  const formatted = formatMarketSize(value);
+
+  // Remove the monetary value pattern to get the description
+  const description = formatted
+    .replace(/\$[\d.,]+\s*[BMKT]?\s*/i, '')
+    .replace(/^[\d.,]+\s*[BMKT]?\s*/i, '')
+    .trim();
+
+  return description || "market";
+}
+
+// Helper to format currency with proper negative handling
+function formatCurrencyWithSign(amount: number): string {
+  if (amount < 0) {
+    return `-${formatCurrency(Math.abs(amount))}`;
+  }
+  return formatCurrency(amount);
 }
 
 // Color scheme for dark slides (cover, closing)
@@ -62,17 +133,6 @@ interface SlideOptions {
 }
 
 export async function generatePitchDeck(data: DeepDiveData): Promise<Buffer> {
-  // Debug: Log financial data received
-  console.log("[Pitch Deck] Financial data:", {
-    hasFinancial: !!data.financial,
-    startupCostsSummaryLength: data.financial?.startupCostsSummary?.length,
-    firstStartupItem: data.financial?.startupCostsSummary?.[0],
-    monthlyOperatingCostsLength: data.financial?.monthlyOperatingCosts?.length,
-    firstMonthlyItem: data.financial?.monthlyOperatingCosts?.[0],
-    hasRevenueProjections: !!data.financial?.revenueProjections,
-    moderateRevenue: data.financial?.revenueProjections?.moderate,
-  });
-
   const pptx = new PptxGenJS();
   const overview = extractBusinessOverview(data);
   const colors = getCategoryColors(overview.category);
@@ -113,12 +173,12 @@ export async function generatePitchDeck(data: DeepDiveData): Promise<Buffer> {
 // Slide 1: Cover
 function createCoverSlide(
   opts: SlideOptions,
-  data: DeepDiveData,
+  _data: DeepDiveData,
   overview: ReturnType<typeof extractBusinessOverview>
 ) {
   const slide = opts.pptx.addSlide({ masterName: "DARK_MASTER" });
 
-  // Decorative accent bar at top
+  // Clean horizontal accent bar at top
   slide.addShape("rect", {
     x: 0,
     y: 0,
@@ -188,14 +248,13 @@ function createCoverSlide(
     fontFace: "Arial",
   });
 
-  // Decorative shape in bottom right
+  // Clean horizontal accent bar at bottom (replaces rotated rectangle)
   slide.addShape("rect", {
-    x: 8.5,
-    y: 4.5,
-    w: 1.3,
-    h: 0.8,
+    x: 0,
+    y: 5.5,
+    w: "100%",
+    h: 0.08,
     fill: { color: opts.colors.primary.replace("#", "") },
-    rotate: 15,
   });
 }
 
@@ -208,7 +267,7 @@ function createOpportunitySlide(
   const slide = opts.pptx.addSlide({ masterName: "LIGHT_MASTER" });
   const { foundation } = data;
 
-  // Header
+  // Header with accent color
   addSlideHeader(slide, "The Opportunity", opts.colors);
 
   // Problem statement
@@ -217,15 +276,15 @@ function createOpportunitySlide(
     y: 1.1,
     fontSize: 12,
     bold: true,
-    color: LIGHT_COLORS.muted,
+    color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
   });
 
-  slide.addText(truncateText(overview.problem, 180), {
+  slide.addText(truncateText(overview.problem, 250), {
     x: 0.5,
     y: 1.35,
     w: 5.2,
-    h: 1.0,
+    h: 1.2,
     fontSize: 13,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
@@ -236,18 +295,18 @@ function createOpportunitySlide(
   // Target audience
   slide.addText("Target Audience", {
     x: 0.5,
-    y: 2.5,
+    y: 2.65,
     fontSize: 12,
     bold: true,
-    color: LIGHT_COLORS.muted,
+    color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
   });
 
-  slide.addText(truncateText(overview.audience, 150), {
+  slide.addText(truncateText(overview.audience, 220), {
     x: 0.5,
-    y: 2.75,
+    y: 2.9,
     w: 5.2,
-    h: 0.8,
+    h: 1.0,
     fontSize: 13,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
@@ -255,15 +314,15 @@ function createOpportunitySlide(
     valign: "top",
   });
 
-  // Market size callout boxes (right side) - stacked vertically with proper spacing
+  // Market size callout boxes (right side)
   const marketResearch = foundation?.marketViability?.marketResearch;
 
-  // TAM callout (large box at top right) - wider to fit formatted values
+  // TAM callout - split number and description
   slide.addShape("roundRect", {
     x: 6.0,
     y: 1.1,
     w: 3.5,
-    h: 1.3,
+    h: 1.4,
     fill: { color: opts.colors.primary.replace("#", "") },
     rectRadius: 0.1,
   });
@@ -278,91 +337,114 @@ function createOpportunitySlide(
     align: "center",
   });
 
-  slide.addText(formatMarketSize(marketResearch?.tam), {
+  // Large number only
+  slide.addText(extractMarketNumber(marketResearch?.tam), {
     x: 6.0,
-    y: 1.5,
+    y: 1.45,
     w: 3.5,
-    fontSize: 22,
+    fontSize: 28,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  // SAM box (left of pair) - wider boxes
+  // Description below
+  const tamDescription = extractMarketDescription(marketResearch?.tam);
+  if (tamDescription && tamDescription !== "market") {
+    slide.addText(truncateText(tamDescription, 35), {
+      x: 6.0,
+      y: 2.05,
+      w: 3.5,
+      fontSize: 9,
+      color: "FFFFFF",
+      fontFace: "Arial",
+      align: "center",
+    });
+  }
+
+  // SAM box - wider
   slide.addShape("roundRect", {
     x: 6.0,
-    y: 2.55,
-    w: 1.65,
-    h: 1.0,
+    y: 2.65,
+    w: 1.7,
+    h: 1.1,
     fill: { color: opts.colors.secondary.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("SAM", {
     x: 6.0,
-    y: 2.6,
-    w: 1.65,
+    y: 2.7,
+    w: 1.7,
     fontSize: 9,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  slide.addText(formatMarketSize(marketResearch?.sam), {
+  slide.addText(extractMarketNumber(marketResearch?.sam), {
     x: 6.0,
-    y: 2.85,
-    w: 1.65,
-    fontSize: 13,
+    y: 2.95,
+    w: 1.7,
+    fontSize: 14,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  // SOM box (right of pair)
+  // SOM box - wider
   slide.addShape("roundRect", {
-    x: 7.85,
-    y: 2.55,
-    w: 1.65,
-    h: 1.0,
+    x: 7.8,
+    y: 2.65,
+    w: 1.7,
+    h: 1.1,
     fill: { color: opts.colors.accent.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("SOM", {
-    x: 7.85,
-    y: 2.6,
-    w: 1.65,
+    x: 7.8,
+    y: 2.7,
+    w: 1.7,
     fontSize: 9,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
     align: "center",
   });
 
-  slide.addText(formatMarketSize(marketResearch?.som), {
-    x: 7.85,
-    y: 2.85,
-    w: 1.65,
-    fontSize: 13,
+  slide.addText(extractMarketNumber(marketResearch?.som), {
+    x: 7.8,
+    y: 2.95,
+    w: 1.7,
+    fontSize: 14,
     bold: true,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
     align: "center",
   });
 
-  // Growth rate (below market boxes) - truncate at word boundary
-  const growthText = marketResearch?.growthRate || "N/A";
-  slide.addText(`Growth: ${truncateText(growthText, 25)}`, {
-    x: 6.0,
-    y: 3.7,
-    w: 3.5,
-    fontSize: 11,
-    color: opts.colors.primary.replace("#", ""),
-    fontFace: "Arial",
-    bold: true,
-    align: "center",
-  });
+  // Growth rate - clean formatting
+  const growthText = marketResearch?.growthRate || "";
+  if (growthText) {
+    // Extract just the percentage if present, otherwise show clean version
+    const percentMatch = growthText.match(/[\d.]+%/);
+    const displayGrowth = percentMatch
+      ? `${percentMatch[0]} annual growth`
+      : truncateText(growthText, 30);
+
+    slide.addText(displayGrowth, {
+      x: 6.0,
+      y: 3.9,
+      w: 3.5,
+      fontSize: 12,
+      color: opts.colors.primary.replace("#", ""),
+      fontFace: "Arial",
+      bold: true,
+      align: "center",
+    });
+  }
 }
 
 // Slide 3: The Solution
@@ -382,16 +464,16 @@ function createSolutionSlide(
     y: 1.1,
     fontSize: 11,
     bold: true,
-    color: LIGHT_COLORS.muted,
+    color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
   });
 
   const description = overview.howItWorks || overview.description || "";
-  slide.addText(truncateText(description, 200), {
+  slide.addText(truncateText(description, 280), {
     x: 0.5,
     y: 1.35,
     w: 9,
-    h: 0.7,
+    h: 0.8,
     fontSize: 12,
     color: LIGHT_COLORS.text,
     fontFace: "Arial",
@@ -402,16 +484,16 @@ function createSolutionSlide(
   // What makes us different
   slide.addText("What Makes Us Different", {
     x: 0.5,
-    y: 2.15,
+    y: 2.25,
     fontSize: 11,
     bold: true,
-    color: LIGHT_COLORS.muted,
+    color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
   });
 
-  slide.addText(truncateText(overview.differentiation || data.idea.valueProposition || "", 180), {
+  slide.addText(truncateText(overview.differentiation || data.idea.valueProposition || "", 250), {
     x: 0.5,
-    y: 2.4,
+    y: 2.5,
     w: 9,
     h: 0.7,
     fontSize: 12,
@@ -421,46 +503,55 @@ function createSolutionSlide(
     valign: "top",
   });
 
-  // Benefits grid (3 columns) - positioned lower with fixed heights
+  // Benefits grid (3 columns) - titles INSIDE cards
   const benefits = growth?.landingPageCopy?.benefits?.slice(0, 3) || [];
   benefits.forEach((benefit, i) => {
     const xPos = 0.5 + i * 3.1;
+    const cardY = 3.3;
+    const cardH = 1.6;
 
-    // Benefit card
+    // Benefit card with accent border
     slide.addShape("roundRect", {
       x: xPos,
-      y: 3.25,
+      y: cardY,
       w: 2.9,
-      h: 1.6,
+      h: cardH,
       fill: { color: "FFFFFF" },
       line: { color: opts.colors.accent.replace("#", ""), width: 2 },
       rectRadius: 0.1,
     });
 
-    // Icon placeholder (circle with number)
+    // Icon circle with number - properly centered
+    const circleX = xPos + 0.15;
+    const circleY = cardY + 0.15;
+    const circleSize = 0.35;
+
     slide.addShape("ellipse", {
-      x: xPos + 0.1,
-      y: 3.35,
-      w: 0.35,
-      h: 0.35,
+      x: circleX,
+      y: circleY,
+      w: circleSize,
+      h: circleSize,
       fill: { color: opts.colors.primary.replace("#", "") },
     });
 
+    // Number centered in circle
     slide.addText(String(i + 1), {
-      x: xPos + 0.1,
-      y: 3.38,
-      w: 0.35,
+      x: circleX,
+      y: circleY,
+      w: circleSize,
+      h: circleSize,
       fontSize: 12,
       bold: true,
       color: "FFFFFF",
       fontFace: "Arial",
       align: "center",
+      valign: "middle",
     });
 
-    // Benefit title (truncated)
-    slide.addText(truncateText(benefit.title, 30), {
+    // Benefit title INSIDE the card, next to circle
+    slide.addText(truncateText(benefit.title, 25), {
       x: xPos + 0.55,
-      y: 3.35,
+      y: cardY + 0.18,
       w: 2.2,
       fontSize: 11,
       bold: true,
@@ -468,12 +559,12 @@ function createSolutionSlide(
       fontFace: "Arial",
     });
 
-    // Benefit description (truncated with fixed height)
-    slide.addText(truncateText(benefit.description, 80), {
-      x: xPos + 0.1,
-      y: 3.8,
-      w: 2.7,
-      h: 0.95,
+    // Benefit description INSIDE card with sentence-aware truncation
+    slide.addText(truncateText(benefit.description, 120), {
+      x: xPos + 0.15,
+      y: cardY + 0.6,
+      w: 2.6,
+      h: 0.9,
       fontSize: 9,
       color: LIGHT_COLORS.muted,
       fontFace: "Arial",
@@ -496,32 +587,39 @@ function createMarketValidationSlide(
 
   const viability = foundation?.marketViability;
 
-  // Viability score callout (large, left side)
+  // Viability score callout (large, left side) - properly centered
   const score = viability?.overallScore || 0;
+  const circleX = 0.5;
+  const circleY = 1.5;
+  const circleW = 2;
+  const circleH = 2;
 
   slide.addShape("ellipse", {
-    x: 0.5,
-    y: 1.5,
-    w: 2,
-    h: 2,
+    x: circleX,
+    y: circleY,
+    w: circleW,
+    h: circleH,
     fill: { color: getScoreColor(score) },
   });
 
+  // Score number - centered in circle using full circle dimensions
   slide.addText(String(score), {
-    x: 0.5,
-    y: 1.8,
-    w: 2,
+    x: circleX,
+    y: circleY + 0.3,
+    w: circleW,
+    h: circleH * 0.5,
     fontSize: 48,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
+    valign: "middle",
   });
 
   slide.addText("/100", {
-    x: 0.5,
-    y: 2.6,
-    w: 2,
+    x: circleX,
+    y: circleY + circleH * 0.6,
+    w: circleW,
     fontSize: 14,
     color: "FFFFFF",
     fontFace: "Arial",
@@ -529,17 +627,17 @@ function createMarketValidationSlide(
   });
 
   slide.addText("Viability Score", {
-    x: 0.5,
-    y: 3.6,
-    w: 2,
+    x: circleX,
+    y: circleY + circleH + 0.1,
+    w: circleW,
     fontSize: 12,
     bold: true,
-    color: LIGHT_COLORS.text,
+    color: opts.colors.primary.replace("#", ""),
     fontFace: "Arial",
     align: "center",
   });
 
-  // Score breakdown table
+  // Score breakdown table with accent-colored header
   const breakdown = viability?.scoreBreakdown || [];
   if (breakdown.length > 0) {
     const tableData: PptxGenJS.TableRow[] = [
@@ -554,7 +652,7 @@ function createMarketValidationSlide(
       tableData.push([
         { text: item.factor },
         { text: `${item.score}/100`, options: { align: "center" } },
-        { text: item.assessment.substring(0, 50) + (item.assessment.length > 50 ? "..." : "") },
+        { text: truncateText(item.assessment, 70) },
       ]);
     });
 
@@ -570,7 +668,7 @@ function createMarketValidationSlide(
     });
   }
 
-  // Key insights
+  // Key insights with accent color
   const research = viability?.marketResearch;
   if (research?.trends && research.trends.length > 0) {
     slide.addText("Key Market Trends", {
@@ -578,11 +676,11 @@ function createMarketValidationSlide(
       y: 3.8,
       fontSize: 12,
       bold: true,
-      color: LIGHT_COLORS.muted,
+      color: opts.colors.primary.replace("#", ""),
       fontFace: "Arial",
     });
 
-    const trendText = research.trends.slice(0, 3).map((t) => `• ${t}`).join("\n");
+    const trendText = research.trends.slice(0, 3).map((t) => `• ${truncateText(t, 80)}`).join("\n");
     slide.addText(trendText, {
       x: 3,
       y: 4.1,
@@ -609,7 +707,10 @@ function createCompetitiveLandscapeSlide(
   const competitors = foundation?.marketViability?.competitorAnalysis || [];
 
   if (competitors.length > 0) {
-    // Competitor table with truncated values
+    // Competitor table with rebalanced columns: 25% / 20% / 30% / 25%
+    const tableW = 9;
+    const colWidths = [tableW * 0.25, tableW * 0.20, tableW * 0.30, tableW * 0.25];
+
     const tableData: PptxGenJS.TableRow[] = [
       [
         { text: "Competitor", options: { bold: true, fill: { color: opts.colors.primary.replace("#", "") }, color: "FFFFFF", fontSize: 9 } },
@@ -621,26 +722,39 @@ function createCompetitiveLandscapeSlide(
 
     competitors.slice(0, 4).forEach((comp) => {
       tableData.push([
-        { text: truncateText(comp.name, 20), options: { fontSize: 9 } },
-        { text: truncateText(comp.pricing, 15) || "N/A", options: { fontSize: 9 } },
-        { text: truncateText(comp.positioning, 35), options: { fontSize: 9 } },
-        { text: truncateText(comp.weakness, 35), options: { fontSize: 9 } },
+        { text: truncateText(comp.name, 28), options: { fontSize: 9 } },
+        { text: truncateText(comp.pricing, 22) || "N/A", options: { fontSize: 9 } },
+        { text: truncateText(comp.positioning, 45), options: { fontSize: 9 } },
+        { text: truncateText(comp.weakness, 38), options: { fontSize: 9 } },
       ]);
     });
 
     slide.addTable(tableData, {
       x: 0.5,
       y: 1.2,
-      w: 9,
+      w: tableW,
       fontSize: 9,
       fontFace: "Arial",
       color: LIGHT_COLORS.text,
       border: { type: "solid", color: "E5E7EB", pt: 0.5 },
-      colW: [1.8, 1.2, 3, 3],
+      colW: colWidths,
     });
+
+    // If only 2 or fewer competitors, add opportunity note
+    if (competitors.length <= 2) {
+      slide.addText("Limited direct competition represents a significant market opportunity.", {
+        x: 0.5,
+        y: 2.6 + competitors.length * 0.35,
+        w: 9,
+        fontSize: 11,
+        italic: true,
+        color: opts.colors.primary.replace("#", ""),
+        fontFace: "Arial",
+      });
+    }
   }
 
-  // Positioning statement box (with truncated text to prevent overflow)
+  // Positioning statement box - show differentiation as standalone statement
   slide.addShape("roundRect", {
     x: 0.5,
     y: 3.9,
@@ -650,10 +764,9 @@ function createCompetitiveLandscapeSlide(
     rectRadius: 0.1,
   });
 
-  const diffText = truncateText(overview.differentiation || "trusted local choice", 50);
-  const audienceText = truncateText(overview.audience, 40);
-  const positioning = `We're the ${diffText} for ${audienceText}`;
-  slide.addText(truncateText(positioning, 100), {
+  // Clean positioning: just show the differentiation without broken template
+  const differentiation = overview.differentiation || "Your trusted local choice";
+  slide.addText(truncateText(differentiation, 150), {
     x: 0.7,
     y: 4.05,
     w: 8.6,
@@ -678,24 +791,97 @@ function createFinancialProjectionsSlide(
 
   addSlideHeader(slide, "Financial Projections", opts.colors);
 
-  // Startup costs callout - use parseCurrency for string values
+  // Calculate totals
   const totalStartup = financial?.startupCostsSummary?.reduce((sum, item) => {
     return sum + parseCurrency(item.cost);
   }, 0) || 0;
 
+  const totalMonthly = financial?.monthlyOperatingCosts?.reduce((sum, item) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const itemAny = item as any;
+    return sum + parseCurrency(itemAny.monthlyCost || itemAny.cost);
+  }, 0) || 0;
+
+  const projections = financial?.revenueProjections;
+  const monthlyRev = parseCurrency(projections?.moderate?.monthlyRevenue);
+  const annualRevenue = monthlyRev * 12;
+
+  // Annual revenue callout (HERO - larger and more prominent) - LEFT side now
   slide.addShape("roundRect", {
     x: 0.5,
     y: 1.15,
-    w: 2.8,
+    w: 3.2,
+    h: 2.8,
+    fill: { color: opts.colors.accent.replace("#", "") },
+    rectRadius: 0.1,
+  });
+
+  slide.addText("Projected Annual Revenue", {
+    x: 0.5,
+    y: 1.3,
+    w: 3.2,
+    fontSize: 11,
+    bold: true,
+    color: LIGHT_COLORS.text,
+    fontFace: "Arial",
+    align: "center",
+  });
+
+  slide.addText(formatCurrency(annualRevenue), {
+    x: 0.5,
+    y: 1.8,
+    w: 3.2,
+    fontSize: 36,
+    bold: true,
+    color: opts.colors.primary.replace("#", ""),
+    fontFace: "Arial",
+    align: "center",
+  });
+
+  slide.addText("(Moderate Scenario)", {
+    x: 0.5,
+    y: 2.6,
+    w: 3.2,
+    fontSize: 10,
+    color: LIGHT_COLORS.muted,
+    fontFace: "Arial",
+    align: "center",
+  });
+
+  // Break-even info with proper sentence handling
+  const breakEven = financial?.breakEvenAnalysis;
+  if (breakEven) {
+    const breakEvenText = breakEven.description || (breakEven.unitsNeeded ? `${breakEven.unitsNeeded} units needed` : "");
+    if (breakEvenText) {
+      slide.addText(truncateText(breakEvenText, 50), {
+        x: 0.5,
+        y: 3.0,
+        w: 3.2,
+        h: 0.8,
+        fontSize: 10,
+        color: LIGHT_COLORS.text,
+        fontFace: "Arial",
+        align: "center",
+        valign: "top",
+        breakLine: true,
+      });
+    }
+  }
+
+  // Startup costs callout - smaller, right side top
+  slide.addShape("roundRect", {
+    x: 4.0,
+    y: 1.15,
+    w: 2.7,
     h: 1.3,
     fill: { color: opts.colors.primary.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("Startup Cost", {
-    x: 0.5,
+    x: 4.0,
     y: 1.2,
-    w: 2.8,
+    w: 2.7,
     fontSize: 10,
     color: "FFFFFF",
     fontFace: "Arial",
@@ -703,36 +889,30 @@ function createFinancialProjectionsSlide(
   });
 
   slide.addText(formatCurrency(totalStartup), {
-    x: 0.5,
+    x: 4.0,
     y: 1.5,
-    w: 2.8,
-    fontSize: 28,
+    w: 2.7,
+    fontSize: 26,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  // Monthly costs callout - use parseCurrency
-  const totalMonthly = financial?.monthlyOperatingCosts?.reduce((sum, item) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const itemAny = item as any;
-    return sum + parseCurrency(itemAny.monthlyCost || itemAny.cost);
-  }, 0) || 0;
-
+  // Monthly costs callout - smaller, right side
   slide.addShape("roundRect", {
-    x: 3.5,
+    x: 7.0,
     y: 1.15,
-    w: 2.8,
+    w: 2.5,
     h: 1.3,
     fill: { color: opts.colors.secondary.replace("#", "") },
     rectRadius: 0.1,
   });
 
   slide.addText("Monthly Costs", {
-    x: 3.5,
+    x: 7.0,
     y: 1.2,
-    w: 2.8,
+    w: 2.5,
     fontSize: 10,
     color: "FFFFFF",
     fontFace: "Arial",
@@ -740,18 +920,17 @@ function createFinancialProjectionsSlide(
   });
 
   slide.addText(formatCurrency(totalMonthly), {
-    x: 3.5,
+    x: 7.0,
     y: 1.5,
-    w: 2.8,
-    fontSize: 28,
+    w: 2.5,
+    fontSize: 24,
     bold: true,
     color: "FFFFFF",
     fontFace: "Arial",
     align: "center",
   });
 
-  // Revenue projections table - use parseCurrency for all values
-  const projections = financial?.revenueProjections;
+  // Revenue projections table with proper negative formatting
   if (projections) {
     const tableData: PptxGenJS.TableRow[] = [
       [
@@ -763,91 +942,32 @@ function createFinancialProjectionsSlide(
       [
         { text: "Conservative", options: { fontSize: 9 } },
         { text: formatCurrency(parseCurrency(projections.conservative?.monthlyRevenue)), options: { fontSize: 9 } },
-        { text: formatCurrency(parseCurrency(projections.conservative?.monthlyProfit)), options: { fontSize: 9 } },
-        { text: truncateText(projections.conservative?.breakEvenMonth, 12) || "N/A", options: { fontSize: 9 } },
+        { text: formatCurrencyWithSign(parseCurrency(projections.conservative?.monthlyProfit)), options: { fontSize: 9 } },
+        { text: truncateText(projections.conservative?.breakEvenMonth, 15) || "N/A", options: { fontSize: 9 } },
       ],
       [
         { text: "Moderate", options: { bold: true, fontSize: 9 } },
         { text: formatCurrency(parseCurrency(projections.moderate?.monthlyRevenue)), options: { bold: true, fontSize: 9 } },
-        { text: formatCurrency(parseCurrency(projections.moderate?.monthlyProfit)), options: { bold: true, fontSize: 9 } },
-        { text: truncateText(projections.moderate?.breakEvenMonth, 12) || "N/A", options: { bold: true, fontSize: 9 } },
+        { text: formatCurrencyWithSign(parseCurrency(projections.moderate?.monthlyProfit)), options: { bold: true, fontSize: 9 } },
+        { text: truncateText(projections.moderate?.breakEvenMonth, 15) || "N/A", options: { bold: true, fontSize: 9 } },
       ],
       [
         { text: "Aggressive", options: { fontSize: 9 } },
         { text: formatCurrency(parseCurrency(projections.aggressive?.monthlyRevenue)), options: { fontSize: 9 } },
-        { text: formatCurrency(parseCurrency(projections.aggressive?.monthlyProfit)), options: { fontSize: 9 } },
-        { text: truncateText(projections.aggressive?.breakEvenMonth, 12) || "N/A", options: { fontSize: 9 } },
+        { text: formatCurrencyWithSign(parseCurrency(projections.aggressive?.monthlyProfit)), options: { fontSize: 9 } },
+        { text: truncateText(projections.aggressive?.breakEvenMonth, 15) || "N/A", options: { fontSize: 9 } },
       ],
     ];
 
     slide.addTable(tableData, {
-      x: 0.5,
+      x: 4.0,
       y: 2.7,
-      w: 5.8,
+      w: 5.5,
       fontSize: 9,
       fontFace: "Arial",
       color: LIGHT_COLORS.text,
       border: { type: "solid", color: "E5E7EB", pt: 0.5 },
-      colW: [1.4, 1.5, 1.5, 1.4],
-    });
-  }
-
-  // Annual revenue callout (moderate scenario) - use parseCurrency
-  const monthlyRev = parseCurrency(projections?.moderate?.monthlyRevenue);
-  const annualRevenue = monthlyRev * 12;
-
-  slide.addShape("roundRect", {
-    x: 6.5,
-    y: 1.15,
-    w: 3,
-    h: 2.6,
-    fill: { color: opts.colors.accent.replace("#", "") },
-    rectRadius: 0.1,
-  });
-
-  slide.addText("Projected Annual Revenue", {
-    x: 6.5,
-    y: 1.25,
-    w: 3,
-    fontSize: 10,
-    color: LIGHT_COLORS.text,
-    fontFace: "Arial",
-    align: "center",
-  });
-
-  slide.addText(formatCurrency(annualRevenue), {
-    x: 6.5,
-    y: 1.7,
-    w: 3,
-    fontSize: 32,
-    bold: true,
-    color: opts.colors.primary.replace("#", ""),
-    fontFace: "Arial",
-    align: "center",
-  });
-
-  slide.addText("(Moderate Scenario)", {
-    x: 6.5,
-    y: 2.4,
-    w: 3,
-    fontSize: 9,
-    color: LIGHT_COLORS.muted,
-    fontFace: "Arial",
-    align: "center",
-  });
-
-  // Break-even info (truncated)
-  const breakEven = financial?.breakEvenAnalysis;
-  if (breakEven) {
-    const breakEvenText = breakEven.description || (breakEven.unitsNeeded ? `${breakEven.unitsNeeded} units` : "");
-    slide.addText(`Break-even: ${truncateText(breakEvenText, 25)}`, {
-      x: 6.5,
-      y: 2.9,
-      w: 3,
-      fontSize: 9,
-      color: LIGHT_COLORS.text,
-      fontFace: "Arial",
-      align: "center",
+      colW: [1.3, 1.4, 1.4, 1.4],
     });
   }
 }
@@ -880,7 +1000,7 @@ function createAskSlide(
     fontFace: "Arial",
   });
 
-  // What we need section
+  // What we need section - dynamic based on actual data
   slide.addText("What We Need to Launch", {
     x: 0.5,
     y: 1.1,
@@ -890,18 +1010,41 @@ function createAskSlide(
     fontFace: "Arial",
   });
 
-  // Calculate total startup needed - use parseCurrency
+  // Calculate total startup needed
   const totalStartup = financial?.startupCostsSummary?.reduce((sum, item) => {
     return sum + parseCurrency(item.cost);
   }, 0) || 0;
 
-  const needs = [
-    `Starting capital: ${formatCurrency(totalStartup)}`,
-    "Location/space (if applicable)",
-    "Strategic partnerships",
-  ];
+  // Build needs list from actual data (no generic filler)
+  const needs: string[] = [];
 
-  needs.forEach((need, i) => {
+  if (totalStartup > 0) {
+    needs.push(`Starting capital: ${formatCurrency(totalStartup)}`);
+  }
+
+  // Add specific needs from startup costs items
+  const startupItems = financial?.startupCostsSummary || [];
+  const significantItems = startupItems
+    .filter(item => parseCurrency(item.cost) > totalStartup * 0.15)
+    .slice(0, 2);
+
+  significantItems.forEach(item => {
+    if (item.item && !item.item.toLowerCase().includes('misc')) {
+      needs.push(`${item.item}: ${formatCurrency(parseCurrency(item.cost))}`);
+    }
+  });
+
+  // Add partnerships/suppliers if available
+  if (data.foundation?.suppliers?.platforms && data.foundation.suppliers.platforms.length > 0) {
+    needs.push("Key supplier relationships");
+  }
+
+  // Ensure we have at least 2 items
+  if (needs.length < 2) {
+    needs.push("Strategic partnerships");
+  }
+
+  needs.slice(0, 3).forEach((need, i) => {
     slide.addText(`• ${need}`, {
       x: 0.5,
       y: 1.4 + i * 0.35,
@@ -944,7 +1087,7 @@ function createAskSlide(
       align: "center",
     });
 
-    slide.addText(week.title.substring(0, 25) + (week.title.length > 25 ? "..." : ""), {
+    slide.addText(truncateText(week.title, 28), {
       x: 0.55 + i * 2.3,
       y: 3.5,
       w: 2,
@@ -984,8 +1127,9 @@ function createAskSlide(
   });
 }
 
-// Helper: Add consistent header to light slides
+// Helper: Add consistent header to light slides with accent color
 function addSlideHeader(slide: PptxGenJS.Slide, title: string, colors: CategoryColors) {
+  // Vertical accent bar on left
   slide.addShape("rect", {
     x: 0,
     y: 0,
@@ -994,6 +1138,7 @@ function addSlideHeader(slide: PptxGenJS.Slide, title: string, colors: CategoryC
     fill: { color: colors.primary.replace("#", "") },
   });
 
+  // Title with accent color
   slide.addText(title, {
     x: 0.5,
     y: 0.3,
@@ -1001,6 +1146,15 @@ function addSlideHeader(slide: PptxGenJS.Slide, title: string, colors: CategoryC
     bold: true,
     color: colors.primary.replace("#", ""),
     fontFace: "Arial",
+  });
+
+  // Thin horizontal accent line under title
+  slide.addShape("rect", {
+    x: 0.5,
+    y: 0.85,
+    w: 2,
+    h: 0.03,
+    fill: { color: colors.accent.replace("#", "") },
   });
 }
 
