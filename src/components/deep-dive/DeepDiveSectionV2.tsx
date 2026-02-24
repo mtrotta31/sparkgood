@@ -526,16 +526,47 @@ export default function DeepDiveSectionV2({
       const result = await response.json();
 
       if (result.success && result.data) {
-        setLaunchKitV2(result.data);
+        // Transform API response to modal-expected format
+        const { textContent, assets } = result.data;
+
+        // Convert socialGraphics from object to array format
+        type GraphicValue = { url?: string; storagePath: string };
+        const socialGraphicsArray = assets?.socialGraphics ? Object.entries(assets.socialGraphics as Record<string, GraphicValue>).map(([key, value]) => {
+          const platformMap: Record<string, { name: string; width: number; height: number }> = {
+            instagramPost: { name: "instagram-post", width: 1080, height: 1080 },
+            instagramStory: { name: "instagram-story", width: 1080, height: 1920 },
+            linkedinPost: { name: "linkedin-post", width: 1200, height: 627 },
+            facebookCover: { name: "facebook-cover", width: 820, height: 312 },
+          };
+          const platformInfo = platformMap[key] || { name: key, width: 1080, height: 1080 };
+          return {
+            platform: platformInfo.name,
+            url: value.url || "",
+            storagePath: value.storagePath,
+            dimensions: { width: platformInfo.width, height: platformInfo.height },
+          };
+        }) : [];
+
+        // Build the transformed V2 assets object
+        const transformedAssets = {
+          textContent,
+          landingPage: assets?.landingPage,
+          pitchDeck: assets?.pitchDeck,
+          socialGraphics: socialGraphicsArray,
+          onePager: assets?.onePager,
+        };
+
+        setLaunchKitV2(transformedAssets);
+
         // Also set V1 launchKit for backwards compatibility if textContent exists
-        if (result.data.textContent) {
+        if (textContent) {
           setLaunchKit({
-            elevatorPitch: result.data.textContent.elevatorPitch,
-            socialPosts: result.data.textContent.socialPosts,
-            emailSequence: result.data.textContent.emailSequence,
-            landingPage: result.data.textContent.landingPageCopy ? {
-              headline: result.data.textContent.landingPageCopy.headline,
-              subheadline: result.data.textContent.landingPageCopy.subheadline,
+            elevatorPitch: textContent.elevatorPitch,
+            socialPosts: textContent.socialPosts,
+            emailSequence: textContent.emailSequence,
+            landingPage: textContent.landingPageCopy ? {
+              headline: textContent.landingPageCopy.headline,
+              subheadline: textContent.landingPageCopy.subheadline,
               html: "",
             } : { headline: "", subheadline: "", html: "" },
           });
