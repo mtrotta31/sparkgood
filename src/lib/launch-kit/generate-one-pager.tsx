@@ -10,7 +10,7 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer";
 import type { DeepDiveData, CategoryColors } from "./types";
-import { getCategoryColors, extractBusinessOverview, formatCurrency } from "./types";
+import { getCategoryColors, extractBusinessOverview, formatCurrency, parseCurrency } from "./types";
 
 // Helper to convert hex to RGB for PDF
 function hexToRgb(hex: string): string {
@@ -40,13 +40,12 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
   const marketSize = foundation?.marketViability?.marketResearch?.tam || "N/A";
   const growthRate = foundation?.marketViability?.marketResearch?.growthRate || "N/A";
 
-  // Calculate totals from financial data
+  // Calculate totals from financial data using parseCurrency for string values
   const startupCost = financial?.startupCostsSummary?.reduce((sum, item) => {
-    const cost = parseFloat(String(item.cost || "0").replace(/[^0-9.-]/g, ""));
-    return sum + (isNaN(cost) ? 0 : cost);
+    return sum + parseCurrency(item.cost);
   }, 0) || 0;
 
-  const monthlyRevenue = financial?.revenueProjections?.moderate?.monthlyRevenue || 0;
+  const monthlyRevenue = parseCurrency(financial?.revenueProjections?.moderate?.monthlyRevenue);
   const breakEvenMonth = financial?.revenueProjections?.moderate?.breakEvenMonth || "N/A";
 
   // Get pricing tiers
@@ -55,6 +54,14 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
   // Get benefits/services
   const benefits = growth?.landingPageCopy?.benefits?.slice(0, 4) || [];
 
+  // Check if description is different from problem (avoid duplicate content)
+  const hasUniqueDescription = overview.description &&
+    overview.description !== overview.problem &&
+    overview.description !== overview.tagline;
+
+  // Get category label (empty string for "other" to avoid showing "BUSINESS")
+  const categoryLabel = formatCategory(overview.category);
+
   // Create the PDF document
   const doc = (
     <Document>
@@ -62,18 +69,18 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.businessName}>{overview.name}</Text>
-            <Text style={styles.tagline}>{overview.tagline}</Text>
+            <Text style={styles.businessName}>{overview.name || "Business"}</Text>
+            <Text style={styles.tagline}>{overview.tagline || " "}</Text>
           </View>
           <View style={styles.headerRight}>
-            {overview.city && overview.state && (
+            {overview.city && overview.state ? (
               <Text style={styles.location}>
                 {overview.city}, {overview.state}
               </Text>
-            )}
-            <Text style={styles.category}>
-              {formatCategory(overview.category)}
-            </Text>
+            ) : null}
+            {categoryLabel ? (
+              <Text style={styles.category}>{categoryLabel}</Text>
+            ) : null}
           </View>
         </View>
 
@@ -84,19 +91,21 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
         <View style={styles.mainContent}>
           {/* Left Column (60%) */}
           <View style={styles.leftColumn}>
-            {/* About */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About</Text>
-              <Text style={styles.sectionText}>
-                {truncate(overview.description || overview.tagline, 200)}
-              </Text>
-            </View>
+            {/* About - only show if we have unique description content */}
+            {hasUniqueDescription ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>About</Text>
+                <Text style={styles.sectionText}>
+                  {truncate(overview.description, 200)}
+                </Text>
+              </View>
+            ) : null}
 
             {/* The Problem We Solve */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>The Problem We Solve</Text>
               <Text style={styles.sectionText}>
-                {truncate(overview.problem, 180)}
+                {truncate(overview.problem || "Addressing unmet customer needs.", 220)}
               </Text>
             </View>
 
@@ -104,7 +113,7 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>How It Works</Text>
               <Text style={styles.sectionText}>
-                {truncate(overview.howItWorks || data.idea.mechanism || data.idea.revenueModel || "", 180)}
+                {truncate(overview.howItWorks || data.idea.mechanism || data.idea.revenueModel || "Contact us to learn more.", 200)}
               </Text>
             </View>
 
@@ -113,37 +122,42 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
               <Text style={styles.sectionTitle}>What Makes Us Different</Text>
               {overview.differentiation ? (
                 <Text style={styles.sectionText}>
-                  {truncate(overview.differentiation, 150)}
+                  {truncate(overview.differentiation, 180)}
                 </Text>
-              ) : (
+              ) : benefits.length > 0 ? (
                 <View style={styles.bulletList}>
                   {benefits.slice(0, 3).map((benefit, i) => (
                     <View key={i} style={styles.bulletItem}>
                       <Text style={styles.bullet}>•</Text>
-                      <Text style={styles.bulletText}>{benefit.title}</Text>
+                      <Text style={styles.bulletText}>{benefit.title || "Quality service"}</Text>
                     </View>
                   ))}
                 </View>
+              ) : (
+                <Text style={styles.sectionText}>Local expertise and personalized service.</Text>
               )}
             </View>
           </View>
 
           {/* Right Column (40%) */}
           <View style={styles.rightColumn}>
+            {/* Viability Score - Prominent callout */}
+            <View style={styles.scoreBox}>
+              <Text style={styles.scoreLabel}>VIABILITY SCORE</Text>
+              <Text style={styles.scoreValue}>{viabilityScore}</Text>
+              <Text style={styles.scoreMax}>/100</Text>
+            </View>
+
             {/* Market Opportunity Box */}
             <View style={styles.infoBox}>
               <Text style={styles.boxTitle}>Market Opportunity</Text>
               <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Viability Score</Text>
-                <Text style={styles.statValue}>{viabilityScore}/100</Text>
-              </View>
-              <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Market Size (TAM)</Text>
-                <Text style={styles.statValue}>{marketSize}</Text>
+                <Text style={styles.statValue}>{marketSize || "N/A"}</Text>
               </View>
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Growth Rate</Text>
-                <Text style={styles.statValue}>{growthRate}</Text>
+                <Text style={styles.statValue}>{growthRate || "N/A"}</Text>
               </View>
             </View>
 
@@ -160,33 +174,37 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
               </View>
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Break-Even</Text>
-                <Text style={styles.statValue}>{breakEvenMonth}</Text>
+                <Text style={styles.statValue}>{breakEvenMonth || "N/A"}</Text>
               </View>
             </View>
 
             {/* Pricing Box */}
-            {pricingStrategy && (
+            {pricingStrategy && pricingStrategy.recommendedPrice ? (
               <View style={styles.infoBox}>
                 <Text style={styles.boxTitle}>Pricing</Text>
                 <Text style={styles.pricingMain}>{pricingStrategy.recommendedPrice}</Text>
-                <Text style={styles.pricingNote}>
-                  {truncate(pricingStrategy.reasoning, 80)}
-                </Text>
+                {pricingStrategy.reasoning ? (
+                  <Text style={styles.pricingNote}>
+                    {truncate(pricingStrategy.reasoning, 80)}
+                  </Text>
+                ) : null}
               </View>
-            )}
+            ) : null}
           </View>
         </View>
 
         {/* Bottom Section - Services/Offerings */}
-        <View style={styles.bottomSection}>
-          <View style={styles.servicesRow}>
-            {benefits.slice(0, 4).map((benefit, i) => (
-              <View key={i} style={styles.serviceItem}>
-                <Text style={styles.serviceTitle}>{benefit.title}</Text>
-              </View>
-            ))}
+        {benefits.length > 0 ? (
+          <View style={styles.bottomSection}>
+            <View style={styles.servicesRow}>
+              {benefits.slice(0, 4).map((benefit, i) => (
+                <View key={i} style={styles.serviceItem}>
+                  <Text style={styles.serviceTitle}>{benefit.title || " "}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        ) : null}
 
         {/* Footer */}
         <View style={styles.footer}>
@@ -309,6 +327,30 @@ function createStyles(colors: CategoryColors) {
       fontSize: 9,
       color: "#374151",
     },
+    // Prominent viability score box
+    scoreBox: {
+      backgroundColor: `#${primary}`,
+      padding: 12,
+      marginBottom: 10,
+      borderRadius: 6,
+      alignItems: "center",
+    },
+    scoreLabel: {
+      fontSize: 8,
+      fontWeight: "bold",
+      color: "#FFFFFF",
+      marginBottom: 4,
+      letterSpacing: 1,
+    },
+    scoreValue: {
+      fontSize: 36,
+      fontWeight: "bold",
+      color: "#FFFFFF",
+    },
+    scoreMax: {
+      fontSize: 12,
+      color: "rgba(255,255,255,0.8)",
+    },
     // Info boxes
     infoBox: {
       backgroundColor: `#${accent}`,
@@ -399,7 +441,7 @@ function createStyles(colors: CategoryColors) {
   });
 }
 
-// Helper to format category for display
+// Helper to format category for display (returns empty string for "other" to avoid generic "BUSINESS" label)
 function formatCategory(category: string): string {
   const labels: Record<string, string> = {
     food_beverage: "Food & Beverage",
@@ -411,9 +453,9 @@ function formatCategory(category: string): string {
     creative_arts: "Creative & Arts",
     real_estate: "Real Estate & Property",
     social_enterprise: "Social Enterprise",
-    other: "Business",
+    other: "", // Empty for "other" to avoid showing generic "BUSINESS"
   };
-  return labels[category] || "Business";
+  return labels[category] || "";
 }
 
 // Helper to truncate text

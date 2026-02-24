@@ -156,12 +156,12 @@ export function getCategoryColors(category: string): CategoryColors {
       textLight: "#92400E",
     },
     other: {
-      primary: "#374151", // Gray
-      secondary: "#4B5563",
-      accent: "#D1D5DB",
-      background: "#F9FAFB",
-      text: "#111827",
-      textLight: "#374151",
+      primary: "#1E293B", // Navy slate
+      secondary: "#334155",
+      accent: "#FEF3C7", // Warm amber accent
+      background: "#FFFBEB",
+      text: "#1E293B",
+      textLight: "#475569",
     },
   };
 
@@ -186,10 +186,20 @@ export function extractBusinessOverview(data: DeepDiveData): BusinessOverview {
   };
 }
 
+// Parse currency string to number (handles "$300", "$7,200", "7200", etc.)
+export function parseCurrency(value: string | number | null | undefined): number {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === "number") return isNaN(value) ? 0 : value;
+  // Strip $, commas, and any non-numeric chars except . and -
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 // Format currency for display
 export function formatCurrency(amount: number | string): string {
-  const num = typeof amount === "string" ? parseFloat(amount.replace(/[^0-9.-]/g, "")) : amount;
-  if (isNaN(num)) return "$0";
+  const num = parseCurrency(amount);
+  if (num === 0) return "$0";
 
   if (num >= 1000000) {
     return `$${(num / 1000000).toFixed(1)}M`;
