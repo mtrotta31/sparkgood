@@ -29,7 +29,7 @@ import type {
 
 // Extended response type for V2
 interface LaunchKitV2Response {
-  textContent: LaunchKit;
+  textContent: LaunchKit | null;
   assets: LaunchKitAssets;
   downloadUrls: {
     pitchDeck?: string;
@@ -43,6 +43,7 @@ interface LaunchKitV2Response {
     };
   };
   landingPageUrl?: string; // Hosted URL at /sites/[slug]
+  failedAssets?: string[]; // List of assets that failed to generate
 }
 
 interface LaunchKitV2Request {
@@ -197,36 +198,49 @@ export async function POST(request: NextRequest) {
     const slug = generateSlug(idea.name);
     const storagePath = `${storageId}`;
 
-    // Generate all assets in parallel
+    // Generate all assets in parallel with individual error handling
     console.log("[Launch Kit V2] Starting asset generation...");
 
+    // Track which assets failed to generate
+    const failedAssets: string[] = [];
+
     const [textContent, pitchDeckBuffer, socialGraphics, onePagerBuffer, landingPageHtml] = await Promise.all([
-      // Generate text content
-      anthropicKey
+      // Generate text content (with retry on rate limit)
+      (anthropicKey
         ? generateTextContent(idea, profile)
-        : getMockTextContent(idea),
+        : Promise.resolve(getMockTextContent(idea))
+      ).catch(err => {
+        console.error("[Launch Kit V2] Text content generation failed:", err);
+        failedAssets.push("textContent");
+        return null;
+      }),
       // Generate pitch deck PPTX
       generatePitchDeck(deepDiveData).catch(err => {
         console.error("[Launch Kit V2] Pitch deck generation failed:", err);
+        failedAssets.push("pitchDeck");
         return null;
       }),
       // Generate social media graphics
       generateSocialGraphics(deepDiveData).catch(err => {
         console.error("[Launch Kit V2] Social graphics generation failed:", err);
+        failedAssets.push("socialGraphics");
         return [];
       }),
       // Generate one-pager PDF
       generateOnePager(deepDiveData).catch(err => {
         console.error("[Launch Kit V2] One-pager generation failed:", err);
+        failedAssets.push("onePager");
         return null;
       }),
-      // Generate landing page HTML
-      anthropicKey
-        ? generateLandingPage(deepDiveData).catch(err => {
-            console.error("[Launch Kit V2] Landing page generation failed:", err);
-            return null;
-          })
-        : getMockLandingPageHtml(idea),
+      // Generate landing page HTML (with retry on rate limit)
+      (anthropicKey
+        ? generateLandingPage(deepDiveData)
+        : Promise.resolve(getMockLandingPageHtml(idea))
+      ).catch(err => {
+        console.error("[Launch Kit V2] Landing page generation failed:", err);
+        failedAssets.push("landingPage");
+        return null;
+      }),
     ]);
 
     console.log("[Launch Kit V2] Asset generation complete:", {
@@ -235,6 +249,7 @@ export async function POST(request: NextRequest) {
       socialGraphicsCount: socialGraphics?.length || 0,
       hasOnePager: !!onePagerBuffer,
       hasLandingPage: !!landingPageHtml,
+      failedAssets: failedAssets.length > 0 ? failedAssets : "none",
     });
 
     // Initialize assets record
@@ -399,6 +414,7 @@ export async function POST(request: NextRequest) {
       socialGraphics: Object.keys(assets.socialGraphics || {}),
     });
 
+    // Return success even with partial results (some assets may have failed)
     return NextResponse.json<ApiResponse<LaunchKitV2Response>>({
       success: true,
       data: {
@@ -406,6 +422,7 @@ export async function POST(request: NextRequest) {
         assets,
         downloadUrls,
         landingPageUrl: assets.landingPage?.url,
+        failedAssets: failedAssets.length > 0 ? failedAssets : undefined,
       },
     });
   } catch (error) {
@@ -462,6 +479,7 @@ Return as JSON:
     systemPrompt: LAUNCH_KIT_SYSTEM_PROMPT,
     temperature: 0.8,
     maxTokens: 6000,
+    retryOnRateLimit: true, // Retry once on 429 rate limit errors
   });
 }
 

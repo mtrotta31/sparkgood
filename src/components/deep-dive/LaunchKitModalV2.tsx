@@ -71,7 +71,7 @@ interface LaunchKitV2Assets {
       headline: string;
       subheadline: string;
     };
-  };
+  } | null;
   pitchDeck?: {
     url: string;
     storagePath: string;
@@ -92,6 +92,7 @@ interface LaunchKitV2Assets {
     storagePath: string;
     slug: string;
   };
+  failedAssets?: string[]; // Track which assets failed to generate
 }
 
 interface LaunchKitModalV2Props {
@@ -103,6 +104,7 @@ interface LaunchKitModalV2Props {
   isLoading: boolean;
   error: string | null;
   ideaName: string;
+  failedAssets?: string[]; // List of assets that failed to generate
 }
 
 export default function LaunchKitModalV2({
@@ -113,6 +115,7 @@ export default function LaunchKitModalV2({
   isLoading,
   error,
   ideaName,
+  failedAssets = [],
 }: LaunchKitModalV2Props) {
   const [activeTab, setActiveTab] = useState<TabId>("landing");
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -211,11 +214,41 @@ export default function LaunchKitModalV2({
     </button>
   );
 
-  const tabs: { id: TabId; label: string; icon: React.ReactNode; available: boolean }[] = [
+  // Map tab IDs to their corresponding failedAssets keys
+  const tabToAssetKey: Record<TabId, string> = {
+    landing: "landingPage",
+    deck: "pitchDeck",
+    graphics: "socialGraphics",
+    onepager: "onePager",
+    text: "textContent",
+  };
+
+  // Check if a tab's asset failed to generate
+  const isTabFailed = (tabId: TabId): boolean => {
+    return failedAssets.includes(tabToAssetKey[tabId]);
+  };
+
+  // Error message component for failed tabs
+  const FailedAssetMessage = ({ assetName }: { assetName: string }) => (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+      </div>
+      <h4 className="text-lg font-medium text-warmwhite mb-2">Generation Failed</h4>
+      <p className="text-warmwhite-muted text-sm max-w-md">
+        {assetName} couldn&apos;t be generated. This may be due to high demand. Please try again later.
+      </p>
+    </div>
+  );
+
+  const tabs: { id: TabId; label: string; icon: React.ReactNode; available: boolean; failed: boolean }[] = [
     {
       id: "landing",
       label: "Landing Page",
-      available: isV2 ? !!assets?.landingPage : !!launchKit?.landingPage,
+      available: (isV2 ? !!assets?.landingPage : !!launchKit?.landingPage) || isTabFailed("landing"),
+      failed: isTabFailed("landing"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -225,7 +258,8 @@ export default function LaunchKitModalV2({
     {
       id: "deck",
       label: "Pitch Deck",
-      available: !!assets?.pitchDeck,
+      available: !!assets?.pitchDeck || isTabFailed("deck"),
+      failed: isTabFailed("deck"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605" />
@@ -235,7 +269,8 @@ export default function LaunchKitModalV2({
     {
       id: "graphics",
       label: "Social Graphics",
-      available: !!assets?.socialGraphics && assets.socialGraphics.length > 0,
+      available: (!!assets?.socialGraphics && assets.socialGraphics.length > 0) || isTabFailed("graphics"),
+      failed: isTabFailed("graphics"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -245,7 +280,8 @@ export default function LaunchKitModalV2({
     {
       id: "onepager",
       label: "One-Pager",
-      available: !!assets?.onePager,
+      available: !!assets?.onePager || isTabFailed("onepager"),
+      failed: isTabFailed("onepager"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -255,7 +291,8 @@ export default function LaunchKitModalV2({
     {
       id: "text",
       label: "Text Content",
-      available: isV2 ? !!assets?.textContent : !!launchKit,
+      available: (isV2 ? !!assets?.textContent : !!launchKit) || isTabFailed("text"),
+      failed: isTabFailed("text"),
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
@@ -264,7 +301,7 @@ export default function LaunchKitModalV2({
     },
   ];
 
-  // Filter to only show available tabs
+  // Filter to only show available tabs (includes failed ones so user can see the error)
   const availableTabs = tabs.filter(t => t.available);
 
   // Reset to first available tab when modal opens
@@ -367,10 +404,14 @@ export default function LaunchKitModalV2({
             </div>
           )}
 
-          {(assets || launchKit) && !isLoading && (
+          {(assets || launchKit) && !isLoading && !error && (
             <>
+              {/* Landing Page Tab - Failed */}
+              {activeTab === "landing" && isTabFailed("landing") && (
+                <FailedAssetMessage assetName="Landing Page" />
+              )}
               {/* Landing Page Tab */}
-              {activeTab === "landing" && assets?.landingPage && (
+              {activeTab === "landing" && !isTabFailed("landing") && assets?.landingPage && (
                 <div className="space-y-4">
                   {/* Hosted URL banner */}
                   <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
@@ -436,8 +477,12 @@ export default function LaunchKitModalV2({
                 </div>
               )}
 
+              {/* Pitch Deck Tab - Failed */}
+              {activeTab === "deck" && isTabFailed("deck") && (
+                <FailedAssetMessage assetName="Pitch Deck" />
+              )}
               {/* Pitch Deck Tab */}
-              {activeTab === "deck" && assets?.pitchDeck && (
+              {activeTab === "deck" && !isTabFailed("deck") && assets?.pitchDeck && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-warmwhite">Investor Pitch Deck</h3>
@@ -472,8 +517,12 @@ export default function LaunchKitModalV2({
                 </div>
               )}
 
+              {/* Social Graphics Tab - Failed */}
+              {activeTab === "graphics" && isTabFailed("graphics") && (
+                <FailedAssetMessage assetName="Social Graphics" />
+              )}
               {/* Social Graphics Tab */}
-              {activeTab === "graphics" && assets?.socialGraphics && assets.socialGraphics.length > 0 && (
+              {activeTab === "graphics" && !isTabFailed("graphics") && assets?.socialGraphics && assets.socialGraphics.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-warmwhite">Social Media Graphics</h3>
@@ -525,8 +574,12 @@ export default function LaunchKitModalV2({
                 </div>
               )}
 
+              {/* One-Pager Tab - Failed */}
+              {activeTab === "onepager" && isTabFailed("onepager") && (
+                <FailedAssetMessage assetName="One-Pager PDF" />
+              )}
               {/* One-Pager Tab */}
-              {activeTab === "onepager" && assets?.onePager && (
+              {activeTab === "onepager" && !isTabFailed("onepager") && assets?.onePager && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-warmwhite">Business One-Pager</h3>
@@ -549,8 +602,12 @@ export default function LaunchKitModalV2({
                 </div>
               )}
 
+              {/* Text Content Tab - Failed */}
+              {activeTab === "text" && isTabFailed("text") && (
+                <FailedAssetMessage assetName="Text Content" />
+              )}
               {/* Text Content Tab */}
-              {activeTab === "text" && (
+              {activeTab === "text" && !isTabFailed("text") && (
                 <div className="space-y-6">
                   {/* Elevator Pitch */}
                   <div className="space-y-3">

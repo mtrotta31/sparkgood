@@ -101,6 +101,7 @@ Generate the complete HTML file now.`;
     systemPrompt: LANDING_PAGE_SYSTEM_PROMPT,
     temperature: 0.7,
     maxTokens: 8000,
+    retryOnRateLimit: true, // Retry once on 429 rate limit errors
   });
 
   // Clean up the response - remove any markdown code blocks if present

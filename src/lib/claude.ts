@@ -30,16 +30,35 @@ export interface ClaudeOptions {
   maxTokens?: number;
   temperature?: number;
   systemPrompt?: string;
+  retryOnRateLimit?: boolean; // If true, retry once after 10s on 429
 }
 
 const DEFAULT_OPTIONS: ClaudeOptions = {
   model: "claude-sonnet-4-20250514",
   maxTokens: 4096,
   temperature: 0.7,
+  retryOnRateLimit: false,
 };
+
+// Helper to sleep for a specified duration
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Check if an error is a rate limit error
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isRateLimitError(error: any): boolean {
+  if (!error) return false;
+  // Check for Anthropic SDK rate limit error
+  if (error.status === 429) return true;
+  if (error.error?.type === "rate_limit_error") return true;
+  if (error.message?.includes("rate_limit") || error.message?.includes("429")) return true;
+  return false;
+}
 
 /**
  * Send a message to Claude and get a response
+ * Supports retry on rate limit errors when retryOnRateLimit is true
  */
 export async function sendMessage(
   userMessage: string,
@@ -48,7 +67,7 @@ export async function sendMessage(
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const anthropic = await getAnthropicClient();
 
-  try {
+  const makeRequest = async (): Promise<string> => {
     const response = await anthropic.messages.create({
       model: opts.model!,
       max_tokens: opts.maxTokens!,
@@ -64,7 +83,23 @@ export async function sendMessage(
     }
 
     return textBlock.text;
+  };
+
+  try {
+    return await makeRequest();
   } catch (error) {
+    // Check if we should retry on rate limit
+    if (opts.retryOnRateLimit && isRateLimitError(error)) {
+      console.log("[Claude] Rate limit hit, waiting 10 seconds before retry...");
+      await sleep(10000); // Wait 10 seconds
+      try {
+        console.log("[Claude] Retrying request after rate limit...");
+        return await makeRequest();
+      } catch (retryError) {
+        console.error("[Claude] Retry also failed:", retryError);
+        throw retryError;
+      }
+    }
     console.error("Claude API error:", error);
     throw error;
   }

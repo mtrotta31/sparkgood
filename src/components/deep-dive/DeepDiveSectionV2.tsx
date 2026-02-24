@@ -126,6 +126,7 @@ export default function DeepDiveSectionV2({
   const [launchKitV2, setLaunchKitV2] = useState<any | null>(null);
   const [isGeneratingLaunchKit, setIsGeneratingLaunchKit] = useState(false);
   const [launchKitError, setLaunchKitError] = useState<string | null>(null);
+  const [launchKitFailedAssets, setLaunchKitFailedAssets] = useState<string[]>([]);
 
   // Content state for each section (initialized from props if available)
   const [checklist, setChecklist] = useState<LaunchChecklistData | null>(initialChecklist || null);
@@ -254,63 +255,6 @@ export default function DeepDiveSectionV2({
       setShowPurchaseModal(true);
     }
   }, [creditsLoading, hasDeepDiveAccess, idea.id, isReturningFromPurchase]);
-
-  // Auto-trigger Launch Kit generation when returning from purchase
-  useEffect(() => {
-    if (isReturningFromLaunchKitPurchase && hasUnlockedAccess) {
-      const timer = setTimeout(() => {
-        setShowLaunchKit(true);
-        setIsGeneratingLaunchKit(true);
-        setLaunchKitError(null);
-
-        fetch("/api/launch-kit/v2", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            idea,
-            profile,
-            savedIdeaId,
-            foundation,
-            growth,
-            financial,
-            checklist,
-            matchedResources: localResources,
-          }),
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            if (result.success && result.data) {
-              setLaunchKitV2(result.data);
-              // Also set V1 launchKit for backwards compatibility if textContent exists
-              if (result.data.textContent) {
-                setLaunchKit({
-                  elevatorPitch: result.data.textContent.elevatorPitch,
-                  socialPosts: result.data.textContent.socialPosts,
-                  emailSequence: result.data.textContent.emailSequence,
-                  landingPage: result.data.textContent.landingPageCopy ? {
-                    headline: result.data.textContent.landingPageCopy.headline,
-                    subheadline: result.data.textContent.landingPageCopy.subheadline,
-                    html: "",
-                  } : { headline: "", subheadline: "", html: "" },
-                });
-              }
-            } else {
-              setLaunchKitError(result.error || "Failed to generate launch kit");
-            }
-          })
-          .catch((err) => {
-            console.error("Error generating launch kit:", err);
-            setLaunchKitError("Something went wrong. Please try again.");
-          })
-          .finally(() => {
-            setIsGeneratingLaunchKit(false);
-            setIsReturningFromLaunchKitPurchase(false);
-          });
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources]);
 
   // Consume credit when accessing
   useEffect(() => {
@@ -503,8 +447,11 @@ export default function DeepDiveSectionV2({
   }, [checklistProgress, savedIdeaId, isAuthenticated]);
 
   // Helper function to transform API response to modal format
-  const transformLaunchKitResponse = useCallback((result: { assets: Record<string, unknown>; textContent?: Record<string, unknown> }) => {
-    const { textContent, assets } = result;
+  const transformLaunchKitResponse = useCallback((result: { assets: Record<string, unknown>; textContent?: Record<string, unknown>; failedAssets?: string[] }) => {
+    const { textContent, assets, failedAssets } = result;
+
+    // Track failed assets
+    setLaunchKitFailedAssets(failedAssets || []);
 
     // Convert socialGraphics from object to array format
     type GraphicValue = { url?: string; storagePath: string };
@@ -550,10 +497,57 @@ export default function DeepDiveSectionV2({
     }
   }, []);
 
+  // Auto-trigger Launch Kit generation when returning from purchase
+  useEffect(() => {
+    if (isReturningFromLaunchKitPurchase && hasUnlockedAccess) {
+      const timer = setTimeout(() => {
+        setShowLaunchKit(true);
+        setIsGeneratingLaunchKit(true);
+        setLaunchKitError(null);
+        setLaunchKitFailedAssets([]);
+
+        fetch("/api/launch-kit/v2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idea,
+            profile,
+            savedIdeaId,
+            foundation,
+            growth,
+            financial,
+            checklist,
+            matchedResources: localResources,
+          }),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.success && result.data) {
+              // Use the transform helper to handle response and failed assets
+              transformLaunchKitResponse(result.data);
+            } else {
+              setLaunchKitError(result.error || "Failed to generate launch kit");
+            }
+          })
+          .catch((err) => {
+            console.error("Error generating launch kit:", err);
+            setLaunchKitError("Something went wrong. Please try again.");
+          })
+          .finally(() => {
+            setIsGeneratingLaunchKit(false);
+            setIsReturningFromLaunchKitPurchase(false);
+          });
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, transformLaunchKitResponse]);
+
   // Generate Launch Kit (or load saved assets)
   const handleGenerateLaunchKit = useCallback(async () => {
     setShowLaunchKit(true);
     setLaunchKitError(null);
+    setLaunchKitFailedAssets([]);
 
     // Skip if we already have V2 assets loaded in memory
     if (launchKitV2) {
@@ -1093,6 +1087,7 @@ export default function DeepDiveSectionV2({
         isLoading={isGeneratingLaunchKit}
         error={launchKitError}
         ideaName={idea.name}
+        failedAssets={launchKitFailedAssets}
       />
 
       {/* Purchase Modal for deep dive access */}
