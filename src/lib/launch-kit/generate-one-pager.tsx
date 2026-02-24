@@ -153,12 +153,12 @@ export async function generateOnePager(data: DeepDiveData): Promise<Buffer> {
             <View style={styles.infoBox}>
               <Text style={styles.boxTitle}>Market Opportunity</Text>
               <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Market Size (TAM)</Text>
-                <Text style={styles.statValue}>{marketSize || "N/A"}</Text>
+                <Text style={styles.statLabel}>Market Size</Text>
+                <Text style={styles.statValue}>{truncate(marketSize || "N/A", 35)}</Text>
               </View>
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Growth Rate</Text>
-                <Text style={styles.statValue}>{growthRate || "N/A"}</Text>
+                <Text style={styles.statValue}>{truncate(growthRate || "N/A", 35)}</Text>
               </View>
             </View>
 
@@ -370,16 +370,21 @@ function createStyles(colors: CategoryColors) {
     statRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 4,
+      alignItems: "flex-start",
+      marginBottom: 6,
     },
     statLabel: {
       fontSize: 8,
       color: "#64748B",
+      width: "35%",
+      flexShrink: 0,
     },
     statValue: {
-      fontSize: 9,
+      fontSize: 8,
       fontWeight: "bold",
       color: "#1E293B",
+      width: "63%",
+      textAlign: "right",
     },
     pricingMain: {
       fontSize: 14,
