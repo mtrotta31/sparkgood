@@ -181,6 +181,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `deep_dive_results` — Deep dive content linked to saved_ideas by idea_id
   - V1 fields: `viability`, `business_plan`, `marketing`, `roadmap`
   - V2 fields: `checklist`, `foundation`, `growth`, `financial`, `matched_resources`, `checklist_progress`, `advisor_message_count`
+  - Launch Kit: `launch_kit_assets` (JSONB with storage paths and download URLs for all generated assets)
 - `advisor_messages` — AI Advisor chat history (project_id, user_id, role, content, created_at)
 
 ### Payments Tables
@@ -292,9 +293,9 @@ Located in `src/components/`:
   - `AIAdvisor.tsx` — Streaming chat UI with the AI business advisor
   - `IdeaList.tsx` — Displays generated ideas with "See an example" link
 - `deep-dive/` — Deep dive section components
-  - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (6 tabs + Launch Kit button)
+  - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (6 tabs + Launch Kit button + regeneration handler)
   - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
-  - `LaunchKitModalV2.tsx` — Launch Kit V2 modal with 5 asset tabs (Landing Page, Pitch Deck, Social Graphics, One-Pager, Text Content)
+  - `LaunchKitModalV2.tsx` — Launch Kit V2 modal with 5 asset tabs (Landing Page, Pitch Deck, Social Graphics, One-Pager, Text Content). Shows "Regenerate" button for failed assets, per-tab error messages, and download/preview functionality.
   - `LaunchKitModal.tsx` — Legacy V1 launch kit modal
   - `ConfirmDialog.tsx` — Regeneration confirmation
   - V1 view components: `ViabilityReport.tsx`, `BusinessPlanView.tsx`, etc.
@@ -460,6 +461,16 @@ Generates 4 PNG graphics using satori + @resvg/resvg-js:
 - **Category-aware colors:** Uses business category for color palette
 - **Responsive font sizing:** Adjusts based on business name length (handles 20+ chars)
 - **No text clipping:** Decorative elements positioned away from text areas
+- **Satori requirements:** All containers with multiple children MUST have explicit `display: "flex"`. Decorative elements wrapped in flex containers to avoid layout errors.
+
+### `launch-kit/generate-one-pager.tsx`
+Generates single-page PDF business summary using @react-pdf/renderer:
+- **Header:** Business name, tagline, location, category badge
+- **Left column (58%):** About, Problem We Solve, How It Works, What Makes Us Different
+- **Right column (42%):** Viability Score (prominent callout), Market Opportunity, Financial Snapshot, Pricing
+- **Footer:** Location and SparkLocal watermark
+- **Market Opportunity layout:** Uses vertical stacking (label above value) to prevent text overlap with long market data
+- **Category-aware colors:** Primary color from business category applied to headers, dividers, score box
 
 ## Development Commands
 
@@ -509,6 +520,7 @@ The core product is fully functional with payments:
 - ✅ Deep Dive V1 (legacy support for existing projects)
 - ✅ Auto-save deep dive content with proper JSON key conversion
 - ✅ Launch Kit V2 with 5 professional assets (pitch deck, social graphics, landing page, one-pager, text content)
+- ✅ Launch Kit regeneration UI for failed assets
 - ✅ Hosted landing pages at `/sites/[slug]`
 - ✅ Rate limit resilience with partial results pattern
 - ✅ PDF export
@@ -586,20 +598,23 @@ The core product is fully functional with payments:
 - Friendly upgrade prompt when limit reached with CTA to pricing page
 
 ### Launch Kit V2
-- **API Route:** `POST /api/launch-kit/v2` generates all 5 assets in parallel
+- **API Route:** `POST /api/launch-kit/v2` generates all 5 assets in parallel; `GET` retrieves cached assets
 - **Rate Limit Resilience:** Each asset generator wrapped in try/catch; returns partial results if some fail
-- **Failed Assets Tracking:** Response includes `failedAssets` array; modal shows per-tab error messages
+- **Failed Assets Tracking:** Response includes `failedAssets` array; modal shows per-tab error messages with "Regenerate" button
+- **Regeneration:** Pass `forceRegenerate: true` in POST body to regenerate all assets fresh (bypasses cache check)
 - **Storage:** Assets uploaded to Supabase Storage bucket `launch-kit-assets/{userId}/{ideaId}/`
+- **Caching:** Generated assets saved to `deep_dive_results.launch_kit_assets` JSONB column
 - **Landing Page Hosting:** HTML stored in storage and served at `/sites/[slug]` route
 - **Color System:** Uses `getCategoryColors()` from `launch-kit/types.ts` for category-aware styling
 - **Generators:**
   - `generatePitchDeck()` — pptxgenjs, returns Buffer
-  - `generateSocialGraphics()` — satori + resvg, returns array of PNG Buffers
+  - `generateSocialGraphics()` — satori + resvg, returns array of PNG Buffers (requires `display: flex` on multi-child containers)
   - `generateLandingPage()` — Claude API, returns HTML string
-  - `generateOnePager()` — @react-pdf/renderer, returns Buffer
+  - `generateOnePager()` — @react-pdf/renderer, returns Buffer (uses vertical stacking for variable-length text)
   - `generateTextContent()` — Claude API, returns LaunchKit JSON (social posts, emails, pitch)
 - **Button Gating:** Launch Kit button disabled until all 5 deep dive tabs are complete
 - **mailto: Links:** Landing pages use `mailto:{userEmail}` instead of forms
+- **Regeneration UI:** `LaunchKitModalV2.tsx` shows "Regenerate" button when `failedAssets` exist; `DeepDiveSectionV2.tsx` handles `handleRegenerateLaunchKit` callback
 
 ### Example Deep Dive & Purchase Flow
 - `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
