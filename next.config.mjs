@@ -16,6 +16,10 @@ const nextConfig = {
       },
     ],
   },
+  // Externalize native modules for server-side only
+  experimental: {
+    serverComponentsExternalPackages: ["@resvg/resvg-js", "pptxgenjs"],
+  },
 };
 
 export default nextConfig;
