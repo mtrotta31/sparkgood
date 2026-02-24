@@ -168,47 +168,62 @@ function createInstagramPost(
         overflow: "hidden",
       },
       children: [
-        // Decorative elements in corners only (away from text)
+        // Decorative elements wrapper - must have display flex for satori
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              top: "40px",
-              left: "40px",
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-              border: "4px solid rgba(255,255,255,0.2)",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
             },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "80px",
-              right: "60px",
-              width: "60px",
-              height: "60px",
-              background: "rgba(255,255,255,0.15)",
-              transform: "rotate(45deg)",
-            },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "180px",
-              left: "120px",
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              background: colors.accent,
-            },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "40px",
+                    left: "40px",
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50%",
+                    border: "4px solid rgba(255,255,255,0.2)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "80px",
+                    right: "60px",
+                    width: "60px",
+                    height: "60px",
+                    background: "rgba(255,255,255,0.15)",
+                    transform: "rotate(45deg)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "180px",
+                    left: "120px",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    background: colors.accent,
+                  },
+                },
+              },
+            ],
           },
         },
         // Main content area - positioned in bottom portion on solid background
@@ -376,33 +391,48 @@ function createInstagramStory(
               position: "relative",
             },
             children: [
-              // Decorative circles in top corners
+              // Decorative circles wrapper - must have display flex for satori
               {
                 type: "div",
                 props: {
                   style: {
                     position: "absolute",
-                    top: "60px",
-                    right: "40px",
-                    width: "120px",
-                    height: "120px",
-                    borderRadius: "50%",
-                    border: "4px solid rgba(255,255,255,0.2)",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
                   },
-                },
-              },
-              {
-                type: "div",
-                props: {
-                  style: {
-                    position: "absolute",
-                    top: "140px",
-                    left: "50px",
-                    width: "60px",
-                    height: "60px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.15)",
-                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          position: "absolute",
+                          top: "60px",
+                          right: "40px",
+                          width: "120px",
+                          height: "120px",
+                          borderRadius: "50%",
+                          border: "4px solid rgba(255,255,255,0.2)",
+                        },
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          position: "absolute",
+                          top: "140px",
+                          left: "50px",
+                          width: "60px",
+                          height: "60px",
+                          borderRadius: "50%",
+                          background: "rgba(255,255,255,0.15)",
+                        },
+                      },
+                    },
+                  ],
                 },
               },
               // Business name - fully visible
@@ -646,11 +676,12 @@ function createLinkedInPost(
             style: {
               width: "280px",
               height: "100%",
+              display: "flex",
               background: `linear-gradient(180deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
               position: "relative",
             },
             children: [
-              // Decorative elements within the accent panel
+              // Single decorative circle (keeping it simple for satori)
               {
                 type: "div",
                 props: {
@@ -662,34 +693,6 @@ function createLinkedInPost(
                     height: "80px",
                     borderRadius: "50%",
                     border: "4px solid rgba(255,255,255,0.25)",
-                  },
-                },
-              },
-              {
-                type: "div",
-                props: {
-                  style: {
-                    position: "absolute",
-                    left: "60px",
-                    bottom: "80px",
-                    width: "50px",
-                    height: "50px",
-                    background: "rgba(255,255,255,0.15)",
-                    transform: "rotate(45deg)",
-                  },
-                },
-              },
-              {
-                type: "div",
-                props: {
-                  style: {
-                    position: "absolute",
-                    right: "80px",
-                    bottom: "140px",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: colors.accent,
                   },
                 },
               },
@@ -732,48 +735,48 @@ function createFacebookCover(
         overflow: "hidden",
       },
       children: [
-        // Decorative elements at edges only (away from text)
+        // Decorative elements wrapper - must have display flex for satori
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              bottom: "-50px",
-              left: "-30px",
-              width: "140px",
-              height: "140px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.08)",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
             },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              top: "-30px",
-              right: "40px",
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              border: "3px solid rgba(255,255,255,0.15)",
-            },
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              position: "absolute",
-              bottom: "30px",
-              right: "60px",
-              width: "20px",
-              height: "20px",
-              background: colors.accent,
-              transform: "rotate(45deg)",
-              opacity: 0.6,
-            },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    bottom: "-50px",
+                    left: "-30px",
+                    width: "140px",
+                    height: "140px",
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.08)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "-30px",
+                    right: "40px",
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    border: "3px solid rgba(255,255,255,0.15)",
+                  },
+                },
+              },
+            ],
           },
         },
         // Left content - business name and tagline

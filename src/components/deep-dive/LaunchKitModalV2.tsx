@@ -105,6 +105,7 @@ interface LaunchKitModalV2Props {
   error: string | null;
   ideaName: string;
   failedAssets?: string[]; // List of assets that failed to generate
+  onRegenerate?: () => void; // Callback to regenerate failed assets
 }
 
 export default function LaunchKitModalV2({
@@ -116,6 +117,7 @@ export default function LaunchKitModalV2({
   error,
   ideaName,
   failedAssets = [],
+  onRegenerate,
 }: LaunchKitModalV2Props) {
   const [activeTab, setActiveTab] = useState<TabId>("landing");
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -237,9 +239,21 @@ export default function LaunchKitModalV2({
         </svg>
       </div>
       <h4 className="text-lg font-medium text-warmwhite mb-2">Generation Failed</h4>
-      <p className="text-warmwhite-muted text-sm max-w-md">
-        {assetName} couldn&apos;t be generated. This may be due to high demand. Please try again later.
+      <p className="text-warmwhite-muted text-sm max-w-md mb-6">
+        {assetName} couldn&apos;t be generated. This may be due to high demand.
       </p>
+      {onRegenerate && (
+        <button
+          onClick={onRegenerate}
+          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl
+            bg-spark hover:bg-spark/90 text-charcoal-dark transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          Regenerate Assets
+        </button>
+      )}
     </div>
   );
 
@@ -335,14 +349,29 @@ export default function LaunchKitModalV2({
               Professional assets for {ideaName}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-warmwhite-muted hover:text-warmwhite transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Show regenerate button when there are failed assets */}
+            {failedAssets.length > 0 && onRegenerate && !isLoading && (
+              <button
+                onClick={onRegenerate}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg
+                  bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Regenerate ({failedAssets.length} failed)
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 text-warmwhite-muted hover:text-warmwhite transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}

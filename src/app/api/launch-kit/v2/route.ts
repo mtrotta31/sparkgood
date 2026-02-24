@@ -55,6 +55,7 @@ interface LaunchKitV2Request {
   financial?: FinancialModelData;
   checklist?: LaunchChecklistData;
   matchedResources?: LocalResourcesData;
+  forceRegenerate?: boolean; // If true, regenerate even if assets exist (client should skip GET check)
 }
 
 const STORAGE_BUCKET = "launch-kit-assets";
@@ -633,9 +634,14 @@ export async function GET(request: NextRequest) {
     downloadUrls.landingPage = url.publicUrl;
   }
 
-  if (assets.socialGraphics) {
+  // Track failed assets (empty or missing)
+  const failedAssets: string[] = [];
+
+  // Check if socialGraphics exists and has actual content
+  const socialGraphicsKeys = assets.socialGraphics ? Object.keys(assets.socialGraphics) : [];
+  if (socialGraphicsKeys.length > 0) {
     downloadUrls.socialGraphics = {};
-    for (const [key, value] of Object.entries(assets.socialGraphics)) {
+    for (const [key, value] of Object.entries(assets.socialGraphics!)) {
       if (value?.storagePath) {
         const { data: url } = supabase.storage
           .from(STORAGE_BUCKET)
@@ -643,6 +649,23 @@ export async function GET(request: NextRequest) {
         downloadUrls.socialGraphics[key as keyof typeof downloadUrls.socialGraphics] = url.publicUrl;
       }
     }
+  } else if (assets.socialGraphics) {
+    // socialGraphics exists but is empty - mark as failed
+    failedAssets.push("socialGraphics");
+  }
+
+  // Check other assets for empty/missing state
+  if (!assets.pitchDeck?.storagePath) {
+    failedAssets.push("pitchDeck");
+  }
+  if (!assets.onePager?.storagePath) {
+    failedAssets.push("onePager");
+  }
+  if (!assets.landingPage?.storagePath) {
+    failedAssets.push("landingPage");
+  }
+  if (!textContent) {
+    failedAssets.push("textContent");
   }
 
   return NextResponse.json({
@@ -652,6 +675,7 @@ export async function GET(request: NextRequest) {
       assets,
       downloadUrls,
       landingPageUrl: assets.landingPage?.url,
+      failedAssets: failedAssets.length > 0 ? failedAssets : undefined,
     },
   });
 }

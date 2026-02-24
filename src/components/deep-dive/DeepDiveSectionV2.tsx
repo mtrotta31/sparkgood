@@ -617,6 +617,47 @@ export default function DeepDiveSectionV2({
     }
   }, [idea.id, hasLaunchKitAccess, handleGenerateLaunchKit]);
 
+  // Handle regenerating failed Launch Kit assets
+  const handleRegenerateLaunchKit = useCallback(async () => {
+    // Clear existing launch kit data to force regeneration
+    setLaunchKitV2(null);
+    setLaunchKit(null);
+    setLaunchKitFailedAssets([]);
+    setLaunchKitError(null);
+    setIsGeneratingLaunchKit(true);
+
+    try {
+      const response = await fetch("/api/launch-kit/v2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idea,
+          profile,
+          savedIdeaId,
+          foundation,
+          growth,
+          financial,
+          checklist,
+          matchedResources: localResources,
+          forceRegenerate: true, // Signal to API to regenerate even if assets exist
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        transformLaunchKitResponse(result.data);
+      } else {
+        setLaunchKitError(result.error || "Failed to regenerate launch kit");
+      }
+    } catch (err) {
+      console.error("Error regenerating launch kit:", err);
+      setLaunchKitError("Something went wrong. Please try again.");
+    } finally {
+      setIsGeneratingLaunchKit(false);
+    }
+  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, transformLaunchKitResponse]);
+
   // Auto-save results when logged in
   useEffect(() => {
     const saveResults = async () => {
@@ -1088,6 +1129,7 @@ export default function DeepDiveSectionV2({
         error={launchKitError}
         ideaName={idea.name}
         failedAssets={launchKitFailedAssets}
+        onRegenerate={handleRegenerateLaunchKit}
       />
 
       {/* Purchase Modal for deep dive access */}
