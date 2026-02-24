@@ -48,7 +48,7 @@ interface LaunchKitV2Response {
 interface LaunchKitV2Request {
   idea: Idea;
   profile: UserProfile;
-  savedIdeaId: string;
+  savedIdeaId?: string; // Optional - if not provided, use idea.id for storage
   foundation?: BusinessFoundationData;
   growth?: GrowthPlanData;
   financial?: FinancialModelData;
@@ -83,12 +83,15 @@ export async function POST(request: NextRequest) {
       matchedResources: providedResources,
     } = body as LaunchKitV2Request;
 
-    if (!idea || !profile || !savedIdeaId) {
+    if (!idea || !profile) {
       return NextResponse.json<ApiResponse<LaunchKitV2Response>>({
         success: false,
-        error: "Missing required fields: idea, profile, or savedIdeaId",
+        error: "Missing required fields: idea or profile",
       });
     }
+
+    // Use savedIdeaId if provided, otherwise fall back to idea.id for storage
+    const storageId = savedIdeaId || idea.id;
 
     // Auth check
     const supabase = await createClient();
@@ -137,14 +140,14 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
-    // Fetch deep dive data if not provided
+    // Fetch deep dive data if not provided and we have a savedIdeaId
     let foundation = providedFoundation;
     let growth = providedGrowth;
     let financial = providedFinancial;
     let checklist = providedChecklist;
     let matchedResources = providedResources;
 
-    if (!foundation || !growth || !financial) {
+    if (savedIdeaId && (!foundation || !growth || !financial)) {
       const { data: deepDiveData } = await supabase
         .from("deep_dive_results")
         .select("foundation, growth, financial, checklist, matched_resources")
@@ -173,7 +176,7 @@ export async function POST(request: NextRequest) {
 
     // Generate slug for landing page
     const slug = generateSlug(idea.name);
-    const storagePath = `${savedIdeaId}`;
+    const storagePath = `${storageId}`;
 
     // Generate all assets in parallel
     const [textContent, pitchDeckBuffer, socialGraphics, onePagerBuffer, landingPageHtml] = await Promise.all([
@@ -210,10 +213,10 @@ export async function POST(request: NextRequest) {
       });
 
     if (!pitchDeckError) {
-      assets.pitchDeck = { storagePath: pitchDeckPath };
       const { data: pitchDeckUrl } = supabase.storage
         .from(STORAGE_BUCKET)
         .getPublicUrl(pitchDeckPath);
+      assets.pitchDeck = { storagePath: pitchDeckPath, url: pitchDeckUrl.publicUrl };
       downloadUrls.pitchDeck = pitchDeckUrl.publicUrl;
     } else {
       console.error("Error uploading pitch deck:", pitchDeckError);
@@ -229,10 +232,10 @@ export async function POST(request: NextRequest) {
       });
 
     if (!onePagerError) {
-      assets.onePager = { storagePath: onePagerPath };
       const { data: onePagerUrl } = supabase.storage
         .from(STORAGE_BUCKET)
         .getPublicUrl(onePagerPath);
+      assets.onePager = { storagePath: onePagerPath, url: onePagerUrl.publicUrl };
       downloadUrls.onePager = onePagerUrl.publicUrl;
     } else {
       console.error("Error uploading one-pager:", onePagerError);
@@ -248,14 +251,16 @@ export async function POST(request: NextRequest) {
       });
 
     if (!landingPageError) {
-      assets.landingPage = {
-        slug,
-        url: `/sites/${slug}`,
-        storagePath: landingPagePath,
-      };
       const { data: landingPageUrl } = supabase.storage
         .from(STORAGE_BUCKET)
         .getPublicUrl(landingPagePath);
+      const hostedUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://sparklocal.co"}/sites/${slug}`;
+      assets.landingPage = {
+        slug,
+        url: landingPageUrl.publicUrl, // Download URL for the HTML file
+        hostedUrl, // Hosted page URL
+        storagePath: landingPagePath,
+      };
       downloadUrls.landingPage = landingPageUrl.publicUrl;
     } else {
       console.error("Error uploading landing page:", landingPageError);
@@ -284,11 +289,13 @@ export async function POST(request: NextRequest) {
 
         const assetKey = keyMap[graphic.platform];
         if (assetKey) {
-          assets.socialGraphics[assetKey] = { storagePath: graphicPath };
-
           const { data: graphicUrl } = supabase.storage
             .from(STORAGE_BUCKET)
             .getPublicUrl(graphicPath);
+          assets.socialGraphics[assetKey] = {
+            storagePath: graphicPath,
+            url: graphicUrl.publicUrl,
+          };
           downloadUrls.socialGraphics![assetKey] = graphicUrl.publicUrl;
         }
       } else {
@@ -296,11 +303,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Save asset references to database
-    await supabase
-      .from("deep_dive_results")
-      .update({ launch_kit_assets: assets })
-      .eq("idea_id", savedIdeaId);
+    // Save asset references to database (only if we have a savedIdeaId)
+    if (savedIdeaId) {
+      await supabase
+        .from("deep_dive_results")
+        .update({ launch_kit_assets: assets })
+        .eq("idea_id", savedIdeaId);
+    }
 
     return NextResponse.json<ApiResponse<LaunchKitV2Response>>({
       success: true,

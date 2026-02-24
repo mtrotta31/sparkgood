@@ -49,19 +49,22 @@ export interface GeneratedGraphic {
 export interface LaunchKitAssets {
   landingPage?: {
     slug: string;
-    url: string;
+    url: string; // Download URL for HTML file
+    hostedUrl?: string; // Hosted page URL at /sites/[slug]
     storagePath: string;
   };
   pitchDeck?: {
+    url?: string;
     storagePath: string;
   };
   socialGraphics?: {
-    instagramPost?: { storagePath: string };
-    instagramStory?: { storagePath: string };
-    linkedinPost?: { storagePath: string };
-    facebookCover?: { storagePath: string };
+    instagramPost?: { url?: string; storagePath: string };
+    instagramStory?: { url?: string; storagePath: string };
+    linkedinPost?: { url?: string; storagePath: string };
+    facebookCover?: { url?: string; storagePath: string };
   };
   onePager?: {
+    url?: string;
     storagePath: string;
   };
   generatedAt: string;
