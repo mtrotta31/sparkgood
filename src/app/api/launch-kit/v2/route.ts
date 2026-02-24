@@ -1,7 +1,6 @@
 // Launch Kit V2 API Route
-// Generates professional assets: pitch deck (PPTX), social graphics (PNG), and text content
-// Phase 1: Pitch Deck + Social Graphics + Text Content
-// Future: Landing Page + One-Pager PDF
+// Generates professional assets: pitch deck (PPTX), social graphics (PNG),
+// landing page (HTML), one-pager (PDF), and text content
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -10,6 +9,9 @@ import { sendMessageForJSON } from "@/lib/claude";
 import {
   generatePitchDeck,
   generateSocialGraphics,
+  generateOnePager,
+  generateLandingPage,
+  generateSlug,
   type DeepDiveData,
   type LaunchKitAssets,
 } from "@/lib/launch-kit";
@@ -27,10 +29,12 @@ import type {
 
 // Extended response type for V2
 interface LaunchKitV2Response {
-  textContent: LaunchKit; // Original text content (social posts, emails, elevator pitch)
-  assets: LaunchKitAssets; // New file-based assets
+  textContent: LaunchKit;
+  assets: LaunchKitAssets;
   downloadUrls: {
     pitchDeck?: string;
+    onePager?: string;
+    landingPage?: string;
     socialGraphics?: {
       instagramPost?: string;
       instagramStory?: string;
@@ -38,13 +42,13 @@ interface LaunchKitV2Response {
       facebookCover?: string;
     };
   };
+  landingPageUrl?: string; // Hosted URL at /sites/[slug]
 }
 
 interface LaunchKitV2Request {
   idea: Idea;
   profile: UserProfile;
-  savedIdeaId: string; // Required to fetch deep dive data
-  // Optional: pass deep dive data directly to avoid extra fetch
+  savedIdeaId: string;
   foundation?: BusinessFoundationData;
   growth?: GrowthPlanData;
   financial?: FinancialModelData;
@@ -79,7 +83,6 @@ export async function POST(request: NextRequest) {
       matchedResources: providedResources,
     } = body as LaunchKitV2Request;
 
-    // Validate required fields
     if (!idea || !profile || !savedIdeaId) {
       return NextResponse.json<ApiResponse<LaunchKitV2Response>>({
         success: false,
@@ -168,9 +171,13 @@ export async function POST(request: NextRequest) {
       matchedResources: matchedResources || null,
     };
 
+    // Generate slug for landing page
+    const slug = generateSlug(idea.name);
+    const storagePath = `${savedIdeaId}`;
+
     // Generate all assets in parallel
-    const [textContent, pitchDeckBuffer, socialGraphics] = await Promise.all([
-      // Generate text content (social posts, emails, elevator pitch)
+    const [textContent, pitchDeckBuffer, socialGraphics, onePagerBuffer, landingPageHtml] = await Promise.all([
+      // Generate text content
       anthropicKey
         ? generateTextContent(idea, profile)
         : getMockTextContent(idea),
@@ -178,10 +185,13 @@ export async function POST(request: NextRequest) {
       generatePitchDeck(deepDiveData),
       // Generate social media graphics
       generateSocialGraphics(deepDiveData),
+      // Generate one-pager PDF
+      generateOnePager(deepDiveData),
+      // Generate landing page HTML
+      anthropicKey
+        ? generateLandingPage(deepDiveData)
+        : getMockLandingPageHtml(idea),
     ]);
-
-    // Upload assets to Supabase Storage
-    const storagePath = `${savedIdeaId}`;
 
     // Initialize assets record
     const assets: LaunchKitAssets = {
@@ -209,6 +219,48 @@ export async function POST(request: NextRequest) {
       console.error("Error uploading pitch deck:", pitchDeckError);
     }
 
+    // Upload one-pager PDF
+    const onePagerPath = `${storagePath}/one-pager.pdf`;
+    const { error: onePagerError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(onePagerPath, onePagerBuffer, {
+        contentType: "application/pdf",
+        upsert: true,
+      });
+
+    if (!onePagerError) {
+      assets.onePager = { storagePath: onePagerPath };
+      const { data: onePagerUrl } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(onePagerPath);
+      downloadUrls.onePager = onePagerUrl.publicUrl;
+    } else {
+      console.error("Error uploading one-pager:", onePagerError);
+    }
+
+    // Upload landing page HTML
+    const landingPagePath = `${storagePath}/landing-page.html`;
+    const { error: landingPageError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(landingPagePath, landingPageHtml, {
+        contentType: "text/html",
+        upsert: true,
+      });
+
+    if (!landingPageError) {
+      assets.landingPage = {
+        slug,
+        url: `/sites/${slug}`,
+        storagePath: landingPagePath,
+      };
+      const { data: landingPageUrl } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(landingPagePath);
+      downloadUrls.landingPage = landingPageUrl.publicUrl;
+    } else {
+      console.error("Error uploading landing page:", landingPageError);
+    }
+
     // Upload social graphics
     assets.socialGraphics = {};
     downloadUrls.socialGraphics = {};
@@ -223,7 +275,6 @@ export async function POST(request: NextRequest) {
         });
 
       if (!graphicError) {
-        // Map platform names to asset keys
         const keyMap: Record<string, keyof NonNullable<LaunchKitAssets["socialGraphics"]>> = {
           "instagram-post": "instagramPost",
           "instagram-story": "instagramStory",
@@ -257,6 +308,7 @@ export async function POST(request: NextRequest) {
         textContent,
         assets,
         downloadUrls,
+        landingPageUrl: assets.landingPage?.url,
       },
     });
   } catch (error) {
@@ -320,7 +372,7 @@ Return as JSON:
 function getMockTextContent(idea: Idea): LaunchKit {
   return {
     landingPage: {
-      html: `<!DOCTYPE html><html><head><title>${idea.name}</title></head><body><h1>${idea.name}</h1><p>${idea.tagline}</p></body></html>`,
+      html: getMockLandingPageHtml(idea),
       headline: idea.name,
       subheadline: idea.tagline,
     },
@@ -364,6 +416,53 @@ function getMockTextContent(idea: Idea): LaunchKit {
   };
 }
 
+// Mock landing page HTML for development
+function getMockLandingPageHtml(idea: Idea): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${idea.name}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #FAFAF8; color: #1E293B; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+    .hero { text-align: center; padding: 6rem 2rem; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 1rem; }
+    .tagline { font-size: 1.5rem; opacity: 0.95; margin-bottom: 2rem; }
+    .cta { display: inline-block; background: white; color: #D97706; padding: 1rem 2.5rem; border-radius: 50px; font-weight: 700; text-decoration: none; transition: transform 0.2s; }
+    .cta:hover { transform: scale(1.05); }
+    .section { padding: 4rem 2rem; }
+    .section h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1.5rem; color: #D97706; }
+    .section p { font-size: 1.1rem; max-width: 700px; }
+    .footer { text-align: center; padding: 2rem; border-top: 1px solid #E5E7EB; color: #64748B; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>${idea.name}</h1>
+    <p class="tagline">${idea.tagline}</p>
+    <a href="#contact" class="cta">Get Started</a>
+  </header>
+  <div class="container">
+    <section class="section">
+      <h2>The Problem</h2>
+      <p>${idea.problem}</p>
+    </section>
+    <section class="section">
+      <h2>Who We Help</h2>
+      <p>${idea.audience}</p>
+    </section>
+  </div>
+  <footer class="footer">
+    <p>&copy; ${new Date().getFullYear()} ${idea.name}. All rights reserved.</p>
+  </footer>
+</body>
+</html>`;
+}
+
 // GET endpoint to fetch existing assets
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -390,7 +489,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: "No launch kit found" });
   }
 
-  // Generate download URLs for existing assets
   const assets = data.launch_kit_assets as LaunchKitAssets;
   const downloadUrls: LaunchKitV2Response["downloadUrls"] = {};
 
@@ -399,6 +497,20 @@ export async function GET(request: NextRequest) {
       .from(STORAGE_BUCKET)
       .getPublicUrl(assets.pitchDeck.storagePath);
     downloadUrls.pitchDeck = url.publicUrl;
+  }
+
+  if (assets.onePager?.storagePath) {
+    const { data: url } = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(assets.onePager.storagePath);
+    downloadUrls.onePager = url.publicUrl;
+  }
+
+  if (assets.landingPage?.storagePath) {
+    const { data: url } = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(assets.landingPage.storagePath);
+    downloadUrls.landingPage = url.publicUrl;
   }
 
   if (assets.socialGraphics) {
@@ -415,6 +527,10 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    data: { assets, downloadUrls },
+    data: {
+      assets,
+      downloadUrls,
+      landingPageUrl: assets.landingPage?.url,
+    },
   });
 }
