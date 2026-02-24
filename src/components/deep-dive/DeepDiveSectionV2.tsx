@@ -274,6 +274,7 @@ export default function DeepDiveSectionV2({
             growth,
             financial,
             checklist,
+            matchedResources: localResources,
           }),
         })
           .then((response) => response.json())
@@ -309,7 +310,7 @@ export default function DeepDiveSectionV2({
 
       return () => clearTimeout(timer);
     }
-  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile]);
+  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources]);
 
   // Consume credit when accessing
   useEffect(() => {
@@ -341,6 +342,11 @@ export default function DeepDiveSectionV2({
       case "advisor": return true; // Placeholder always available
     }
   }, [checklist, foundation, growth, financial, localResources]);
+
+  // Count how many of the 5 content tabs are complete (excluding advisor)
+  const contentTabsComplete = [foundation, checklist, growth, financial, localResources].filter(Boolean).length;
+  const allContentTabsComplete = contentTabsComplete === 5;
+  const isLaunchKitReady = allContentTabsComplete;
 
   // Fetch content for a specific tab
   const fetchContent = useCallback(async (tabId: TabId) => {
@@ -587,6 +593,7 @@ export default function DeepDiveSectionV2({
           growth,
           financial,
           checklist,
+          matchedResources: localResources,
         }),
       });
 
@@ -603,7 +610,7 @@ export default function DeepDiveSectionV2({
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, launchKitV2, transformLaunchKitResponse]);
+  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, launchKitV2, transformLaunchKitResponse]);
 
   // Handle Launch Kit button click
   const handleLaunchKitClick = useCallback(() => {
@@ -778,17 +785,33 @@ export default function DeepDiveSectionV2({
                   Saved
                 </span>
               )}
-              <button
-                onClick={handleLaunchKitClick}
-                className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium
-                  bg-gradient-to-r from-spark to-accent text-charcoal-dark hover:opacity-90 transition-all duration-200 hover:scale-105"
-                title="Generate complete marketing package"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span className="hidden sm:inline">Launch Kit</span>
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={handleLaunchKitClick}
+                  disabled={!isLaunchKitReady}
+                  className={`flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                    ${isLaunchKitReady
+                      ? "bg-gradient-to-r from-spark to-accent text-charcoal-dark hover:opacity-90 hover:scale-105"
+                      : "bg-warmwhite/10 text-warmwhite-muted cursor-not-allowed"
+                    }`}
+                  title={isLaunchKitReady ? "Generate complete marketing package" : `Generate all deep dive tabs to unlock (${contentTabsComplete}/5 complete)`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">Launch Kit</span>
+                  {!isLaunchKitReady && (
+                    <span className="hidden sm:inline text-warmwhite-dim">({contentTabsComplete}/5)</span>
+                  )}
+                </button>
+                {/* Tooltip for disabled state */}
+                {!isLaunchKitReady && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-charcoal-light border border-warmwhite/10 rounded-lg text-xs text-warmwhite-muted whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+                    Generate all deep dive tabs to unlock
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-charcoal-light border-l border-t border-warmwhite/10 rotate-45" />
+                  </div>
+                )}
+              </div>
               <button
                 onClick={downloadPDF}
                 disabled={!hasAnyContent || isDownloadingPDF}
