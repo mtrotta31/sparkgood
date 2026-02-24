@@ -3,6 +3,8 @@
 
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
+import { readFileSync } from "fs";
+import { join } from "path";
 import type { DeepDiveData, GeneratedGraphic, CategoryColors } from "./types";
 import { getCategoryColors, extractBusinessOverview } from "./types";
 
@@ -18,30 +20,22 @@ const DIMENSIONS = {
   "facebook-cover": { width: 820, height: 312 },
 } as const;
 
-// Font loading - we'll use system fonts and fetch Inter from Google Fonts
-async function loadFonts(): Promise<ArrayBuffer[]> {
-  // Fetch Inter font from Google Fonts (Regular and Bold)
-  const fontUrls = [
-    "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
-    "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2",
-  ];
+// Font loading - use local .otf files (satori only supports .ttf/.otf, not .woff2)
+function loadFonts(): ArrayBuffer[] {
+  const fontsDir = join(process.cwd(), "src/lib/launch-kit/fonts");
 
-  const fonts = await Promise.all(
-    fontUrls.map(async (url) => {
-      const response = await fetch(url);
-      return response.arrayBuffer();
-    })
-  );
+  const regularFont = readFileSync(join(fontsDir, "Inter-Regular.otf"));
+  const boldFont = readFileSync(join(fontsDir, "Inter-Bold.otf"));
 
-  return fonts;
+  return [regularFont.buffer.slice(regularFont.byteOffset, regularFont.byteOffset + regularFont.byteLength), boldFont.buffer.slice(boldFont.byteOffset, boldFont.byteOffset + boldFont.byteLength)];
 }
 
-// Cache fonts to avoid re-fetching
+// Cache fonts to avoid re-reading
 let cachedFonts: ArrayBuffer[] | null = null;
 
-async function getFonts(): Promise<ArrayBuffer[]> {
+function getFonts(): ArrayBuffer[] {
   if (!cachedFonts) {
-    cachedFonts = await loadFonts();
+    cachedFonts = loadFonts();
   }
   return cachedFonts;
 }
@@ -49,7 +43,7 @@ async function getFonts(): Promise<ArrayBuffer[]> {
 export async function generateSocialGraphics(data: DeepDiveData): Promise<GeneratedGraphic[]> {
   const overview = extractBusinessOverview(data);
   const colors = getCategoryColors(overview.category);
-  const fonts = await getFonts();
+  const fonts = getFonts();
 
   const graphics: GeneratedGraphic[] = [];
 
