@@ -577,9 +577,10 @@ The core product is fully functional with payments:
 ## Technical Notes
 
 ### Deep Dive V1 vs V2 Detection
-- Project pages detect V1 vs V2 using `hasV2Data()` function
-- V2 projects have `checklist`, `foundation`, `growth`, or `financial` data
-- V1 projects use `viability`, `businessPlan`, `marketing`, `roadmap`
+- Project pages detect V1 vs V2 using `shouldUseV2Layout()` function in `/projects/[id]/page.tsx`
+- **V2 is the default** for all new projects (even if no data exists yet)
+- Only projects with V1 data (viability, businessPlan, marketing, roadmap) AND no V2 data use V1 layout
+- V2 projects have `checklist`, `foundation`, `growth`, `financial`, or `matchedResources` data
 - Both versions supported simultaneously for backward compatibility
 
 ### Claude API JSON Handling
@@ -623,6 +624,29 @@ const handleGenerateLaunchKit = useCallback(async () => {
   // ... use currentData
 }, [/* NO deep dive states here */]);
 ```
+
+### Deep Dive Data Persistence (Builder Flow)
+When entering deep dive from the builder flow (vs My Projects), the component handles two scenarios:
+1. **My Projects flow:** Parent fetches data from DB, passes as `initial*` props → component uses props directly
+2. **Builder flow:** No initial props, component must:
+   - Save the idea via `/api/user/ideas/save` → gets `savedIdeaId`
+   - Auto-save generated tabs to `/api/user/deep-dive` (runs on state change)
+   - **Load saved data on remount** via `loadSavedDeepDiveData` effect
+
+The `loadSavedDeepDiveData` effect ensures data persists across page remounts (e.g., after Stripe checkout):
+```typescript
+useEffect(() => {
+  // Runs when savedIdeaId becomes available
+  // Skips if initial props were provided (My Projects flow)
+  // Fetches from /api/user/deep-dive?ideaId=${savedIdeaId}
+  // Populates state + marks tabs as fetched/saved
+}, [savedIdeaId, initialFoundation, ...]);
+```
+**Key refs:**
+- `hasAttemptedSaveIdea` — Prevents duplicate idea save calls
+- `hasAttemptedLoadSavedData` — Prevents duplicate DB fetch calls
+- `fetchedTabs` — Tracks which tabs have content (prevents duplicate API generation)
+- `savedTabs` — Tracks which tabs are saved to DB (prevents duplicate saves)
 
 ### Launch Kit V2
 - **API Route:** `POST /api/launch-kit/v2` generates all 5 assets in parallel; `GET` retrieves cached assets
