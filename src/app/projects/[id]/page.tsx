@@ -98,10 +98,21 @@ interface Project {
   } | null;
 }
 
-// Helper to detect if project has V2 data
-function hasV2Data(deepDive: Project["deepDive"]): boolean {
-  if (!deepDive) return false;
-  return !!(deepDive.checklist || deepDive.foundation || deepDive.growth || deepDive.financial || deepDive.matchedResources);
+// Helper to detect if project should use V2 (current) or V1 (legacy) layout
+// V2 is the default for all new projects. Only use V1 for legacy projects that
+// have V1 data but no V2 data.
+function shouldUseV2Layout(deepDive: Project["deepDive"]): boolean {
+  if (!deepDive) return true; // No data = new project = use V2
+
+  const hasV1Data = !!(deepDive.viability || deepDive.businessPlan || deepDive.marketing || deepDive.roadmap);
+  const hasV2Data = !!(deepDive.checklist || deepDive.foundation || deepDive.growth || deepDive.financial || deepDive.matchedResources);
+
+  // If has any V2 data, use V2 layout
+  if (hasV2Data) return true;
+  // If has V1 data but no V2 data, use V1 layout (legacy project)
+  if (hasV1Data && !hasV2Data) return false;
+  // No data at all = new project = use V2
+  return true;
 }
 
 export default function ProjectPage() {
@@ -672,8 +683,9 @@ export default function ProjectPage() {
     ownIdea: "",
   };
 
-  // Check if this is a V2 project (has V2 deep dive data)
-  const isV2Project = hasV2Data(project.deepDive);
+  // Determine whether to use V2 (current) or V1 (legacy) layout
+  // V2 is the default for all new projects
+  const isV2Project = shouldUseV2Layout(project.deepDive);
 
   // V2 Project: Render DeepDiveSectionV2 component (handles its own header)
   if (isV2Project) {
