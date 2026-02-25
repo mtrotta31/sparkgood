@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button, FadeIn } from "@/components/ui";
 import { US_STATES } from "@/lib/constants";
 import type { UserLocation } from "@/types";
@@ -21,14 +21,18 @@ export default function Location({
   const [city, setCity] = useState(value?.city || "");
   const [state, setState] = useState(value?.state || "");
 
+  // Use ref to avoid onChange in dependency array (prevents infinite loop when parent doesn't memoize)
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
   // Update parent when values change
   useEffect(() => {
     if (city && state) {
-      onChange({ city, state });
+      onChangeRef.current({ city, state });
     } else if (!city && !state) {
-      onChange(null);
+      onChangeRef.current(null);
     }
-  }, [city, state, onChange]);
+  }, [city, state]);
 
   const handleSkip = () => {
     onChange(null);
