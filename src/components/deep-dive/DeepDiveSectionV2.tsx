@@ -152,6 +152,8 @@ export default function DeepDiveSectionV2({
   const hasAttemptedSaveIdea = useRef(!!initialSavedIdeaId);
   // Track if we've initialized from props
   const hasInitializedFromProps = useRef(false);
+  // Track if we've attempted to load saved data from DB (for when we have savedIdeaId but no initial props)
+  const hasAttemptedLoadSavedData = useRef(!!initialSavedIdeaId); // Skip if we got initial props
 
   // Ref to hold current deep dive data for Launch Kit API calls
   // This prevents having these as useEffect dependencies which can cause re-render issues
@@ -239,6 +241,69 @@ export default function DeepDiveSectionV2({
 
     saveIdeaToProjects();
   }, [isAuthenticated, idea, profileId]);
+
+  // Load saved deep dive data from database when we have a savedIdeaId but weren't given initial props
+  // This handles the case where user returns from Stripe and the component remounts
+  useEffect(() => {
+    const loadSavedDeepDiveData = async () => {
+      // Only run if we have a savedIdeaId and haven't loaded yet
+      if (!savedIdeaId || hasAttemptedLoadSavedData.current) return;
+      // Skip if we already have data from props
+      if (initialFoundation || initialChecklist || initialGrowth || initialFinancial || initialLocalResources) return;
+
+      hasAttemptedLoadSavedData.current = true;
+      console.log("[DeepDiveSectionV2] Loading saved deep dive data for:", savedIdeaId);
+
+      try {
+        const response = await fetch(`/api/user/deep-dive?ideaId=${savedIdeaId}`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          console.log("[DeepDiveSectionV2] Loaded saved data:", {
+            hasFoundation: !!result.data.foundation,
+            hasChecklist: !!result.data.checklist,
+            hasGrowth: !!result.data.growth,
+            hasFinancial: !!result.data.financial,
+            hasResources: !!result.data.matchedResources,
+          });
+
+          // Populate state with saved data
+          if (result.data.foundation) {
+            setFoundation(result.data.foundation);
+            fetchedTabs.current.add("foundation");
+            savedTabs.current.add("foundation");
+          }
+          if (result.data.checklist) {
+            setChecklist(result.data.checklist);
+            fetchedTabs.current.add("checklist");
+            savedTabs.current.add("checklist");
+          }
+          if (result.data.growth) {
+            setGrowth(result.data.growth);
+            fetchedTabs.current.add("growth");
+            savedTabs.current.add("growth");
+          }
+          if (result.data.financial) {
+            setFinancial(result.data.financial);
+            fetchedTabs.current.add("financial");
+            savedTabs.current.add("financial");
+          }
+          if (result.data.matchedResources) {
+            setLocalResources(result.data.matchedResources);
+            fetchedTabs.current.add("resources");
+            savedTabs.current.add("resources");
+          }
+          if (result.data.checklistProgress) {
+            setChecklistProgress(result.data.checklistProgress);
+          }
+        }
+      } catch (err) {
+        console.error("[DeepDiveSectionV2] Error loading saved deep dive data:", err);
+      }
+    };
+
+    loadSavedDeepDiveData();
+  }, [savedIdeaId, initialFoundation, initialChecklist, initialGrowth, initialFinancial, initialLocalResources]);
 
   // Track if we're returning from a successful Stripe purchase
   const [isReturningFromPurchase, setIsReturningFromPurchase] = useState(false);
