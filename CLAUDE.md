@@ -442,15 +442,17 @@ Launch Kit V2 type definitions and helpers:
 
 ### `launch-kit/generate-pitch-deck.ts`
 Generates 7-slide PPTX presentation using pptxgenjs:
-- Slide 1: Cover (business name, tagline, location)
-- Slide 2: The Opportunity (problem, audience, TAM/SAM/SOM)
-- Slide 3: The Solution (description, differentiation, benefits)
-- Slide 4: Market Validation (viability score, breakdown table, trends)
-- Slide 5: Competitive Landscape (competitor table, positioning)
-- Slide 6: Financial Projections (startup costs, revenue, break-even)
-- Slide 7: Next Steps (funding needs, 4-week timeline)
+- Slide 1: Cover (business name, tagline, location, accent bar)
+- Slide 2: The Opportunity (problem, audience, TAM/SAM/SOM with proper spacing)
+- Slide 3: The Solution (description, differentiation, benefit cards with centered numbers)
+- Slide 4: Market Validation (viability score centered in circle, breakdown table, trends)
+- Slide 5: Competitive Landscape (competitor table with full names, positioning statement)
+- Slide 6: Financial Projections (startup costs, prominent annual revenue, break-even)
+- Slide 7: Next Steps (funding needs, 4-week timeline, accent bar)
 - **Smart number formatting:** `formatMarketSize()` converts "$8.99 billion" → "$8.99B"
-- **Word-boundary truncation:** Text truncation never cuts mid-word
+- **Sentence-aware truncation:** `truncateText()` cuts at sentence boundaries (. ! ?), falls back to comma, then word boundary - never mid-sentence
+- **Color consistency:** Accent color (#F97316) only on slides 1 and 7; navy/professional palette for content slides
+- **Character limits:** benefit descriptions (150), break-even (200), assessment (100)
 
 ### `launch-kit/generate-social-graphics.ts`
 Generates 4 PNG graphics using satori + @resvg/resvg-js:
@@ -463,6 +465,15 @@ Generates 4 PNG graphics using satori + @resvg/resvg-js:
 - **No text clipping:** Decorative elements positioned away from text areas
 - **Satori requirements:** All containers with multiple children MUST have explicit `display: "flex"`. Decorative elements wrapped in flex containers to avoid layout errors.
 
+### `launch-kit/generate-landing-page.ts`
+Generates standalone HTML landing page via Claude API:
+- Professional design with Google Fonts (Playfair Display + DM Sans)
+- Category-aware color palette from `getCategoryColors()`
+- Sections: Hero, Problem/Solution, Benefits, About, FAQ, Footer
+- **mailto: CTAs:** All contact buttons use `mailto:{userEmail}` instead of forms
+- **Copyright year:** Prompt explicitly requests current year (never hardcoded 2024/2025)
+- Mobile responsive with CSS media queries, no JavaScript required
+
 ### `launch-kit/generate-one-pager.tsx`
 Generates single-page PDF business summary using @react-pdf/renderer:
 - **Header:** Business name, tagline, location, category badge
@@ -470,6 +481,7 @@ Generates single-page PDF business summary using @react-pdf/renderer:
 - **Right column (42%):** Viability Score (prominent callout), Market Opportunity, Financial Snapshot, Pricing
 - **Footer:** Location and SparkLocal watermark
 - **Market Opportunity layout:** Uses vertical stacking (label above value) to prevent text overlap with long market data
+- **Sentence-aware truncation:** `truncate()` cuts at sentence boundaries, falls back to comma, then word boundary
 - **Category-aware colors:** Primary color from business category applied to headers, dividers, score box
 
 ## Development Commands
@@ -597,6 +609,21 @@ The core product is fully functional with payments:
 - Shows "Unlimited messages" badge for active subscribers, "X of 20 messages" for others
 - Friendly upgrade prompt when limit reached with CTA to pricing page
 
+### Deep Dive State Management
+`DeepDiveSectionV2.tsx` uses a ref pattern to avoid stale closures and unnecessary re-renders:
+- **deepDiveDataRef:** Holds current values of `foundation`, `growth`, `financial`, `checklist`, `localResources`
+- **Why:** Launch Kit callbacks need current deep dive data, but adding these states as useCallback/useEffect dependencies would cause re-renders when data changes
+- **Pattern:** Ref synced via useEffect, callbacks read from `deepDiveDataRef.current`:
+```typescript
+const deepDiveDataRef = useRef({ foundation, growth, financial, checklist, localResources });
+useEffect(() => { deepDiveDataRef.current = { foundation, growth, ... }; }, [foundation, growth, ...]);
+
+const handleGenerateLaunchKit = useCallback(async () => {
+  const currentData = deepDiveDataRef.current;  // Always fresh
+  // ... use currentData
+}, [/* NO deep dive states here */]);
+```
+
 ### Launch Kit V2
 - **API Route:** `POST /api/launch-kit/v2` generates all 5 assets in parallel; `GET` retrieves cached assets
 - **Rate Limit Resilience:** Each asset generator wrapped in try/catch; returns partial results if some fail
@@ -615,6 +642,20 @@ The core product is fully functional with payments:
 - **Button Gating:** Launch Kit button disabled until all 5 deep dive tabs are complete
 - **mailto: Links:** Landing pages use `mailto:{userEmail}` instead of forms
 - **Regeneration UI:** `LaunchKitModalV2.tsx` shows "Regenerate" button when `failedAssets` exist; `DeepDiveSectionV2.tsx` handles `handleRegenerateLaunchKit` callback
+
+### Callback Ref Pattern (Step Components)
+Step components like `Location.tsx` receive `onChange` callbacks from the parent builder page. To avoid infinite re-render loops:
+- **Problem:** Parent passes inline arrow functions (`(v) => updateProfile("location", v)`) which create new references on every render
+- **Solution:** Use a ref to store the latest callback, avoiding it as a useEffect dependency:
+```typescript
+const onChangeRef = useRef(onChange);
+onChangeRef.current = onChange;
+
+useEffect(() => {
+  onChangeRef.current(value);  // Always calls latest version
+}, [value]);  // onChange NOT in deps
+```
+This pattern is used in `Location.tsx` and should be applied to any step component that calls `onChange` inside a useEffect.
 
 ### Example Deep Dive & Purchase Flow
 - `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
