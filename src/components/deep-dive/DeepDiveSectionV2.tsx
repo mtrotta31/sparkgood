@@ -153,6 +153,16 @@ export default function DeepDiveSectionV2({
   // Track if we've initialized from props
   const hasInitializedFromProps = useRef(false);
 
+  // Ref to hold current deep dive data for Launch Kit API calls
+  // This prevents having these as useEffect dependencies which can cause re-render issues
+  const deepDiveDataRef = useRef({
+    foundation: initialFoundation || null,
+    growth: initialGrowth || null,
+    financial: initialFinancial || null,
+    checklist: initialChecklist || null,
+    localResources: initialLocalResources || null,
+  });
+
   // Initialize refs with content from props (only once on mount)
   useEffect(() => {
     if (hasInitializedFromProps.current) return;
@@ -179,6 +189,18 @@ export default function DeepDiveSectionV2({
       savedTabs.current.add("resources");
     }
   }, [initialChecklist, initialFoundation, initialGrowth, initialFinancial, initialLocalResources]);
+
+  // Keep the deep dive data ref in sync with state
+  // This allows useEffect/callbacks to access current values without having them as dependencies
+  useEffect(() => {
+    deepDiveDataRef.current = {
+      foundation,
+      growth,
+      financial,
+      checklist,
+      localResources,
+    };
+  }, [foundation, growth, financial, checklist, localResources]);
 
   // User data hook for saving results
   const { isAuthenticated } = useUserData();
@@ -498,6 +520,8 @@ export default function DeepDiveSectionV2({
   }, []);
 
   // Auto-trigger Launch Kit generation when returning from purchase
+  // NOTE: Uses deepDiveDataRef to avoid having foundation/growth/financial/checklist/localResources
+  // as dependencies, which was causing state reset issues when the modal closed
   useEffect(() => {
     if (isReturningFromLaunchKitPurchase && hasUnlockedAccess) {
       const timer = setTimeout(() => {
@@ -506,6 +530,9 @@ export default function DeepDiveSectionV2({
         setLaunchKitError(null);
         setLaunchKitFailedAssets([]);
 
+        // Get current deep dive data from ref to avoid stale closures
+        const currentData = deepDiveDataRef.current;
+
         fetch("/api/launch-kit/v2", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -513,11 +540,11 @@ export default function DeepDiveSectionV2({
             idea,
             profile,
             savedIdeaId,
-            foundation,
-            growth,
-            financial,
-            checklist,
-            matchedResources: localResources,
+            foundation: currentData.foundation,
+            growth: currentData.growth,
+            financial: currentData.financial,
+            checklist: currentData.checklist,
+            matchedResources: currentData.localResources,
           }),
         })
           .then((response) => response.json())
@@ -541,9 +568,10 @@ export default function DeepDiveSectionV2({
 
       return () => clearTimeout(timer);
     }
-  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, transformLaunchKitResponse]);
+  }, [isReturningFromLaunchKitPurchase, hasUnlockedAccess, idea, profile, savedIdeaId, transformLaunchKitResponse]);
 
   // Generate Launch Kit (or load saved assets)
+  // Uses deepDiveDataRef to avoid having deep dive states as dependencies
   const handleGenerateLaunchKit = useCallback(async () => {
     setShowLaunchKit(true);
     setLaunchKitError(null);
@@ -575,6 +603,9 @@ export default function DeepDiveSectionV2({
     // No saved assets, generate new ones
     setIsGeneratingLaunchKit(true);
 
+    // Get current deep dive data from ref
+    const currentData = deepDiveDataRef.current;
+
     try {
       const response = await fetch("/api/launch-kit/v2", {
         method: "POST",
@@ -583,11 +614,11 @@ export default function DeepDiveSectionV2({
           idea,
           profile,
           savedIdeaId,
-          foundation,
-          growth,
-          financial,
-          checklist,
-          matchedResources: localResources,
+          foundation: currentData.foundation,
+          growth: currentData.growth,
+          financial: currentData.financial,
+          checklist: currentData.checklist,
+          matchedResources: currentData.localResources,
         }),
       });
 
@@ -604,7 +635,7 @@ export default function DeepDiveSectionV2({
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, launchKitV2, transformLaunchKitResponse]);
+  }, [idea, profile, savedIdeaId, launchKitV2, transformLaunchKitResponse]);
 
   // Handle Launch Kit button click
   const handleLaunchKitClick = useCallback(() => {
@@ -618,6 +649,7 @@ export default function DeepDiveSectionV2({
   }, [idea.id, hasLaunchKitAccess, handleGenerateLaunchKit]);
 
   // Handle regenerating failed Launch Kit assets
+  // Uses deepDiveDataRef to avoid having deep dive states as dependencies
   const handleRegenerateLaunchKit = useCallback(async () => {
     // Clear existing launch kit data to force regeneration
     setLaunchKitV2(null);
@@ -625,6 +657,9 @@ export default function DeepDiveSectionV2({
     setLaunchKitFailedAssets([]);
     setLaunchKitError(null);
     setIsGeneratingLaunchKit(true);
+
+    // Get current deep dive data from ref
+    const currentData = deepDiveDataRef.current;
 
     try {
       const response = await fetch("/api/launch-kit/v2", {
@@ -634,11 +669,11 @@ export default function DeepDiveSectionV2({
           idea,
           profile,
           savedIdeaId,
-          foundation,
-          growth,
-          financial,
-          checklist,
-          matchedResources: localResources,
+          foundation: currentData.foundation,
+          growth: currentData.growth,
+          financial: currentData.financial,
+          checklist: currentData.checklist,
+          matchedResources: currentData.localResources,
           forceRegenerate: true, // Signal to API to regenerate even if assets exist
         }),
       });
@@ -656,7 +691,7 @@ export default function DeepDiveSectionV2({
     } finally {
       setIsGeneratingLaunchKit(false);
     }
-  }, [idea, profile, savedIdeaId, foundation, growth, financial, checklist, localResources, transformLaunchKitResponse]);
+  }, [idea, profile, savedIdeaId, transformLaunchKitResponse]);
 
   // Auto-save results when logged in
   useEffect(() => {
