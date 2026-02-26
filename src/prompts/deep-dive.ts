@@ -2358,7 +2358,7 @@ export function generateChecklistPrompt(
 
   const resourcesFormatted = formatResourcesForPromptV2(resources);
 
-  return `Generate a week-by-week launch checklist for this business idea.
+  return `Generate a week-by-week launch checklist for this business idea following the "validate first, formalize later" principle.
 
 ## Business Overview
 - **Idea:** ${idea.name}
@@ -2381,18 +2381,16 @@ Return a JSON object with this EXACT structure (use camelCase keys):
   "weeks": [
     {
       "weekNumber": 1,
-      "title": "Foundation",
+      "title": "Validate Your Idea",
       "items": [
         {
           "id": "week1-item1",
-          "title": "Short action title (e.g., 'Register your LLC in ${profile.location?.state || "your state"}')",
+          "title": "Talk to 10 potential customers and record their honest reactions",
           "priority": "critical",
-          "estimatedTime": "1-2 hours",
-          "estimatedCost": "$300",
-          "guide": "Detailed step-by-step markdown with specific links and instructions. For a ${category} in ${profile.location?.state || "your state"}, explain exactly what to do, where to go, what to click. Include actual URLs.",
-          "links": [
-            {"label": "Secretary of State", "url": "https://actual-state-url.gov"}
-          ]
+          "estimatedTime": "2-3 hours",
+          "estimatedCost": "$0",
+          "guide": "Detailed validation script: who to talk to, what questions to ask, how to interpret responses. Be specific about where to find these people.",
+          "links": []
         }
       ]
     }
@@ -2404,20 +2402,62 @@ IMPORTANT:
 - priority must be one of: "critical", "important", "optional" (NOT "high", "medium", "low")
 - Use camelCase for all keys: weekNumber, estimatedTime, estimatedCost
 
+## THE VALIDATE-FIRST STRUCTURE (CRITICAL)
+
+**Week 1: Validate Your Idea** — Test real demand BEFORE spending money on LLC/EIN
+Tasks must be SPECIFIC to ${category} businesses. Examples by business type:
+- Product business (physical goods, subscription boxes): "Talk to 10 friends/family — ask 'Would you pay $X for this?' Record their honest reactions. If they hesitate, ask why."
+- Service business (mobile bar, consulting, coaching): "Post in 2 local Facebook groups describing your service. Ask if anyone would book it. Track responses."
+- Food business (food truck, bakery, catering): "Make a small batch and sell/give samples at a local farmers market or to neighbors. Get feedback on taste, price, and packaging."
+- Digital/online business (e-commerce, SaaS, course): "Create a simple landing page describing the product. Run a $20 Facebook/Instagram ad. Track click-through and signup rates."
+- Service-to-businesses (B2B consulting, agency): "Cold email or call 5 potential clients with a specific pitch. Track how many express genuine interest."
+
+Generate 3-4 validation tasks specific to "${idea.name}" as a ${category} business in ${location || "their area"}.
+
+Include links to validation tools where relevant (e.g., Google Forms for surveys, Carrd for landing pages, Facebook Groups for posting).
+
+**Week 2: Refine Based on Feedback** — Process validation results before investing
+- "Review your validation results: What did people love? What concerned them? Refine your offering."
+- "Set a pre-sale or waitlist goal: Get 5 people to commit (deposit, signup, or verbal yes) before moving forward."
+- "Research your top 3 competitors more deeply — what do their customers complain about? That's your opportunity."
+- "Based on feedback, adjust your pricing or offering. Test the refined version with 3 more people."
+
+**Week 3: Formalize Your Business** — NOW do the admin work (only after validation)
+Begin this week with a transition note: "You've confirmed there's demand for ${idea.name} — now it's time to make it official."
+- Register your LLC (or sole proprietorship) in ${profile.location?.state || "your state"}
+- Get your EIN from IRS.gov
+- Open a business bank account
+- Set up simple bookkeeping (Wave, free)
+- Get required licenses for ${category} in ${profile.location?.city || "your city"}
+
+Week 3 tasks should answer: "What exactly do I do, where do I go, and how much does it cost?" Include real URLs (state gov sites, IRS.gov) and specific costs.
+
+**Week 4: Build and Launch** — Create and ship
+- Create your product/service offering based on validated feedback
+- Set up your online presence (reference Growth Plan tab content)
+- Soft launch to your validated audience (the people who said yes)
+- Apply to your matched resources — reference the Local Resources tab for grants, accelerators, and SBA programs matched to this business. Include specific application tasks.
+- Announce publicly and start marketing
+
+Week 4 tasks should answer: "What exactly do I do, where do I go, and how much does it cost?" Include real URLs and specific costs.
+
 ## Requirements
 1. Create 4 weeks of tasks (12-16 total items)
-2. Week 1: Foundation (legal, banking, EIN)
-3. Week 2: Setup (workspace, insurance, tools)
-4. Week 3: Build (inventory/services, online presence)
-5. Week 4: Launch (soft launch, marketing, apply for resources)
+2. VALIDATION FIRST: Weeks 1-2 must focus on testing demand, not paperwork
+3. Week 1 tasks must be SPECIFIC to this exact business type — not generic "do market research"
+4. Every validation task needs a MEASURABLE outcome (number of conversations, signups, etc.)
+5. Week 3 transition should acknowledge they've validated demand
 6. Each item MUST have a detailed "guide" with step-by-step instructions
-7. Include REAL links (state gov sites, IRS.gov, tool signups)
-8. Reference matched resources where relevant (coworking, grants, accelerators)
+7. Include REAL links throughout:
+   - Weeks 1-2: Link to validation tools (Google Forms, Carrd, Typeform, relevant Facebook groups, etc.)
+   - Weeks 3-4: Link to government sites (state Secretary of State, IRS.gov), tool signups, and matched resources
+8. Reference matched resources in Week 4 — include specific tasks to apply for grants, accelerators, SBA programs from the Local Resources tab
 9. Tailor complexity to commitment level:
-   - weekend: Simplest path, minimum viable steps
-   - steady: Balanced approach, proper foundation
-   - all_in: Comprehensive, professional setup
+   - weekend: Quick validation, simpler formalization, lower time commitment per task
+   - steady: Thorough validation, proper foundation
+   - all_in: Comprehensive validation across channels, professional setup
 10. All costs should be realistic for ${profile.location?.state || "the user's state"}
+11. Weeks 3-4 tasks must answer: "What exactly do I do, where do I go, and how much does it cost?"
 
 Return ONLY valid JSON, no markdown formatting.`;
 }
@@ -2485,19 +2525,87 @@ ${researchContext}
 ## Matched Local Resources
 ${resourcesFormatted}
 
+## VIABILITY SCORING RUBRIC (CRITICAL — Follow This Exactly)
+
+Before assigning scores, you MUST explicitly consider for each dimension:
+- 2 specific reasons the score should be LOWER
+- 2 specific reasons the score should be HIGHER
+Then arrive at your final score. This prevents defaulting to the "safe" 70-75 range.
+
+### Market Demand (0-100)
+- 90-100: Proven demand — people actively searching for this, clear willingness to pay, large addressable market
+- 70-89: Strong signals of demand, growing market, some competition validates the space
+- 50-69: Moderate demand, niche market, unclear if people will pay or just express interest
+- 30-49: Weak demand signals, very small market, likely hard to find paying customers
+- 0-29: No evidence of demand, solution looking for a problem
+
+### Competition (0-100) — Higher = better competitive position
+- 90-100: Clear gap in market, no direct competitors doing this specific thing in this location
+- 70-89: Few competitors, clear differentiation opportunity, incumbents are weak or generic
+- 50-69: Moderate competition, differentiation possible but requires strong execution
+- 30-49: Crowded market, hard to stand out, would need significant innovation or capital
+- 0-29: Dominated by established players with strong brand loyalty and resources
+
+### Startup Feasibility (0-100)
+- 90-100: Can launch within budget with existing skills, minimal regulatory hurdles, low complexity
+- 70-89: Achievable with some learning/investment, manageable complexity
+- 50-69: Stretches budget or skills, moderate regulatory/licensing requirements, some technical challenges
+- 30-49: Significant capital, expertise, or time beyond what user has indicated
+- 0-29: Unrealistic given stated budget/experience, heavy regulatory burden, requires specialized infrastructure
+
+### Revenue Potential (0-100)
+- 90-100: High margins (60%+), clear path to $10K+/month, recurring revenue model, scalable
+- 70-89: Good margins, realistic path to $5K+/month, some recurring revenue potential
+- 50-69: Moderate margins, income possible but may stay as side income, limited scalability
+- 30-49: Low margins, hard to scale, likely hobby-level income unless significant investment
+- 0-29: Very difficult to monetize, unclear business model, likely to lose money
+
+### Timing (0-100)
+- 90-100: Perfect timing — trend is accelerating, seasonal advantage, regulatory tailwind, cultural moment
+- 70-89: Good timing, market is growing, no major headwinds
+- 50-69: Neutral timing, no particular advantage or disadvantage
+- 30-49: Challenging timing — market is contracting, seasonal disadvantage, regulatory headwinds
+- 0-29: Terrible timing — market is saturated or declining, major obstacles ahead
+
+## CALIBRATION EXAMPLES — Use These as Anchors
+
+**Strong Idea (Score: 87):**
+"Mobile dog grooming in a fast-growing suburb with only 1 competitor, owner has grooming experience, $3K startup budget covers a used van and supplies, recurring revenue from repeat customers."
+- Market Demand: 85 (pet spending growing 8% annually, busy pet owners need convenience)
+- Competition: 92 (only 1 competitor in the area, clear geographic opportunity)
+- Feasibility: 88 (owner has skills, budget is adequate)
+- Revenue: 82 (recurring bookings, $50-80 per groom, 4-6 dogs/day realistic)
+- Timing: 88 (post-pandemic pet ownership boom)
+
+**Mediocre Idea (Score: 58):**
+"Artisanal candle business in a city with 12 existing candle makers on Etsy, no particular differentiation, owner has never made candles before, moderate demand but very crowded market."
+- Market Demand: 65 (people buy candles, but commodity market)
+- Competition: 42 (12+ competitors, hard to stand out)
+- Feasibility: 68 (candle-making learnable, low startup cost)
+- Revenue: 52 (low margins after materials, crowded marketplace)
+- Timing: 62 (steady market, no particular tailwind)
+
+**Weak Idea (Score: 34):**
+"Opening a full-service restaurant with $2K budget and no restaurant experience in a location with dozens of established competitors."
+- Market Demand: 55 (people eat out, but not underserved)
+- Competition: 25 (dozens of established restaurants)
+- Feasibility: 18 ($2K is nowhere near enough, no experience)
+- Revenue: 45 (restaurants have thin margins even when successful)
+- Timing: 35 (post-pandemic dining recovery but labor costs high)
+
 ## Output Format
 Return a JSON object with this EXACT structure (use camelCase keys):
 
 \`\`\`json
 {
   "marketViability": {
-    "overallScore": 78,
+    "overallScore": 62,
     "scoreBreakdown": [
-      {"factor": "Market Demand", "score": 85, "assessment": "Growing 12% YoY, strong local interest"},
-      {"factor": "Competition", "score": 65, "assessment": "4 direct competitors, but none in ${profile.location?.city || "your city"}"},
-      {"factor": "Startup Feasibility", "score": 80, "assessment": "Achievable within your budget"},
-      {"factor": "Revenue Potential", "score": 75, "assessment": "$3K-8K/month realistic within 6 months"},
-      {"factor": "Timing", "score": 82, "assessment": "Market trend favors this, no regulatory barriers"}
+      {"factor": "Market Demand", "score": 68, "assessment": "Moderate demand in this niche — validate before investing"},
+      {"factor": "Competition", "score": 55, "assessment": "5 established competitors — differentiation needed"},
+      {"factor": "Startup Feasibility", "score": 72, "assessment": "Achievable with your budget and skills"},
+      {"factor": "Revenue Potential", "score": 58, "assessment": "$2K-4K/month realistic, not get-rich-quick"},
+      {"factor": "Timing", "score": 65, "assessment": "Neutral timing, no major tailwinds or headwinds"}
     ],
     "marketResearch": {
       "tam": "$X billion total addressable market",
@@ -2565,7 +2673,11 @@ Return a JSON object with this EXACT structure (use camelCase keys):
 \`\`\`
 
 ## Requirements
-1. Viability score should be honest and evidence-based
+1. CRITICAL — HONEST SCORING:
+   - Scores must reflect genuine differentiation. A mediocre idea in a crowded market should score in the 40s-50s, NOT the 70s.
+   - Only score above 80 if the idea has clear, specific advantages (low competition, founder expertise, adequate budget, growing market).
+   - The overall score should NOT default to the 70-75 range. Use the FULL scale.
+   - Before each dimension score, mentally list 2 reasons it should be lower and 2 reasons higher, then decide.
 2. Use REAL market data if research was provided, otherwise use industry estimates
 3. Competitors should be REAL companies (from research) or realistic examples
 4. All costs should be specific (not ranges when possible) and realistic for ${profile.location?.state || "the user's state"}
@@ -2573,6 +2685,7 @@ Return a JSON object with this EXACT structure (use camelCase keys):
 6. Include real URLs for government sites, tools, platforms
 7. Tailor recommendations to their budget (don't suggest expensive options for low budgets)
 8. Reference matched local resources where relevant
+9. Each score assessment should be SPECIFIC to this business, not generic (e.g., "3 competitors within 5 miles" not "some competition exists")
 
 Return ONLY valid JSON, no markdown formatting.`;
 }
@@ -2826,31 +2939,42 @@ Return ONLY valid JSON, no markdown formatting.`;
 // V2 SYSTEM PROMPTS
 // ============================================================================
 
-export const CHECKLIST_SYSTEM_PROMPT = `You are SparkLocal's launch strategist — practical, specific, and action-oriented.
+export const CHECKLIST_SYSTEM_PROMPT = `You are SparkLocal's launch strategist — practical, specific, and validation-focused.
 
-Your job is to create a step-by-step launch checklist that transforms "I want to start a business" into "I know exactly what to do this week."
+Your job is to create a step-by-step launch checklist that follows the "validate first, formalize later" principle. A business should NEVER spend $300 on an LLC for an idea nobody will pay for.
 
-Your checklists are:
-- SPECIFIC: Name actual tools, websites, costs, and timelines
+Your philosophy:
+- VALIDATE BEFORE FORMALIZING: Weeks 1-2 test real demand. Weeks 3-4 build the business.
+- SPECIFIC: Name actual actions, people to talk to, and metrics to track
+- CONTEXTUAL: Validation tasks differ by business type — a food truck validates differently than a consulting service
+- MEASURABLE: Every validation task has a clear success metric ("5 people commit to pre-order")
 - ACTIONABLE: Each item can be done TODAY, not "someday"
-- CONTEXTUAL: Tailored to their business type, location, and budget
-- LINKED: Include real URLs for government sites, tools, and resources
-- REALISTIC: Match complexity to their commitment level
+- LINKED: Include real URLs for government sites, tools, and resources (validation tools like Google Forms, Carrd; government sites like Secretary of State, IRS.gov)
+- REALISTIC: Match complexity to their commitment level (weekend = simpler, all_in = comprehensive)
 
-Every item should answer: "What exactly do I do, where do I go, and how much does it cost?"
+Different weeks answer different questions:
+- Weeks 1-2 (Validation): "How will I KNOW if people actually want this?"
+- Weeks 3-4 (Formalization & Launch): "What exactly do I do, where do I go, and how much does it cost?"
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation text before or after. No markdown code blocks. Just the raw JSON object starting with { and ending with }.`;
 
-export const FOUNDATION_SYSTEM_PROMPT = `You are SparkLocal's business analyst — rigorous, research-backed, and practical.
+export const FOUNDATION_SYSTEM_PROMPT = `You are SparkLocal's business analyst — rigorous, research-backed, and HONEST about viability.
 
 Your job is to provide comprehensive business foundation analysis that answers: "Is this a good idea?" and "How do I actually build it?"
 
 Your analysis is:
 - EVIDENCE-BASED: Use real market data, not generic statements
 - SPECIFIC: Name actual competitors, tools, costs, and legal requirements
-- HONEST: Give real viability scores — a "refine" verdict with direction is better than false optimism
+- GENUINELY HONEST: Scores must reflect reality. A mediocre idea in a crowded market should score in the 40s-50s, NOT the 70s. Only score above 80 for ideas with clear, specific advantages. Do NOT default to the "safe" 70-75 range.
 - ACTIONABLE: Every section answers "what do I do with this?"
 - TAILORED: Recommendations match their budget, location, and experience
+
+CRITICAL SCORING GUIDANCE:
+- Scores of 85+ = Exceptional: Clear market gap, strong founder-market fit, realistic budget, favorable timing
+- Scores of 70-84 = Good: Solid opportunity with some advantages
+- Scores of 50-69 = Needs Work: Viable but significant challenges exist
+- Scores of 30-49 = Risky: Major obstacles, needs substantial pivot or investment
+- Scores below 30 = Rethink: Fundamental problems with the concept
 
 When research data is provided, synthesize it into clear insights. When competitors are scraped, analyze them specifically.
 
