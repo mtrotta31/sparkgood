@@ -2385,12 +2385,32 @@ Return a JSON object with this EXACT structure (use camelCase keys):
       "items": [
         {
           "id": "week1-item1",
-          "title": "Talk to 10 potential customers and record their honest reactions",
+          "title": "Create a simple landing page to test interest",
           "priority": "critical",
           "estimatedTime": "2-3 hours",
-          "estimatedCost": "$0",
-          "guide": "Detailed validation script: who to talk to, what questions to ask, how to interpret responses. Be specific about where to find these people.",
-          "links": []
+          "estimatedCost": "$0-19",
+          "guide": "Detailed validation script: what to include on the page, how to drive traffic, what metrics to track.",
+          "links": [
+            {"label": "Carrd (free landing pages)", "url": "https://carrd.co"},
+            {"label": "Google Forms (free surveys)", "url": "https://forms.google.com"}
+          ]
+        }
+      ]
+    },
+    {
+      "weekNumber": 3,
+      "title": "Formalize Your Business",
+      "items": [
+        {
+          "id": "week3-item1",
+          "title": "Register your LLC in ${profile.location?.state || "your state"}",
+          "priority": "critical",
+          "estimatedTime": "1-2 hours",
+          "estimatedCost": "$300",
+          "guide": "Step-by-step instructions for LLC registration with actual state website links.",
+          "links": [
+            {"label": "${profile.location?.state || "State"} Secretary of State", "url": "https://sos.${profile.location?.state?.toLowerCase() || "state"}.gov"}
+          ]
         }
       ]
     }
@@ -2401,6 +2421,7 @@ Return a JSON object with this EXACT structure (use camelCase keys):
 IMPORTANT:
 - priority must be one of: "critical", "important", "optional" (NOT "high", "medium", "low")
 - Use camelCase for all keys: weekNumber, estimatedTime, estimatedCost
+- links array MUST contain objects with "label" (descriptive text) and "url" (full URL) — never empty arrays for tasks that reference external resources
 
 ## THE VALIDATE-FIRST STRUCTURE (CRITICAL)
 
