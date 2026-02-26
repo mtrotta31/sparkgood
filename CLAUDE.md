@@ -23,8 +23,8 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
   - **Social Enterprise Path:** Business category (Social Enterprise) → Venture type → Format → Location → Causes → Experience → Budget → Commitment → Depth → Ideas
 - **Idea Generation** — AI generates 4 tailored business concepts based on user profile
 - **Deep Dive V2** — Premium 6-tab experience (current version):
-  - **"🏗️ Business Foundation"** — Viability score (0-100), market research (TAM/SAM/SOM), competitor analysis, legal structure, startup costs, suppliers, tech stack, insurance
-  - **"🚀 Launch Checklist"** — 4-week action plan with 16 prioritized tasks, time/cost estimates, checkable progress
+  - **"🏗️ Business Foundation"** — Viability score (0-100) with calibrated scoring rubrics, market research (TAM/SAM/SOM), competitor analysis, legal structure, startup costs, suppliers, tech stack, insurance
+  - **"🚀 Launch Checklist"** — 4-week "validate first, formalize later" action plan: Weeks 1-2 test demand with business-type-specific validation tasks, Weeks 3-4 formalize and launch after validation
   - **"📈 Growth Plan"** — Elevator pitch, landing page copy, social media posts (5 platforms), email templates, local marketing tactics
   - **"💰 Financial Model"** — Startup costs breakdown, monthly operating costs, revenue projections (3 scenarios), break-even analysis, pricing strategy
   - **"📍 Local Resources"** — Matched grants, accelerators, coworking spaces, and SBA resources for user's city
@@ -557,6 +557,8 @@ The core product is fully functional with payments:
 - ✅ Example deep dive page (`/builder/example`) with Austin Pour Co. showcase
 - ✅ "See an example" links at key conversion points
 - ✅ Business Overview component (idea summary at top of Business Foundation tab)
+- ✅ Launch Checklist "validate first" structure (Weeks 1-2 test demand, Weeks 3-4 formalize)
+- ✅ Viability Score calibration (rubrics, examples at 87/58/34, prevents 72-74 clustering)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
@@ -588,6 +590,20 @@ The core product is fully functional with payments:
 - TypeScript types use camelCase (e.g., `estimatedTime`)
 - `sendMessageForJSON()` in `claude.ts` automatically converts keys
 - Prompts in `src/prompts/deep-dive.ts` should specify camelCase keys in examples to help Claude
+
+### Prompt Engineering Notes
+**Launch Checklist Prompt** (`generateChecklistPrompt` in `src/prompts/deep-dive.ts`):
+- Follows "validate first, formalize later" principle
+- Week 1-2: Business-type-specific validation tasks (product vs service vs food vs digital)
+- Week 3-4: Formalization and launch only after validation confirmed
+- Includes links to validation tools (Google Forms, Carrd) and government sites (IRS, Secretary of State)
+- Week 3 includes transition message: "You've confirmed there's demand — now it's time to make it official"
+
+**Viability Score Prompt** (`generateFoundationPrompt` in `src/prompts/deep-dive.ts`):
+- Explicit scoring rubrics for all 5 dimensions (Market Demand, Competition, Feasibility, Revenue, Timing)
+- Calibration examples anchored in prompt: strong idea (87), mediocre (58), weak (34)
+- Reasoning step: "List 2 reasons score should be LOWER and 2 reasons HIGHER before deciding"
+- Prevents clustering around 72-74 by requiring genuine differentiation for high scores
 
 ### Project Save Flow
 1. User enters deep dive → idea saved to `saved_ideas` table → returns `savedIdeaId`
