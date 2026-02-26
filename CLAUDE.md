@@ -296,6 +296,7 @@ Located in `src/components/`:
   - `DeepDiveSectionV2.tsx` — Main V2 deep dive component (6 tabs + Launch Kit button + regeneration handler)
   - `DeepDiveSection.tsx` — Legacy V1 deep dive component (4 tabs)
   - `LaunchKitModalV2.tsx` — Launch Kit V2 modal with 5 asset tabs (Landing Page, Pitch Deck, Social Graphics, One-Pager, Text Content). Shows "Regenerate" button for failed assets, per-tab error messages, and download/preview functionality.
+  - `LaunchKitUpsell.tsx` — Conversion component that appears after all 5 deep dive tabs complete. Shows Launch Kit benefits with CTA to purchase. Dismissible (local state).
   - `LaunchKitModal.tsx` — Legacy V1 launch kit modal
   - `ConfirmDialog.tsx` — Regeneration confirmation
   - V1 view components: `ViabilityReport.tsx`, `BusinessPlanView.tsx`, etc.
@@ -559,6 +560,7 @@ The core product is fully functional with payments:
 - ✅ Business Overview component (idea summary at top of Business Foundation tab)
 - ✅ Launch Checklist "validate first" structure (Weeks 1-2 test demand, Weeks 3-4 formalize)
 - ✅ Viability Score calibration (rubrics, examples at 87/58/34, prevents 72-74 clustering)
+- ✅ Launch Kit upsell component (appears after all 5 tabs complete, drives conversion)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
