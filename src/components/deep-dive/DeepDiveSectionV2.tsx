@@ -14,6 +14,7 @@ import LocalResources from "@/components/results/LocalResources";
 import AIAdvisor from "@/components/results/AIAdvisor";
 import ConfirmDialog from "./ConfirmDialog";
 import LaunchKitModalV2 from "./LaunchKitModalV2";
+import LaunchKitUpsell from "./LaunchKitUpsell";
 import type {
   Idea,
   UserProfile,
@@ -1205,6 +1206,11 @@ export default function DeepDiveSectionV2({
               </div>
             )}
           </FadeIn>
+        )}
+
+        {/* Launch Kit Upsell - appears after all 5 tabs are complete and user hasn't purchased */}
+        {hasUnlockedAccess && allContentTabsComplete && !launchKitV2 && !hasLaunchKitAccess(idea.id) && (
+          <LaunchKitUpsell onGetLaunchKit={() => setShowLaunchKitPurchaseModal(true)} />
         )}
       </div>
 
