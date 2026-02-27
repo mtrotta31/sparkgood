@@ -74,8 +74,14 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 ### Analytics & SEO
 - **Google Analytics (GA4)** — User tracking and conversion events
+- **Google Search Console** — Site verification via meta tag in `src/app/layout.tsx`
 - **Schema.org Structured Data** — Organization, LocalBusiness, WebSite schemas
 - **Newsletter Capture** — Email signup for updates
+
+### Security & Rate Limiting
+- **API Rate Limiting** — Supabase-backed rate limiter prevents abuse (`src/lib/rate-limit.ts`)
+- **HTML Sanitization** — DOMPurify for user-generated HTML content (`src/lib/sanitize.ts`)
+- **Stripe Webhook Idempotency** — Prevents duplicate credit grants on webhook retries
 
 ## Tech Stack (Implemented)
 
@@ -103,7 +109,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Idea Generation & Deep Dive
 - `POST /api/generate-ideas` — Generate 4 ideas from user profile (supports both paths)
 - `POST /api/deep-dive` — Generate viability, plan, marketing, or roadmap content
-- `POST /api/deep-dive/resources` — Match local resources to user's idea
+- `POST /api/deep-dive/resources` — Match local resources to user's idea (uses Haiku for cost savings)
 - `POST /api/launch-kit` — Generate complete launch kit (legacy V1)
 - `POST /api/launch-kit/v2` — Generate Launch Kit V2 assets (pitch deck, social graphics, landing page, one-pager, text content)
 - `POST /api/build-asset` — Build specific assets (pitch deck, landing page, etc.)
@@ -203,6 +209,10 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 ### Newsletter
 - `newsletter_subscribers` — Email signups
+
+### Security
+- `rate_limits` — API rate limiting (user_id, endpoint, requested_at)
+- `webhook_events` — Stripe webhook idempotency (event_id, processed_at)
 
 ## Builder Flow Paths
 
@@ -399,7 +409,9 @@ sparklocal/
 │       ├── 20240223_add_checklist_progress.sql        # Checklist progress tracking
 │       ├── 20240224_add_deep_dive_v2_columns.sql      # V2 deep dive columns
 │       ├── 20240225_add_matched_resources_column.sql  # Local resources column
-│       └── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
+│       ├── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
+│       ├── 20240227_launch_kit_v2.sql                 # Launch Kit V2 storage
+│       └── 20260226_webhook_idempotency.sql           # Stripe webhook deduplication
 └── public/                      # Static assets
 ```
 
@@ -429,7 +441,20 @@ Claude API wrapper with JSON handling and rate limit resilience:
 - `sendMessageForJSON<T>(prompt, options)` — Send message, parse JSON response with automatic snake_case to camelCase conversion
 - `extractJSON(response)` — Extract JSON from Claude response (handles markdown code blocks, extra text)
 - Automatic key conversion ensures Claude's snake_case responses match TypeScript camelCase types
+- **Model Tier Selection:** Set `modelTier: "sonnet"` or `modelTier: "haiku"` for simplified model selection. Sonnet is the default. Haiku is used for simpler tasks to reduce costs.
 - **Rate Limit Retry:** Set `retryOnRateLimit: true` in options to automatically retry once after 10s on 429 errors
+
+### `rate-limit.ts`
+Supabase-backed rate limiter to prevent API abuse:
+- `checkRateLimit(endpoint, identifier)` — Returns true if request allowed, false if rate limited
+- Tracks requests per user/endpoint in `rate_limits` table
+- **Fails open** — If database unavailable, allows requests through
+- **Limits per hour:** generate-ideas (10), deep-dive (20), deep-dive/resources (30), launch-kit/v2 (20), chat-advisor (60)
+
+### `sanitize.ts`
+HTML sanitization using DOMPurify:
+- Used for landing page HTML, AI advisor responses, and any user-generated HTML content
+- Prevents XSS attacks by stripping dangerous tags and attributes
 
 ### `launch-kit/types.ts`
 Launch Kit V2 type definitions and helpers:
@@ -561,6 +586,11 @@ The core product is fully functional with payments:
 - ✅ Launch Checklist "validate first" structure (Weeks 1-2 test demand, Weeks 3-4 formalize)
 - ✅ Viability Score calibration (rubrics, examples at 87/58/34, prevents 72-74 clustering)
 - ✅ Launch Kit upsell component (appears after all 5 tabs complete, drives conversion)
+- ✅ API rate limiting (prevents abuse and runaway costs)
+- ✅ HTML sanitization (XSS prevention)
+- ✅ Stripe webhook idempotency (prevents duplicate credit grants)
+- ✅ Google Search Console verification
+- ✅ Model tiering (Haiku for simple tasks, Sonnet for complex)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
