@@ -19,6 +19,68 @@ interface CityHubContentProps {
   location: ResourceLocation;
 }
 
+// FAQPage structured data component
+function FAQStructuredData({ faqs }: { faqs: Array<{ question: string; answer: string }> }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
+// BreadcrumbList structured data component
+function BreadcrumbStructuredData({
+  cityName,
+  citySlug,
+}: {
+  cityName: string;
+  citySlug: string;
+}) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Resources",
+        item: "https://sparklocal.co/resources",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: cityName,
+        item: `https://sparklocal.co/resources/${citySlug}`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
 // Category section data
 interface CategorySection {
   category: ResourceCategory;
@@ -255,9 +317,18 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
     .map((s) => `${s.count} ${s.count === 1 ? s.name : s.plural}`)
     .join(" • ");
 
+  // City name for structured data
+  const cityName = `${location.city}, ${location.state}`;
+
   return (
     <>
       <DirectoryNav />
+
+      {/* Structured Data */}
+      <BreadcrumbStructuredData cityName={cityName} citySlug={location.slug} />
+      {location.ai_city_faqs && location.ai_city_faqs.length > 0 && (
+        <FAQStructuredData faqs={location.ai_city_faqs} />
+      )}
 
       <main>
         {/* Hero Section */}
@@ -320,6 +391,17 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
             )}
           </div>
         </section>
+
+        {/* City Introduction */}
+        {location.ai_city_intro && (
+          <section className="py-8 px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-slate-700 text-lg leading-relaxed whitespace-pre-line">
+                {location.ai_city_intro}
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* Category Sections */}
         {categorySections.map((section) => (
@@ -451,6 +533,57 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                     listing={listing as ResourceListing}
                     compact
                   />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Tips Section */}
+        {location.ai_city_tips && (
+          <section className="py-12 px-4 sm:px-6 border-t border-slate-200">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+                Tips for Entrepreneurs in {location.city}
+              </h2>
+              <div className="text-slate-700 leading-relaxed whitespace-pre-line">
+                {location.ai_city_tips}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* FAQ Section */}
+        {location.ai_city_faqs && location.ai_city_faqs.length > 0 && (
+          <section className="py-12 px-4 sm:px-6 bg-cream-dark border-t border-slate-200">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+                Starting a Business in {location.city} — FAQ
+              </h2>
+              <div className="space-y-3">
+                {location.ai_city_faqs.map((faq, i) => (
+                  <details
+                    key={i}
+                    className="group bg-white rounded-xl border border-slate-200"
+                  >
+                    <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-slate-900 font-medium hover:text-slate-700 transition-colors">
+                      <span className="pr-4">{faq.question}</span>
+                      <svg
+                        className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180 flex-shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </summary>
+                    <div className="px-5 pb-5 border-t border-slate-100">
+                      <p className="pt-4 text-slate-600 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </details>
                 ))}
               </div>
             </div>

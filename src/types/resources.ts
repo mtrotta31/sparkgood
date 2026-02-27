@@ -40,6 +40,8 @@ export interface ResourceListing {
   phone?: string;
   details: ResourceDetails;
   enrichment_status: EnrichmentStatus;
+  enrichment_data?: ListingEnrichmentData;
+  last_enriched_at?: string;
   logo_url?: string;
   images: string[];
   source: string;
@@ -105,8 +107,38 @@ export interface ResourceLocation {
   listing_count: number;
   seo_title?: string;
   seo_description?: string;
+  // AI-generated content for SEO
+  ai_city_intro?: string;
+  ai_city_faqs?: Array<{ question: string; answer: string }>;
+  ai_city_tips?: string;
+  enrichment_status?: EnrichmentStatus;
+  last_enriched_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+// Enrichment data structure for listings (stored in enrichment_data JSONB)
+export interface ListingEnrichmentData {
+  ai_description?: string;
+  ai_faqs?: Array<{ question: string; answer: string }>;
+  ai_key_details?: {
+    workspace_type?: string;
+    best_for?: string;
+    neighborhood?: string;
+    // Grant-specific
+    grant_type?: string;
+    funding_range?: string;
+    application_type?: string;
+    // Accelerator-specific
+    program_type?: string;
+    focus?: string;
+    funding?: string;
+    // SBA-specific
+    services?: string;
+    cost?: string;
+  };
+  // Any existing Perplexity enrichment data
+  [key: string]: unknown;
 }
 
 export interface ResourceCategoryLocation {

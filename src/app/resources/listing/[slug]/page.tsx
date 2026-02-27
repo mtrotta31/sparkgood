@@ -13,6 +13,7 @@ import {
   type GrantDetails,
   type SBADetails,
   type CoworkingDetails,
+  type ListingEnrichmentData,
 } from "@/types/resources";
 import ResourceCard from "@/components/resources/ResourceCard";
 import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
@@ -121,6 +122,101 @@ function getCategoryColor(category: string) {
   }
 }
 
+// FAQ structured data component
+function FAQStructuredData({ faqs }: { faqs: Array<{ question: string; answer: string }> }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
+// Breadcrumb structured data component
+function BreadcrumbStructuredData({
+  category,
+  categoryName,
+  citySlug,
+  cityName,
+  listingName,
+}: {
+  category: string;
+  categoryName: string;
+  citySlug?: string;
+  cityName?: string;
+  listingName: string;
+}) {
+  const items: Array<{
+    "@type": string;
+    position: number;
+    name: string;
+    item?: string;
+  }> = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Resources",
+      item: "https://sparklocal.co/resources",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: categoryName,
+      item: `https://sparklocal.co/resources/${category}`,
+    },
+  ];
+
+  if (citySlug && cityName) {
+    items.push({
+      "@type": "ListItem",
+      position: 3,
+      name: cityName,
+      item: `https://sparklocal.co/resources/${citySlug}`,
+    });
+    items.push({
+      "@type": "ListItem",
+      position: 4,
+      name: listingName,
+    });
+  } else {
+    items.push({
+      "@type": "ListItem",
+      position: 3,
+      name: listingName,
+    });
+  }
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items,
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
 // Star rating component
 function StarRating({ rating, reviewCount }: { rating: number; reviewCount?: number }) {
   const fullStars = Math.floor(rating);
@@ -208,10 +304,32 @@ export default async function ListingPage({ params }: PageProps) {
     ? `${listing.city}, ${listing.state}`
     : null;
 
+  // Build city slug for structured data
+  const citySlug = listing.city && listing.state
+    ? `${listing.city.toLowerCase().replace(/\s+/g, "-")}-${listing.state.toLowerCase()}`
+    : undefined;
+
+  // Get enrichment data
+  const enrichmentData = listing.enrichment_data as ListingEnrichmentData | undefined;
+
   return (
     <main className="min-h-screen bg-white">
       {/* Schema.org Structured Data */}
       <ResourceStructuredData listing={listing as ResourceListing} />
+
+      {/* Breadcrumb Schema */}
+      <BreadcrumbStructuredData
+        category={listing.category}
+        categoryName={categoryInfo.plural}
+        citySlug={citySlug}
+        cityName={breadcrumbLocation || undefined}
+        listingName={listing.name}
+      />
+
+      {/* FAQ Schema (only if FAQs exist) */}
+      {enrichmentData?.ai_faqs && enrichmentData.ai_faqs.length > 0 && (
+        <FAQStructuredData faqs={enrichmentData.ai_faqs} />
+      )}
 
       {/* Breadcrumbs */}
       <section className="pt-20 px-4 bg-gray-50 border-b border-gray-200">
@@ -336,23 +454,45 @@ export default async function ListingPage({ params }: PageProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content Column */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Description */}
+              {/* Description / About Section */}
               {(() => {
                 const cleanedAbout = formatDescription(listing.description, {
                   category: listing.category,
                   city: listing.city || undefined,
                   state: listing.state || undefined,
                 });
-                return cleanedAbout ? (
+                const isDescriptionShort = !cleanedAbout || cleanedAbout.length < 100;
+                const hasAiDescription = enrichmentData?.ai_description && enrichmentData.ai_description.length > 0;
+
+                // Show AI description as main content if original is short/empty
+                // Otherwise show original, with AI as supplementary if available
+                if (!cleanedAbout && !hasAiDescription) return null;
+
+                return (
                   <div className="bg-white rounded-xl border border-gray-200 p-6">
                     <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                       About
                     </h2>
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                      {cleanedAbout}
-                    </p>
+                    {isDescriptionShort && hasAiDescription ? (
+                      // AI description is the main content
+                      <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                        {enrichmentData.ai_description}
+                      </p>
+                    ) : (
+                      // Original description is primary
+                      <>
+                        <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                          {cleanedAbout}
+                        </p>
+                        {hasAiDescription && (
+                          <p className="text-gray-600 leading-relaxed whitespace-pre-line mt-4">
+                            {enrichmentData.ai_description}
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
-                ) : null;
+                );
               })()}
 
               {/* Accelerator Details */}
@@ -378,6 +518,15 @@ export default async function ListingPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
+                    {/* AI funding as fallback */}
+                    {!(typeof details.funding_provided === "number" && details.funding_provided > 0) && enrichmentData?.ai_key_details?.funding && (
+                      <div className="p-4 rounded-lg bg-orange-50">
+                        <p className="text-gray-500 text-sm mb-1">Funding</p>
+                        <p className="text-orange-600 font-bold text-xl">
+                          {enrichmentData.ai_key_details.funding}
+                        </p>
+                      </div>
+                    )}
                     {typeof details.equity_taken === "number" && (
                       <div className="p-4 rounded-lg bg-gray-50">
                         <p className="text-gray-500 text-sm mb-1">Equity</p>
@@ -391,6 +540,31 @@ export default async function ListingPage({ params }: PageProps) {
                         <p className="text-gray-500 text-sm mb-1">Batch Size</p>
                         <p className="text-gray-900 font-semibold text-lg">
                           ~{details.batch_size} companies
+                        </p>
+                      </div>
+                    )}
+                    {/* AI-generated key details */}
+                    {enrichmentData?.ai_key_details?.program_type && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Program Type</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.program_type}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.focus && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Focus</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.focus}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.best_for && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Best For</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.best_for}
                         </p>
                       </div>
                     )}
@@ -428,6 +602,15 @@ export default async function ListingPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
+                    {/* AI funding range as fallback if no amount data */}
+                    {!details.amount_min && !details.amount_max && enrichmentData?.ai_key_details?.funding_range && (
+                      <div className="p-4 rounded-lg bg-green-50">
+                        <p className="text-gray-500 text-sm mb-1">Funding Range</p>
+                        <p className="text-green-600 font-bold text-xl">
+                          {enrichmentData.ai_key_details.funding_range}
+                        </p>
+                      </div>
+                    )}
                     {details.deadline && (
                       <div className="p-4 rounded-lg bg-gray-50">
                         <p className="text-gray-500 text-sm mb-1">Deadline</p>
@@ -441,6 +624,31 @@ export default async function ListingPage({ params }: PageProps) {
                         <p className="text-gray-500 text-sm mb-1">Grant Type</p>
                         <p className="text-gray-900 font-semibold text-lg capitalize">
                           {details.grant_type}
+                        </p>
+                      </div>
+                    )}
+                    {/* AI grant type as fallback */}
+                    {!details.grant_type && enrichmentData?.ai_key_details?.grant_type && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Grant Type</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.grant_type}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.application_type && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Application Cycle</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.application_type}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.best_for && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Best For</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.best_for}
                         </p>
                       </div>
                     )}
@@ -489,6 +697,31 @@ export default async function ListingPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
+                    {/* AI-generated key details */}
+                    {enrichmentData?.ai_key_details?.workspace_type && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Workspace Type</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.workspace_type}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.best_for && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Best For</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.best_for}
+                        </p>
+                      </div>
+                    )}
+                    {enrichmentData?.ai_key_details?.neighborhood && (
+                      <div className="p-4 rounded-lg bg-gray-50">
+                        <p className="text-gray-500 text-sm mb-1">Neighborhood</p>
+                        <p className="text-gray-900 font-semibold text-lg">
+                          {enrichmentData.ai_key_details.neighborhood}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   {details.amenities && details.amenities.length > 0 && (
                     <div>
@@ -509,21 +742,60 @@ export default async function ListingPage({ params }: PageProps) {
               )}
 
               {/* SBA Services */}
-              {listing.category === "sba" && details.services && (
+              {listing.category === "sba" && (
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
                     Services Offered
                   </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {details.services.map((service: string) => (
-                      <span
-                        key={service}
-                        className="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm"
-                      >
-                        {service}
-                      </span>
-                    ))}
-                  </div>
+                  {/* AI-generated key details for SBA */}
+                  {(enrichmentData?.ai_key_details?.program_type || enrichmentData?.ai_key_details?.cost || enrichmentData?.ai_key_details?.best_for) && (
+                    <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                      {enrichmentData?.ai_key_details?.program_type && (
+                        <div className="p-4 rounded-lg bg-gray-50">
+                          <p className="text-gray-500 text-sm mb-1">Program Type</p>
+                          <p className="text-gray-900 font-semibold text-lg">
+                            {enrichmentData.ai_key_details.program_type}
+                          </p>
+                        </div>
+                      )}
+                      {enrichmentData?.ai_key_details?.cost && (
+                        <div className="p-4 rounded-lg bg-green-50">
+                          <p className="text-gray-500 text-sm mb-1">Cost</p>
+                          <p className="text-green-600 font-bold text-lg">
+                            {enrichmentData.ai_key_details.cost}
+                          </p>
+                        </div>
+                      )}
+                      {enrichmentData?.ai_key_details?.services && (
+                        <div className="p-4 rounded-lg bg-gray-50">
+                          <p className="text-gray-500 text-sm mb-1">Services</p>
+                          <p className="text-gray-900 font-semibold text-lg">
+                            {enrichmentData.ai_key_details.services}
+                          </p>
+                        </div>
+                      )}
+                      {enrichmentData?.ai_key_details?.best_for && (
+                        <div className="p-4 rounded-lg bg-gray-50">
+                          <p className="text-gray-500 text-sm mb-1">Best For</p>
+                          <p className="text-gray-900 font-semibold text-lg">
+                            {enrichmentData.ai_key_details.best_for}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {details.services && details.services.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {details.services.map((service: string) => (
+                        <span
+                          key={service}
+                          className="px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm"
+                        >
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -560,6 +832,39 @@ export default async function ListingPage({ params }: PageProps) {
                       >
                         {cause.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* FAQ Section */}
+              {enrichmentData?.ai_faqs && enrichmentData.ai_faqs.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
+                    Frequently Asked Questions
+                  </h2>
+                  <div className="space-y-3">
+                    {enrichmentData.ai_faqs.map((faq, i) => (
+                      <details
+                        key={i}
+                        className="group border-b border-gray-200 last:border-0"
+                      >
+                        <summary className="flex items-center justify-between py-4 cursor-pointer list-none text-gray-900 font-medium hover:text-gray-700 transition-colors">
+                          <span className="pr-4">{faq.question}</span>
+                          <svg
+                            className="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180 flex-shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </summary>
+                        <p className="pb-4 text-gray-600 leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </details>
                     ))}
                   </div>
                 </div>
