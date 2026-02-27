@@ -1,10 +1,11 @@
 // Dynamic Sitemap for SparkLocal
-// Generates sitemap.xml for all resource directory pages
+// Generates sitemap.xml for all resource directory pages and blog posts
 // Critical for SEO - helps Google index 16,000+ pages
 
 import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
+import { getAllPostsMeta } from "@/lib/blog";
 
 const BASE_URL = "https://sparklocal.co";
 
@@ -42,7 +43,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
+
+  // Blog posts
+  const blogPosts = getAllPostsMeta();
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${BASE_URL}/blog/${post.slug}`,
+    lastModified: post.date ? new Date(post.date) : new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
   // Get all active listings with timestamps for lastmod calculation
   const { data: listings } = await supabase
@@ -140,6 +156,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
+    ...blogPages,
     ...categoryPages,
     ...cityHubPages,
     ...categoryLocationPages,

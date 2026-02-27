@@ -24,6 +24,12 @@ export default function DirectoryNav() {
             Directory
           </Link>
           <Link
+            href="/blog"
+            className="hidden sm:inline-flex text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Blog
+          </Link>
+          <Link
             href="/builder"
             className="px-5 py-2.5 bg-spark hover:bg-spark-600 text-white font-semibold rounded-full transition-all shadow-warm hover:shadow-warm-md"
           >
