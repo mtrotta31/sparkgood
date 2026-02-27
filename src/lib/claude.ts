@@ -25,8 +25,18 @@ export interface ClaudeMessage {
   content: string;
 }
 
+// Model tier for simplified model selection
+export type ModelTier = "sonnet" | "haiku";
+
+// Map model tiers to actual model identifiers
+const MODEL_TIER_MAP: Record<ModelTier, string> = {
+  sonnet: "claude-sonnet-4-20250514",
+  haiku: "claude-haiku-4-5-20251001",
+};
+
 export interface ClaudeOptions {
   model?: string;
+  modelTier?: ModelTier; // Simplified model selection: "sonnet" or "haiku"
   maxTokens?: number;
   temperature?: number;
   systemPrompt?: string;
@@ -57,6 +67,20 @@ function isRateLimitError(error: any): boolean {
 }
 
 /**
+ * Resolve the model string from options.
+ * Priority: modelTier > model > default (sonnet)
+ */
+function resolveModel(options: ClaudeOptions): string {
+  if (options.modelTier) {
+    return MODEL_TIER_MAP[options.modelTier];
+  }
+  if (options.model) {
+    return options.model;
+  }
+  return MODEL_TIER_MAP.sonnet; // Default to sonnet
+}
+
+/**
  * Send a message to Claude and get a response
  * Supports retry on rate limit errors when retryOnRateLimit is true
  */
@@ -65,11 +89,12 @@ export async function sendMessage(
   options: ClaudeOptions = {}
 ): Promise<string> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  const model = resolveModel(options);
   const anthropic = await getAnthropicClient();
 
   const makeRequest = async (): Promise<string> => {
     const response = await anthropic.messages.create({
-      model: opts.model!,
+      model,
       max_tokens: opts.maxTokens!,
       ...(opts.systemPrompt && { system: opts.systemPrompt }),
       messages: [{ role: "user", content: userMessage }],
