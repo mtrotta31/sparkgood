@@ -415,10 +415,17 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
         {location.ai_city_intro && (
           <section className="py-8 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white/60 rounded-xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                <h3 className="text-xs uppercase tracking-wide text-slate-400 mb-4">
-                  About Starting a Business in {location.city}
-                </h3>
+              <div className="bg-white/80 rounded-xl p-6 md:p-8 border border-amber-100/50 shadow-[0_4px_20px_-4px_rgba(245,158,11,0.15)]">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xs uppercase tracking-wide text-slate-500 font-medium">
+                    About Starting a Business in {location.city}
+                  </h3>
+                </div>
                 {(() => {
                   const text = location.ai_city_intro;
                   // First try splitting on double newlines
