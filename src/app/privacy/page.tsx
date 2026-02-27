@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Footer from "@/components/ui/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | SparkLocal",
+  title: "Privacy Policy",
   description: "SparkLocal privacy policy - how we collect, use, and protect your data.",
   robots: {
     index: true,

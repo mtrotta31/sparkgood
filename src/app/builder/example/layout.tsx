@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Example Business Plan: Austin Pour Co. | SparkLocal",
+  title: "Example Business Plan: Austin Pour Co.",
   description:
     "See a complete AI-generated business launch plan. Market research, financial projections, step-by-step checklist, local resources, and AI advisor — all personalized for a real business idea.",
   keywords: [

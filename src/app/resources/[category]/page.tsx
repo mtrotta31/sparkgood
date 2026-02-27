@@ -108,7 +108,7 @@ export async function generateMetadata({
 
     const listingCount = count || 0;
 
-    const title = `${info.plural} for Entrepreneurs | SparkLocal Resources`;
+    const title = `${info.plural} for Entrepreneurs`;
     const description = `Browse ${listingCount} ${info.plural.toLowerCase()} to launch your business. ${info.description}. Compare options, eligibility, and apply.`;
 
     return {
@@ -185,7 +185,7 @@ export async function generateMetadata({
     const totalLocal = Object.values(catCounts).reduce((a, b) => a + b, 0);
     const countSummary = countParts.length > 0 ? countParts.join(", ") : "coworking, grants, accelerators";
 
-    const title = `Business Resources in ${location.city}, ${location.state} | SparkLocal`;
+    const title = `Business Resources in ${location.city}, ${location.state}`;
     const description = `Find ${totalLocal}+ resources in ${location.city}, ${location.state}: ${countSummary}. Free directory on SparkLocal.`;
 
     return {

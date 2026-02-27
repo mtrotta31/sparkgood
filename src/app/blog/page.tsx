@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { getAllPostsMeta, formatBlogDate } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Blog | SparkLocal",
+  title: "Blog",
   description:
     "Startup guides, funding tips, and business resources for entrepreneurs. Learn how to start and grow your business with SparkLocal.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "funding advice",
   ],
   openGraph: {
-    title: "Blog | SparkLocal",
+    title: "Blog | SparkLocal",  // OG title should include brand
     description:
       "Startup guides, funding tips, and business resources for entrepreneurs.",
     type: "website",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blog | SparkLocal",
+    title: "Blog | SparkLocal",  // Twitter title should include brand
     description:
       "Startup guides, funding tips, and business resources for entrepreneurs.",
     images: ["https://sparklocal.co/og-default.png"],

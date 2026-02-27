@@ -32,7 +32,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${post.title} | SparkLocal Blog`,
+    title: post.title,
     description: post.description,
     keywords: post.tags,
     authors: [{ name: post.author }],

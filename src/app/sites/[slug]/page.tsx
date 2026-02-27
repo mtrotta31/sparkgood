@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!page) {
     return {
-      title: "Page Not Found | SparkLocal",
+      title: "Page Not Found",
     };
   }
 
@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const tagline = ideaData?.tagline || "";
 
   return {
-    title: `${businessName} | SparkLocal Sites`,
+    title: businessName,
     description: tagline || `${businessName} - Built with SparkLocal`,
     openGraph: {
       title: businessName,
