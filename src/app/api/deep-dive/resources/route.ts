@@ -95,6 +95,7 @@ Return a JSON object with resource IDs as keys and relevance notes as values:
     const notes = await sendMessageForJSON<RelevanceNotes>(prompt, {
       maxTokens: 2000,
       temperature: 0.7,
+      modelTier: "haiku",
     });
     return notes;
   } catch (error) {
