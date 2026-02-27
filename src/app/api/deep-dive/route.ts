@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { hasDeepDiveAccess, type SubscriptionTier } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import { conductMarketResearch, type MarketResearchData } from "@/lib/perplexity";
@@ -247,6 +248,15 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Authentication required",
       }, { status: 401 });
+    }
+
+    // Rate limit check
+    const allowed = await checkRateLimit("/api/deep-dive", user.id);
+    if (!allowed) {
+      return NextResponse.json<ApiResponse<DeepDiveResponse>>(
+        { success: false, error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
+      );
     }
 
     // Get user's credits and purchases

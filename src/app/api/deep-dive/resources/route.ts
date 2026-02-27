@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { hasDeepDiveAccess } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import { matchResources, type MatchedResource } from "@/lib/match-resources";
@@ -152,6 +153,15 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: "Authentication required" },
         { status: 401 }
+      );
+    }
+
+    // Rate limit check
+    const allowed = await checkRateLimit("/api/deep-dive/resources", user.id);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
       );
     }
 

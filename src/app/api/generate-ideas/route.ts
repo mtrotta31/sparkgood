@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { sendMessageForJSON } from "@/lib/claude";
+import { checkRateLimit, getClientIP } from "@/lib/rate-limit";
 import { generateIdeaPrompt, SYSTEM_PROMPT, SOCIAL_ENTERPRISE_SYSTEM_PROMPT } from "@/prompts/idea-generation";
 import type { UserProfile, Idea, ApiResponse } from "@/types";
 
@@ -64,6 +65,16 @@ function transformIdeas(rawIdeas: RawIdea[], profile: UserProfile): Idea[] {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit check (using IP since this route doesn't require auth)
+    const clientIP = getClientIP(request.headers);
+    const allowed = await checkRateLimit("/api/generate-ideas", clientIP);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
+      );
+    }
+
     // Parse the user profile from the request body
     const body = await request.json();
     const profile = body.profile as UserProfile;

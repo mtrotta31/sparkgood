@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { sendMessageForJSON } from "@/lib/claude";
+import { checkRateLimit, getClientIP } from "@/lib/rate-limit";
 import { generateAssetPrompt, ASSET_SYSTEM_PROMPT } from "@/prompts/build-asset";
 import type { BuildAssetRequest, GeneratedAsset, AssetType } from "@/types/assets";
 import { detectAssetType } from "@/types/assets";
@@ -34,6 +35,16 @@ export async function POST(request: NextRequest) {
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
   try {
+    // Rate limit check (using IP since this route doesn't require auth)
+    const clientIP = getClientIP(request.headers);
+    const allowed = await checkRateLimit("/api/build-asset", clientIP);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
+      );
+    }
+
     const body: RequestBody = await request.json();
     const { taskDescription, idea, profile, platform } = body;
 

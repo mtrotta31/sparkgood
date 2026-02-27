@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { hasDeepDiveAccess, hasLaunchKitAccess, type SubscriptionTier } from "@/lib/stripe";
 import { sendMessageForJSON } from "@/lib/claude";
 import {
@@ -104,6 +105,15 @@ export async function POST(request: NextRequest) {
         success: false,
         error: "Authentication required",
       }, { status: 401 });
+    }
+
+    // Rate limit check
+    const allowed = await checkRateLimit("/api/launch-kit/v2", user.id);
+    if (!allowed) {
+      return NextResponse.json<ApiResponse<LaunchKitV2Response>>(
+        { success: false, error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
+      );
     }
 
     // Credit/access check

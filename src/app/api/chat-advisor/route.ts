@@ -3,6 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import Anthropic from "@anthropic-ai/sdk";
 import type {
   UserProfile,
@@ -386,6 +387,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
+      );
+    }
+
+    // Rate limit check
+    const allowed = await checkRateLimit("/api/chat-advisor", user.id);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: "Rate limit exceeded. Please try again in a few minutes." },
+        { status: 429 }
       );
     }
 
