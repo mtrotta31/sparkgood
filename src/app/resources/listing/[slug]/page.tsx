@@ -48,7 +48,7 @@ export async function generateMetadata({
 
   const { data: listing } = await supabase
     .from("resource_listings")
-    .select("name, short_description, category, city, state, is_nationwide, logo_url")
+    .select("name, short_description, description, category, city, state, is_nationwide, logo_url")
     .eq("slug", slug)
     .single();
 
@@ -57,18 +57,27 @@ export async function generateMetadata({
   }
 
   const categoryInfo = CATEGORY_INFO[listing.category as ResourceCategory];
-  const categoryName = categoryInfo?.name.toLowerCase() || "resource";
+  const categoryName = categoryInfo?.name || "Resource";
 
-  const location = listing.is_nationwide
+  // Build location string
+  const locationStr = listing.is_nationwide
     ? "nationwide"
     : listing.city && listing.state
     ? `in ${listing.city}, ${listing.state}`
     : "";
 
-  const title = `${listing.name} | ${categoryInfo?.name || "Resource"} for Entrepreneurs`;
+  const title = `${listing.name} | ${categoryName} for Entrepreneurs`;
 
-  const description = listing.short_description ||
-    `${listing.name} is a ${categoryName} ${location} for entrepreneurs. Learn about eligibility, how to apply, and more.`;
+  // Build unique, keyword-rich description under 160 chars
+  // Format: "{name} - {category} in {city}, {state}. {snippet}. Find details on SparkLocal."
+  const snippet = listing.short_description || listing.description || "";
+  const truncatedSnippet = snippet.length > 80
+    ? snippet.slice(0, 77).trim() + "..."
+    : snippet;
+
+  const description = truncatedSnippet
+    ? `${listing.name} — ${categoryName.toLowerCase()} ${locationStr}. ${truncatedSnippet} Details on SparkLocal.`
+    : `${listing.name} — ${categoryName.toLowerCase()} ${locationStr} for entrepreneurs. Find hours, contact info, and how to apply on SparkLocal.`;
 
   return {
     title,

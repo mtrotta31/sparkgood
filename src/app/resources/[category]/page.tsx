@@ -148,8 +148,36 @@ export async function generateMetadata({
     .single();
 
   if (location) {
-    const title = `Business Resources in ${location.city}, ${location.state} | Grants, Coworking & More`;
-    const description = `Find ${location.listing_count} business resources in ${location.city}, ${location.state}. Browse coworking spaces, grants, accelerators, and free SBA mentorship to help launch your business.`;
+    // Get category counts for this city (local listings only)
+    const categories = ["grant", "coworking", "accelerator", "sba"] as const;
+    const countPromises = categories.map(async (cat) => {
+      const { count } = await supabase
+        .from("resource_listings")
+        .select("*", { count: "exact", head: true })
+        .eq("is_active", true)
+        .eq("city", location.city)
+        .eq("state", location.state)
+        .eq("is_remote", false)
+        .or("is_nationwide.eq.false,is_nationwide.is.null")
+        .eq("category", cat);
+      return { cat, count: count || 0 };
+    });
+    const counts = await Promise.all(countPromises);
+    const catCounts: Record<string, number> = {};
+    counts.forEach(({ cat, count }) => { catCounts[cat] = count; });
+
+    // Build category summary for description (e.g., "12 grants, 8 coworking spaces")
+    const countParts: string[] = [];
+    if (catCounts.grant > 0) countParts.push(`${catCounts.grant} grants`);
+    if (catCounts.coworking > 0) countParts.push(`${catCounts.coworking} coworking`);
+    if (catCounts.accelerator > 0) countParts.push(`${catCounts.accelerator} accelerators`);
+    if (catCounts.sba > 0) countParts.push(`${catCounts.sba} SBA resources`);
+
+    const totalLocal = Object.values(catCounts).reduce((a, b) => a + b, 0);
+    const countSummary = countParts.length > 0 ? countParts.join(", ") : "coworking, grants, accelerators";
+
+    const title = `Business Resources in ${location.city}, ${location.state} | SparkLocal`;
+    const description = `Find ${totalLocal}+ resources in ${location.city}, ${location.state}: ${countSummary}. Free directory on SparkLocal.`;
 
     return {
       title,
