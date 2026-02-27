@@ -24,18 +24,18 @@ export function getStripeClient(): Stripe {
 export const PRICING = {
   // One-time purchases
   deepDive: {
-    price: 499, // in cents
-    displayPrice: "$4.99",
+    price: 1499, // in cents
+    displayPrice: "$14.99",
     priceId: process.env.STRIPE_DEEP_DIVE_PRICE_ID || "",
     name: "Single Deep Dive",
     description: "Unlock viability analysis, business plan, marketing assets, and action roadmap for one idea",
   },
   launchKit: {
-    price: 299, // in cents
-    displayPrice: "$2.99",
+    price: 999, // in cents
+    displayPrice: "$9.99",
     priceId: process.env.STRIPE_LAUNCH_KIT_PRICE_ID || "",
     name: "Launch Kit Add-on",
-    description: "Generate landing page, social posts, email sequence, and elevator pitch",
+    description: "Generate pitch deck, landing page, social graphics, business one-pager, and email templates",
   },
 
   // Subscriptions
@@ -48,7 +48,7 @@ export const PRICING = {
     features: [
       "5 deep dives per month",
       "2 Launch Kits per month",
-      "All 4 deep dive tabs",
+      "All 5 deep dive tabs",
       "Save & export projects",
       "Email support",
     ],

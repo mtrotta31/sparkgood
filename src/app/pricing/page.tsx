@@ -244,7 +244,7 @@ export default function PricingPage() {
                 <div className="text-2xl font-bold text-spark">{PRICING.deepDive.displayPrice}</div>
               </div>
               <p className="text-warmwhite-dim text-xs">
-                One-time purchase. Unlocks all 4 tabs (viability, plan, marketing, roadmap) for one idea.
+                One-time purchase. Unlocks all 5 deep dive tabs (foundation, checklist, growth, financial, local resources) for one idea.
               </p>
             </div>
 
@@ -257,7 +257,7 @@ export default function PricingPage() {
                 <div className="text-2xl font-bold text-spark">{PRICING.launchKit.displayPrice}</div>
               </div>
               <p className="text-warmwhite-dim text-xs">
-                Requires a deep dive purchase first. Generates complete marketing package.
+                Requires a deep dive purchase first. Generates complete professional launch package.
               </p>
             </div>
           </div>
@@ -290,14 +290,14 @@ export default function PricingPage() {
                 <tr className="border-b border-warmwhite/5">
                   <td className="py-3 px-4 text-warmwhite-muted">Deep dives</td>
                   <td className="py-3 px-4 text-center text-warmwhite-dim">—</td>
-                  <td className="py-3 px-4 text-center text-warmwhite-muted">$4.99 each</td>
+                  <td className="py-3 px-4 text-center text-warmwhite-muted">$14.99 each</td>
                   <td className="py-3 px-4 text-center text-warmwhite-muted">5/month</td>
                   <td className="py-3 px-4 text-center text-green-400">Unlimited</td>
                 </tr>
                 <tr className="border-b border-warmwhite/5">
                   <td className="py-3 px-4 text-warmwhite-muted">Launch Kits</td>
                   <td className="py-3 px-4 text-center text-warmwhite-dim">—</td>
-                  <td className="py-3 px-4 text-center text-warmwhite-muted">$2.99 each</td>
+                  <td className="py-3 px-4 text-center text-warmwhite-muted">$9.99 each</td>
                   <td className="py-3 px-4 text-center text-warmwhite-muted">2/month</td>
                   <td className="py-3 px-4 text-center text-green-400">Unlimited</td>
                 </tr>

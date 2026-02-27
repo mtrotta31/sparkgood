@@ -96,7 +96,7 @@ export default function LaunchKitUpsell({ onGetLaunchKit }: LaunchKitUpsellProps
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Get Launch Kit — $2.99
+            Get Launch Kit — $9.99
           </button>
 
           <Link

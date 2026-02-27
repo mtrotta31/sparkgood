@@ -798,7 +798,7 @@ export default function DeepDiveSection({ idea, ideas, profile, onBack, profileI
                 onClick={() => setShowPurchaseModal(true)}
                 className="px-6 py-3 font-medium rounded-xl bg-spark text-charcoal hover:bg-spark-light transition-colors"
               >
-                Unlock for $4.99
+                Unlock for $14.99
               </button>
             </div>
           </FadeIn>
