@@ -566,9 +566,27 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
               <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-6">
                 Tips for Entrepreneurs in {location.city}
               </h2>
-              <div className="text-slate-700 leading-relaxed whitespace-pre-line">
-                {location.ai_city_tips}
-              </div>
+              <ol className="space-y-4">
+                {location.ai_city_tips
+                  .split(/(?=\d+\.\s)/)
+                  .filter((tip) => tip.trim())
+                  .map((tip, i) => {
+                    // Remove the leading number and period (e.g., "1. " or "10. ")
+                    const cleanTip = tip.replace(/^\d+\.\s*/, "").trim();
+                    if (!cleanTip) return null;
+                    return (
+                      <li
+                        key={i}
+                        className="flex gap-4 text-slate-700 leading-relaxed"
+                      >
+                        <span className="flex-shrink-0 w-7 h-7 rounded-full bg-spark/10 text-spark font-semibold text-sm flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <span>{cleanTip}</span>
+                      </li>
+                    );
+                  })}
+              </ol>
             </div>
           </section>
         )}
