@@ -55,6 +55,15 @@ export async function POST(request: NextRequest) {
 
   const supabase = getServiceClient();
 
+  // Idempotency check - prevent duplicate processing on webhook retries
+  const { error: idempotencyError } = await supabase
+    .from('stripe_webhook_events')
+    .insert({ event_id: event.id, event_type: event.type });
+
+  if (idempotencyError?.code === '23505') {
+    return NextResponse.json({ received: true, duplicate: true }, { status: 200 });
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
