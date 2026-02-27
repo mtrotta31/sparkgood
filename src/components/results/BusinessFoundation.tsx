@@ -366,8 +366,8 @@ function StartupCostsTable({ items }: { items?: StartupCostItem[] }) {
             <tr key={i} className={i % 2 === 0 ? "bg-charcoal-dark/30" : ""}>
               <td className="py-3 px-2 text-warmwhite font-medium">{item?.item ?? "Unknown"}</td>
               <td className="py-3 px-2 text-right text-spark font-medium">{item?.cost ?? "N/A"}</td>
-              <td className="py-3 px-2 text-center">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-warmwhite/10 text-warmwhite-dim">
+              <td className="py-3 px-2 text-center whitespace-nowrap">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-warmwhite/10 text-warmwhite-dim whitespace-nowrap">
                   {item?.priority ?? "N/A"}
                 </span>
               </td>
