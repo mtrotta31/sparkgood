@@ -355,7 +355,7 @@ export async function POST(request: NextRequest) {
               console.log("Research cache HIT for:", researchCacheKey);
               marketResearch = cachedResearch.data as MarketResearchData;
             }
-          } catch (cacheReadError) {
+          } catch (_cacheReadError) {
             // Cache miss or read error - proceed with API call
             console.log("Research cache MISS for:", researchCacheKey);
           }
