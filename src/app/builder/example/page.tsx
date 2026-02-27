@@ -11,6 +11,7 @@ import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
 import { PURCHASE_CONTEXT_KEY } from "@/components/PurchaseModal";
+import { sanitizeMarkdownHTML } from "@/lib/sanitize";
 import type {
   Idea,
   LaunchChecklistData,
@@ -582,7 +583,8 @@ function MockAIAdvisor({ messages }: { messages: AdvisorMessage[] }) {
     formatted = formatted.replace(/^(\d+)\.\s/gm, "<span class='text-spark'>$1.</span> ");
     formatted = formatted.replace(/^[-•]\s/gm, "<span class='text-spark'>•</span> ");
     formatted = formatted.replace(/\n/g, "<br />");
-    return formatted;
+    // Sanitize the final HTML to prevent XSS
+    return sanitizeMarkdownHTML(formatted);
   };
 
   return (

@@ -55,6 +55,37 @@ export async function POST(request: NextRequest) {
 
   const supabase = getServiceClient();
 
+  // Idempotency check: prevent duplicate webhook processing
+  const { data: existingEvent, error: checkError } = await supabase
+    .from("stripe_webhook_events")
+    .select("id")
+    .eq("stripe_event_id", event.id)
+    .single();
+
+  if (checkError && checkError.code !== "PGRST116") {
+    // Log error but continue (fail open for database issues)
+    console.error("[webhook] Error checking idempotency:", checkError);
+  }
+
+  if (existingEvent) {
+    console.log(`[webhook] Duplicate event ${event.id}, skipping`);
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
+  // Record this event as processed
+  const { error: insertError } = await supabase
+    .from("stripe_webhook_events")
+    .insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      payload: event.data.object,
+    });
+
+  if (insertError) {
+    console.error("[webhook] Error recording event:", insertError);
+    // Continue processing anyway (idempotency is best-effort)
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {

@@ -204,6 +204,16 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Newsletter
 - `newsletter_subscribers` — Email signups
 
+### Security & Rate Limiting Tables
+- `rate_limits` — API rate limiting per user per route
+  - `key`: Composite key "{user_id}:{route_key}"
+  - `request_count`: Number of requests in current window
+  - `window_start`: Start of current rate limit window
+- `stripe_webhook_events` — Webhook idempotency tracking
+  - `stripe_event_id`: Stripe's unique event ID
+  - `event_type`: Event type (e.g., "checkout.session.completed")
+  - `processed_at`: When the event was processed
+
 ## Builder Flow Paths
 
 ### Business Categories (10 total)
@@ -366,7 +376,9 @@ sparklocal/
 │   │   ├── sessionState.ts      # Session persistence with migration
 │   │   ├── supabase.ts          # Supabase client
 │   │   ├── stripe.ts            # Stripe utilities
-│   │   ├── claude.ts            # Claude API wrapper with retry logic
+│   │   ├── claude.ts            # Claude API wrapper with retry logic and model tiering
+│   │   ├── sanitize.ts          # DOMPurify XSS sanitization utilities
+│   │   ├── rate-limit.ts        # Supabase-backed API rate limiting
 │   │   ├── format-amount.ts     # Currency formatting ($5M, $25K, etc.)
 │   │   ├── format-description.ts # Clean up listing descriptions
 │   │   ├── formatHours.ts       # Parse hours JSONB to readable format
@@ -399,7 +411,9 @@ sparklocal/
 │       ├── 20240223_add_checklist_progress.sql        # Checklist progress tracking
 │       ├── 20240224_add_deep_dive_v2_columns.sql      # V2 deep dive columns
 │       ├── 20240225_add_matched_resources_column.sql  # Local resources column
-│       └── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
+│       ├── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
+│       ├── 20240227_launch_kit_v2.sql                 # Launch Kit V2 storage
+│       └── 20240228_security_improvements.sql         # Rate limiting & webhook idempotency
 └── public/                      # Static assets
 ```
 
@@ -424,12 +438,34 @@ Parse hours JSONB from database into readable format:
 Clean up listing descriptions by removing boilerplate text.
 
 ### `claude.ts`
-Claude API wrapper with JSON handling and rate limit resilience:
+Claude API wrapper with JSON handling, rate limit resilience, and model tiering:
 - `sendMessage(prompt, options)` — Send message to Claude, get text response
 - `sendMessageForJSON<T>(prompt, options)` — Send message, parse JSON response with automatic snake_case to camelCase conversion
 - `extractJSON(response)` — Extract JSON from Claude response (handles markdown code blocks, extra text)
 - Automatic key conversion ensures Claude's snake_case responses match TypeScript camelCase types
 - **Rate Limit Retry:** Set `retryOnRateLimit: true` in options to automatically retry once after 10s on 429 errors
+- **Model Tiering:** Use `modelTier` option instead of raw model IDs:
+  - `modelTier: "haiku"` → claude-haiku-4-5-20251001 (fast, cheap)
+  - `modelTier: "sonnet"` → claude-sonnet-4-5-20250929 (balanced, default)
+
+### `sanitize.ts`
+XSS protection using isomorphic-dompurify:
+- `sanitizeHTML(html)` — Sanitize full HTML pages (landing pages). Allows formatting tags, links, images, tables.
+- `sanitizeMarkdownHTML(html)` — Stricter sanitization for markdown-converted content (AI advisor, checklist guides). Allows basic formatting only.
+- `sanitizeText(text)` — Strip ALL HTML tags for plain text output.
+- **Safe defaults:** Blocks scripts, event handlers, javascript: URLs. Only allows https/mailto/tel protocols.
+
+### `rate-limit.ts`
+Supabase-backed API rate limiting for serverless:
+- `checkRateLimit(userId, routeKey)` — Check and update rate limit, returns `{ allowed, remaining, resetAt }`
+- `rateLimitResponse(result)` — Create 429 response with proper headers
+- **Configured limits:**
+  - `generate-ideas`: 30/hour
+  - `deep-dive`: 10/hour
+  - `launch-kit`: 5/hour
+  - `chat-advisor`: 60/hour
+  - `research`: 20/hour
+- **Fail-open:** If database unavailable, allows request (prevents outages)
 
 ### `launch-kit/types.ts`
 Launch Kit V2 type definitions and helpers:
@@ -561,6 +597,10 @@ The core product is fully functional with payments:
 - ✅ Launch Checklist "validate first" structure (Weeks 1-2 test demand, Weeks 3-4 formalize)
 - ✅ Viability Score calibration (rubrics, examples at 87/58/34, prevents 72-74 clustering)
 - ✅ Launch Kit upsell component (appears after all 5 tabs complete, drives conversion)
+- ✅ XSS sanitization with DOMPurify on all AI-generated HTML
+- ✅ Rate limiting infrastructure (Supabase-backed, per-user per-route)
+- ✅ Stripe webhook idempotency (prevents duplicate credit grants)
+- ✅ Model tiering infrastructure in Claude wrapper (haiku/sonnet options)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
@@ -714,3 +754,22 @@ This pattern is used in `Location.tsx` and should be applied to any step compone
   - Builder page restores state from sessionStorage and navigates to deep_dive step
 - When accessed from other entry points (Welcome, IdeaList, direct URL):
   - Generic CTAs pointing to `/builder`
+
+### Security Hardening
+**XSS Protection:**
+- All `dangerouslySetInnerHTML` uses are wrapped with DOMPurify sanitization
+- `sanitizeHTML()` for full HTML (landing pages) — allows formatting, links, images
+- `sanitizeMarkdownHTML()` for AI messages — stricter, only basic formatting
+- Files protected: `sites/[slug]/page.tsx`, `AIAdvisor.tsx`, `LaunchChecklist.tsx`, `example/page.tsx`
+- SEO/Analytics files use static content and don't need sanitization
+
+**Rate Limiting:**
+- Infrastructure in `src/lib/rate-limit.ts` with Supabase persistence
+- Per-user, per-route sliding window limits
+- Requires `rate_limits` table from migration `20240228_security_improvements.sql`
+- To enable: import `checkRateLimit` and `rateLimitResponse` in API routes
+
+**Webhook Idempotency:**
+- Stripe webhooks check `stripe_webhook_events` table before processing
+- Prevents duplicate credit grants from webhook retries
+- Event ID logged with payload for debugging
