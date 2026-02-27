@@ -34,12 +34,21 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "SparkLocal",
     url: "https://sparklocal.co/resources",
+    images: [
+      {
+        url: "https://sparklocal.co/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "SparkLocal - Business Resources Directory",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Business Resources Directory | SparkLocal",
     description:
       "Find grants, accelerators, SBA resources, and more for entrepreneurs.",
+    images: ["https://sparklocal.co/og-default.png"],
   },
   alternates: {
     canonical: "https://sparklocal.co/resources",

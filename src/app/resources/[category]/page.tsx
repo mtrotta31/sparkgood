@@ -127,11 +127,20 @@ export async function generateMetadata({
         type: "website",
         siteName: "SparkLocal",
         url: `https://sparklocal.co/resources/${normalizedCategory}`,
+        images: [
+          {
+            url: "https://sparklocal.co/og-default.png",
+            width: 1200,
+            height: 630,
+            alt: "SparkLocal - Business Resources Directory",
+          },
+        ],
       },
       twitter: {
-        card: "summary",
+        card: "summary_large_image",
         title,
         description,
+        images: ["https://sparklocal.co/og-default.png"],
       },
       alternates: {
         canonical: `https://sparklocal.co/resources/${normalizedCategory}`,
@@ -196,11 +205,20 @@ export async function generateMetadata({
         type: "website",
         siteName: "SparkLocal",
         url: `https://sparklocal.co/resources/${paramValue}`,
+        images: [
+          {
+            url: "https://sparklocal.co/og-default.png",
+            width: 1200,
+            height: 630,
+            alt: "SparkLocal - Business Resources Directory",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ["https://sparklocal.co/og-default.png"],
       },
       alternates: {
         canonical: `https://sparklocal.co/resources/${paramValue}`,

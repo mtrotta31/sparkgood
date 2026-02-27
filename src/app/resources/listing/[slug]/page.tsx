@@ -96,22 +96,29 @@ export async function generateMetadata({
       type: "website",
       siteName: "SparkLocal",
       url: `https://sparklocal.co/resources/listing/${slug}`,
-      ...(listing.logo_url && {
-        images: [
-          {
-            url: listing.logo_url,
-            width: 200,
-            height: 200,
-            alt: listing.name,
-          },
-        ],
-      }),
+      images: listing.logo_url
+        ? [
+            {
+              url: listing.logo_url,
+              width: 200,
+              height: 200,
+              alt: listing.name,
+            },
+          ]
+        : [
+            {
+              url: "https://sparklocal.co/og-default.png",
+              width: 1200,
+              height: 630,
+              alt: "SparkLocal - Business Resources Directory",
+            },
+          ],
     },
     twitter: {
-      card: "summary",
+      card: listing.logo_url ? "summary" : "summary_large_image",
       title: listing.name,
       description,
-      ...(listing.logo_url && { images: [listing.logo_url] }),
+      images: [listing.logo_url || "https://sparklocal.co/og-default.png"],
     },
     alternates: {
       canonical: `https://sparklocal.co/resources/listing/${slug}`,
