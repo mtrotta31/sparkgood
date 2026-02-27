@@ -181,17 +181,9 @@ function processViabilityScores(report: ViabilityReport): ViabilityReport {
   };
 }
 
-// Generate cache key from idea name and profile (for in-memory session cache)
+// Generate cache key from idea name and profile
 function getCacheKey(idea: Idea, profile: UserProfile): string {
   return `${idea.name}-${profile.ventureType}-${profile.causes?.join(",") || ""}`;
-}
-
-// Generate cache key for database research cache (based on category + location)
-function getResearchCacheKey(profile: UserProfile): string {
-  const category = (profile.businessCategory || "general").toLowerCase().trim();
-  const city = (profile.location?.city || "unknown").toLowerCase().trim();
-  const state = (profile.location?.state || "unknown").toLowerCase().trim();
-  return `${category}_${city}_${state}`;
 }
 
 // Check if cache is still valid (1 hour TTL)
@@ -338,55 +330,15 @@ export async function POST(request: NextRequest) {
             ? `${profile.location.city}, ${profile.location.state}`
             : undefined;
 
-          // Check database cache first (7 day TTL)
-          const researchCacheKey = getResearchCacheKey(profile);
-          let marketResearch: MarketResearchData | null = null;
-
-          try {
-            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-            const { data: cachedResearch } = await supabase
-              .from("research_cache")
-              .select("data")
-              .eq("cache_key", researchCacheKey)
-              .gte("created_at", sevenDaysAgo)
-              .single();
-
-            if (cachedResearch?.data) {
-              console.log("Research cache HIT for:", researchCacheKey);
-              marketResearch = cachedResearch.data as MarketResearchData;
-            }
-          } catch {
-            // Cache miss or read error - proceed with API call
-            console.log("Research cache MISS for:", researchCacheKey);
-          }
-
-          // If no cache hit, call Perplexity
-          if (!marketResearch) {
-            marketResearch = await conductMarketResearch(
-              idea.name,
-              idea.tagline,
-              primaryCause,
-              profile.ventureType || "project",
-              profile.format || "both",
-              locationString
-            );
-
-            // Save to database cache (fire and forget, don't block on errors)
-            (async () => {
-              try {
-                await supabase
-                  .from("research_cache")
-                  .upsert({
-                    cache_key: researchCacheKey,
-                    data: marketResearch,
-                    created_at: new Date().toISOString(),
-                  });
-                console.log("Research cache saved for:", researchCacheKey);
-              } catch (err) {
-                console.warn("Failed to save research cache:", err);
-              }
-            })();
-          }
+          // Step 1: Market research via Perplexity (BLOCKING)
+          const marketResearch = await conductMarketResearch(
+            idea.name,
+            idea.tagline,
+            primaryCause,
+            profile.ventureType || "project",
+            profile.format || "both",
+            locationString
+          );
 
           cachedData.marketResearch = marketResearch;
 
