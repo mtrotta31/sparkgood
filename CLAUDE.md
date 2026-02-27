@@ -410,6 +410,7 @@ sparklocal/
 │   ├── seed-directory.ts        # Seeds resource listings from data files
 │   ├── enrich-listings.ts       # Enriches listings via Perplexity API (legacy)
 │   ├── enrich-content-seo.ts    # AI content enrichment for SEO (Claude Haiku)
+│   ├── fix-city-intros.ts       # Removes SparkLocal references from city intros
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   └── ...                      # Data files
 ├── supabase/
@@ -539,6 +540,8 @@ npm run enrich:directory # Enrich listings with Perplexity API (adds description
 npx tsx scripts/enrich-content-seo.ts --mode listings --batch-size 50  # Enrich all listings
 npx tsx scripts/enrich-content-seo.ts --mode cities --batch-size 50    # Enrich all cities
 npx tsx scripts/enrich-content-seo.ts --mode listings --category coworking --city "new-york-ny" --dry-run  # Test specific subset
+npx tsx scripts/fix-city-intros.ts --dry-run  # Preview city intro fixes (removes SparkLocal refs)
+npx tsx scripts/fix-city-intros.ts            # Apply city intro fixes
 ```
 
 ## Environment Variables
@@ -758,6 +761,12 @@ The `scripts/enrich-content-seo.ts` script generates AI content for directory pa
 - **CLI flags:** `--mode` (listings|cities), `--batch-size`, `--category`, `--city`, `--force`, `--dry-run`
 - **Rate limiting:** 200ms delay between API calls to avoid rate limits
 - **Database:** Content stored in `enrichment_data` JSONB (listings) and `ai_*` columns (cities)
+- **Neutral prompts:** City prompts no longer mention SparkLocal or specific resource counts — content is platform-agnostic
+
+**Fix Script** (`scripts/fix-city-intros.ts`):
+- Rewrites existing city intros to remove SparkLocal references
+- Uses Claude Haiku to rewrite while preserving neighborhoods, industries, and other content
+- Supports `--dry-run` flag to preview changes
 
 **City Hub Page Rendering** (`CityHubContent.tsx`):
 - **City Intro Card:** Styled as info card with amber brand accents
