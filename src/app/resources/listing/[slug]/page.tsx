@@ -997,6 +997,41 @@ export default async function ListingPage({ params }: PageProps) {
                     </svg>
                   </Link>
                 </div>
+
+                {/* More in {City} Links */}
+                {listing.city && listing.state && citySlug && (
+                  <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <h4 className="font-display text-gray-900 font-semibold mb-3">
+                      More in {listing.city}
+                    </h4>
+                    <ul className="space-y-2 text-sm">
+                      <li>
+                        <Link
+                          href={`/resources/${citySlug}`}
+                          className="text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                          Browse all resources in {listing.city}, {listing.state} →
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={`/resources/${citySlug}#${listing.category}`}
+                          className="text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                          More {categoryInfo?.plural.toLowerCase() || "resources"} in {listing.city} →
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/resources"
+                          className="text-gray-600 hover:text-gray-800 transition-colors"
+                        >
+                          Explore all cities →
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             </aside>
           </div>

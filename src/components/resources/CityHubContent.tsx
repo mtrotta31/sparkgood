@@ -317,6 +317,16 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
     .map((s) => `${s.count} ${s.count === 1 ? s.name : s.plural}`)
     .join(" • ");
 
+  // Get nearby cities (same state, excluding current city)
+  const { data: nearbyCities } = await supabase
+    .from("resource_locations")
+    .select("city, state, slug, listing_count")
+    .eq("state", location.state)
+    .neq("city", location.city)
+    .gt("listing_count", 0)
+    .order("listing_count", { ascending: false })
+    .limit(6);
+
   // City name for structured data
   const cityName = `${location.city}, ${location.state}`;
 
@@ -584,6 +594,33 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                       </p>
                     </div>
                   </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Nearby Cities Section */}
+        {nearbyCities && nearbyCities.length >= 3 && (
+          <section className="py-12 px-4 sm:px-6 border-t border-slate-200">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+                Nearby Cities in {location.state}
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {nearbyCities.map((city) => (
+                  <Link
+                    key={city.slug}
+                    href={`/resources/${city.slug}`}
+                    className="block p-4 bg-white rounded-xl border border-slate-200 hover:border-spark hover:shadow-warm transition-all text-center"
+                  >
+                    <span className="block font-medium text-slate-800 mb-1">
+                      {city.city}
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      {city.listing_count} resources
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
