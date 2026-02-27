@@ -68,7 +68,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Stripe Integration** — Checkout sessions, webhooks, subscription management
 - **Pricing Page** (`/pricing`) — Three tiers: Free, Spark ($14.99/mo), Ignite ($29.99/mo)
 - **Credits System** — Subscription credits + one-time purchases
-- **One-Time Purchases** — Deep Dive ($4.99), Launch Kit ($2.99)
+- **One-Time Purchases** — Deep Dive ($14.99), Launch Kit ($9.99)
 - **Payment Gates** — Server-side verification on `/api/deep-dive`, client-side gates on project pages
 - **Purchase Modals** — In-app purchase flow with Stripe Checkout redirect
 
@@ -262,8 +262,8 @@ welcome → business_category → venture_type → format → location → cause
 - Priority support
 
 ### One-Time Purchases
-- Deep Dive: $4.99 per idea
-- Launch Kit: $2.99 per idea (requires Deep Dive first)
+- Deep Dive: $14.99 per idea
+- Launch Kit: $9.99 per idea (requires Deep Dive first)
 
 ## Design System
 
@@ -651,7 +651,7 @@ The core product is fully functional with payments:
 - Advisor persona: practical, specific, references user's actual plan/city/budget/resources by name
 - Requires `savedIdeaId` to function (user must be logged in with saved project)
 - **Message Limits:**
-  - One-time deep dive purchase ($4.99): 20 messages per project
+  - One-time deep dive purchase ($14.99): 20 messages per project
   - Spark subscription ($14.99/mo): Unlimited messages on all projects
   - Ignite subscription ($29.99/mo): Unlimited messages on all projects
 - Checks `user_credits.subscription_tier` and `subscription_status` before enforcing limit
