@@ -6,7 +6,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 1. **SparkLocal Web App** — A guided web experience that takes users from "I want to start something" to a complete launch package (ideas, market research, business plan, marketing assets, action roadmap). Works for any business type — from food trucks to tech startups to social enterprises. Powered by AI tools running behind the scenes (Perplexity, Claude) so users never touch a terminal.
 
-2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, and coworking spaces (2,400+ listings across 275 cities) that helps entrepreneurs find real-world support matched to their idea and location.
+2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, and coworking spaces (2,400+ listings across 326 cities) that helps entrepreneurs find real-world support matched to their idea and location. All listings and city pages have AI-generated SEO content for better search visibility.
 
 3. **SparkLocal Pro Toolkit** (Future) — A downloadable package of pre-configured Claude Code skills for advanced users who want to run the same powerful frameworks in their own environment.
 
@@ -48,14 +48,15 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Resource Directory (Fully Functional)
 - **Main Directory** (`/resources`) — Homepage with hero, city search, animated stats, top cities grid, category cards
 - **Category Pages** (`/resources/[category]`) — List all resources with filters, location sidebar with accurate local counts
-- **City Hub Pages** (`/resources/[city-slug]`) — SEO-optimized city pages (e.g., `/resources/austin-tx`) showing all resources grouped by category
+- **City Hub Pages** (`/resources/[city-slug]`) — SEO-optimized city pages (e.g., `/resources/austin-tx`) showing all resources grouped by category, AI-generated intro, tips, and FAQs
 - **Location Pages** (`/resources/[category]/[location]`) — Category + location pages (e.g., "Grants in Austin, TX")
-- **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details with structured data
+- **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details with structured data and AI-generated descriptions
 - **URL Slug Aliases** — Supports common variations (`/resources/grants` → `/resources/grant`, etc.)
 - **Resource Matching API** — Matches resources to user's idea based on category, location, business type
 - **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages (includes city hub pages)
 - **Light Theme** — Directory uses warm cream/white theme (separate from dark builder theme)
-- **Stats:** 2,400+ listings across 275 cities
+- **Content Enrichment** — All 2,416 listings and 326 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
+- **Stats:** 2,400+ listings across 326 cities
 
 ### Authentication & User Data
 - **Supabase Auth** — Email/password authentication with magic links
@@ -201,9 +202,20 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Resource Directory Tables
 - `resource_listings` — All resources (grants, accelerators, SBA, coworking)
   - `enrichment_status`: 'raw' | 'enriched' | 'verified'
-  - `enrichment_data`: JSONB with additional info from Perplexity
+  - `enrichment_data`: JSONB with AI-generated SEO content:
+    - `ai_description`: 180+ word description for SEO
+    - `ai_meta_description`: 150-160 char meta description
+    - `ai_faqs`: Array of {question, answer} for structured data
+    - `ai_geo_terms`: Local SEO keywords
+    - `ai_nearby_landmarks`: Nearby points of interest
   - `details`: JSONB with category-specific data (amounts, deadlines, etc.)
-- `resource_locations` — Cities with listing counts
+- `resource_locations` — Cities with listing counts and AI content
+  - `enrichment_status`: 'raw' | 'enriched' | 'verified'
+  - `ai_city_intro`: Intro paragraph about the city's business ecosystem
+  - `ai_city_tips`: Numbered tips for entrepreneurs (rendered as list)
+  - `ai_city_faqs`: Array of {question, answer} for FAQ section
+  - `ai_business_climate`: Overview of local business environment
+  - `ai_key_industries`: Major industries in the city
 - `resource_category_locations` — Category counts per location
 - `resource_saves` — User saved resources
 
@@ -396,7 +408,8 @@ sparklocal/
 │   └── types/                   # TypeScript types
 ├── scripts/
 │   ├── seed-directory.ts        # Seeds resource listings from data files
-│   ├── enrich-listings.ts       # Enriches listings via Perplexity API
+│   ├── enrich-listings.ts       # Enriches listings via Perplexity API (legacy)
+│   ├── enrich-content-seo.ts    # AI content enrichment for SEO (Claude Haiku)
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   └── ...                      # Data files
 ├── supabase/
@@ -521,6 +534,11 @@ npx tsc --noEmit         # TypeScript check
 # Resource Directory
 npm run seed:directory   # Seed/update resource listings from data files
 npm run enrich:directory # Enrich listings with Perplexity API (adds descriptions, stats)
+
+# Content Enrichment (SEO)
+npx tsx scripts/enrich-content-seo.ts --mode listings --batch-size 50  # Enrich all listings
+npx tsx scripts/enrich-content-seo.ts --mode cities --batch-size 50    # Enrich all cities
+npx tsx scripts/enrich-content-seo.ts --mode listings --category coworking --city "new-york-ny" --dry-run  # Test specific subset
 ```
 
 ## Environment Variables
@@ -591,10 +609,12 @@ The core product is fully functional with payments:
 - ✅ Stripe webhook idempotency (prevents duplicate credit grants)
 - ✅ Google Search Console verification
 - ✅ Model tiering (Haiku for simple tasks, Sonnet for complex)
+- ✅ Content enrichment for SEO (2,416 listings + 326 cities with AI-generated content)
+- ✅ City hub tips rendered as visual list items
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
-- More resource data (currently 2,400+ listings, targeting 16,000+)
+- More resource data (currently 2,400+ listings across 326 cities, targeting 16,000+)
 - Email notifications
 - Team collaboration features
 - Usage analytics dashboard
@@ -728,6 +748,17 @@ useEffect(() => {
 }, [value]);  // onChange NOT in deps
 ```
 This pattern is used in `Location.tsx` and should be applied to any step component that calls `onChange` inside a useEffect.
+
+### Content Enrichment System (SEO)
+The `scripts/enrich-content-seo.ts` script generates AI content for directory pages to solve thin content issues:
+- **Purpose:** Pages with ~50 words need 500+ for Google indexing
+- **Model:** Claude Haiku (`claude-haiku-4-5-20251001`) for cost-effective bulk generation
+- **Listings enrichment:** Generates 180+ word descriptions, FAQs, meta descriptions, geo terms, nearby landmarks
+- **City enrichment:** Generates intro paragraphs, numbered tips, FAQs, business climate, key industries
+- **CLI flags:** `--mode` (listings|cities), `--batch-size`, `--category`, `--city`, `--force`, `--dry-run`
+- **Rate limiting:** 200ms delay between API calls to avoid rate limits
+- **Database:** Content stored in `enrichment_data` JSONB (listings) and `ai_*` columns (cities)
+- **Rendering:** City tips split on numbered pattern (`/\d+\.\s/`) and rendered as styled list items in `CityHubContent.tsx`
 
 ### Example Deep Dive & Purchase Flow
 - `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
