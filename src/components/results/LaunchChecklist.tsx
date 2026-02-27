@@ -7,6 +7,7 @@ import type {
   ChecklistProgress,
   MatchedResourceRef,
 } from "@/types";
+import { sanitizeContentHTML } from "@/lib/sanitize";
 
 interface LaunchChecklistProps {
   data: LaunchChecklistData;
@@ -163,11 +164,13 @@ function ChecklistItemRow({
             <div
               className="text-sm text-warmwhite-muted leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{
-                __html: item.guide
-                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-warmwhite">$1</strong>')
-                  .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                  .replace(/`(.*?)`/g, '<code class="bg-charcoal-light px-1 rounded text-spark">$1</code>')
-                  .replace(/\n/g, '<br/>')
+                __html: sanitizeContentHTML(
+                  item.guide
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-warmwhite">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code class="bg-charcoal-light px-1 rounded text-spark">$1</code>')
+                    .replace(/\n/g, '<br/>')
+                )
               }}
             />
           </div>

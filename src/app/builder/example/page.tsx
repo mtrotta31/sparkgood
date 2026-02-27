@@ -11,6 +11,7 @@ import GrowthPlan from "@/components/results/GrowthPlan";
 import FinancialModel from "@/components/results/FinancialModel";
 import LocalResources from "@/components/results/LocalResources";
 import { PURCHASE_CONTEXT_KEY } from "@/components/PurchaseModal";
+import { sanitizeContentHTML } from "@/lib/sanitize";
 import type {
   Idea,
   LaunchChecklistData,
@@ -622,7 +623,7 @@ function MockAIAdvisor({ messages }: { messages: AdvisorMessage[] }) {
               {message.role === "assistant" ? (
                 <div
                   className="text-sm leading-relaxed whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeContentHTML(formatMessage(message.content)) }}
                 />
               ) : (
                 <p className="text-sm leading-relaxed">{message.content}</p>

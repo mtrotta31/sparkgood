@@ -3,6 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { sanitizeLandingPageHTML } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -107,7 +108,7 @@ export default async function LandingPage({ params }: PageProps) {
     <div className="min-h-screen">
       {/* Render the landing page HTML */}
       <div
-        dangerouslySetInnerHTML={{ __html: page.html }}
+        dangerouslySetInnerHTML={{ __html: sanitizeLandingPageHTML(page.html) }}
         className="landing-page-container"
       />
 

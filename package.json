@@ -22,6 +22,7 @@
     "pptxgenjs": "^4.0.1",
     "react": "^18",
     "react-dom": "^18",
+    "sanitize-html": "^2.17.1",
     "satori": "^0.19.2",
     "stripe": "^20.3.1",
     "xlsx": "^0.18.5"
@@ -30,6 +31,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/sanitize-html": "^2.16.0",
     "autoprefixer": "^10.4.24",
     "dotenv": "^17.3.1",
     "eslint": "^8",

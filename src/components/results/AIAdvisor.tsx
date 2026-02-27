@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { AdvisorMessage } from "@/types";
+import { sanitizeContentHTML } from "@/lib/sanitize";
 
 interface AIAdvisorProps {
   projectId: string;
@@ -331,7 +332,7 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
               {message.role === "assistant" ? (
                 <div
                   className="text-sm leading-relaxed whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeContentHTML(formatMessage(message.content)) }}
                 />
               ) : (
                 <p className="text-sm leading-relaxed">{message.content}</p>
