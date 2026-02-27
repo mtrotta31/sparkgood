@@ -1045,6 +1045,25 @@ export default async function ListingPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Last Updated Timestamp */}
+      {(listing.updated_at || listing.last_enriched_at) && (
+        <div className="max-w-5xl mx-auto px-4 py-4 text-center">
+          <p className="text-sm text-gray-400">
+            Last updated:{" "}
+            {new Date(
+              Math.max(
+                listing.updated_at ? new Date(listing.updated_at).getTime() : 0,
+                listing.last_enriched_at ? new Date(listing.last_enriched_at).getTime() : 0
+              )
+            ).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
+      )}
+
       {/* Similar Resources */}
       {similarListings && similarListings.length > 0 && (
         <section className="py-12 px-4 bg-gray-50">

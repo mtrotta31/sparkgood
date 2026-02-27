@@ -317,6 +317,14 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
     .map((s) => `${s.count} ${s.count === 1 ? s.name : s.plural}`)
     .join(" • ");
 
+  // Calculate most recent update date from all listings
+  const mostRecentUpdate = localListings?.reduce((latest, listing) => {
+    const updatedAt = listing.updated_at ? new Date(listing.updated_at).getTime() : 0;
+    const enrichedAt = listing.last_enriched_at ? new Date(listing.last_enriched_at).getTime() : 0;
+    const listingLatest = Math.max(updatedAt, enrichedAt);
+    return listingLatest > latest ? listingLatest : latest;
+  }, 0);
+
   // Get nearby cities (same state, excluding current city)
   const { data: nearbyCities } = await supabase
     .from("resource_locations")
@@ -661,6 +669,20 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
             </div>
           </div>
         </section>
+
+        {/* Last Updated Timestamp */}
+        {mostRecentUpdate && mostRecentUpdate > 0 && (
+          <div className="py-4 px-4 sm:px-6 text-center">
+            <p className="text-sm text-slate-400">
+              Last updated:{" "}
+              {new Date(mostRecentUpdate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+        )}
 
         {/* Newsletter */}
         <section className="py-12 px-4 sm:px-6 bg-cream-dark">
