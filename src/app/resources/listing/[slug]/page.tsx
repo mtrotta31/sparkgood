@@ -18,6 +18,7 @@ import {
 import ResourceCard from "@/components/resources/ResourceCard";
 import ResourceStructuredData from "@/components/seo/ResourceStructuredData";
 import CopyButton from "@/components/resources/CopyButton";
+import DirectoryBuilderCTA from "@/components/resources/DirectoryBuilderCTA";
 import { formatHours } from "@/lib/formatHours";
 import { formatDescription } from "@/lib/format-description";
 import { formatAmount, formatAmountRange } from "@/lib/format-amount";
@@ -994,15 +995,17 @@ export default async function ListingPage({ params }: PageProps) {
                     Build your complete business plan with SparkLocal and get matched
                     with more resources like this one.
                   </p>
-                  <Link
-                    href="/builder"
+                  <DirectoryBuilderCTA
+                    pageType="listing"
+                    category={listing.category}
+                    city={listing.city || undefined}
                     className="inline-flex items-center gap-1 text-amber-600 text-sm font-semibold hover:text-amber-700 transition-colors"
                   >
                     Get Started Free
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
-                  </Link>
+                  </DirectoryBuilderCTA>
                 </div>
 
                 {/* More in {City} Links */}

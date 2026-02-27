@@ -14,6 +14,7 @@ import DirectoryNav from "@/components/resources/DirectoryNav";
 import DirectoryFooter from "@/components/resources/DirectoryFooter";
 import ResourceListingCardLight from "@/components/resources/ResourceListingCardLight";
 import NewsletterSignupLight from "@/components/resources/NewsletterSignupLight";
+import DirectoryBuilderCTA from "@/components/resources/DirectoryBuilderCTA";
 
 interface CityHubContentProps {
   location: ResourceLocation;
@@ -500,8 +501,9 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                 meantime, check out nationwide resources below that can help you
                 anywhere.
               </p>
-              <Link
-                href="/builder"
+              <DirectoryBuilderCTA
+                pageType="city_hub"
+                city={location.city}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-spark hover:bg-spark-600 text-white font-semibold rounded-full transition-all"
               >
                 Get Personalized Resources
@@ -518,7 +520,7 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                     d="M13 7l5 5m0 0l-5 5m5-5H6"
                   />
                 </svg>
-              </Link>
+              </DirectoryBuilderCTA>
             </div>
           </section>
         )}
@@ -647,8 +649,9 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                 resources you need based on your business idea, budget, and
                 goals.
               </p>
-              <Link
-                href="/builder"
+              <DirectoryBuilderCTA
+                pageType="city_hub"
+                city={location.city}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-spark hover:bg-spark-400 text-white font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/30"
               >
                 Create Your Launch Plan
@@ -665,7 +668,7 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                     d="M13 7l5 5m0 0l-5 5m5-5H6"
                   />
                 </svg>
-              </Link>
+              </DirectoryBuilderCTA>
             </div>
           </div>
         </section>

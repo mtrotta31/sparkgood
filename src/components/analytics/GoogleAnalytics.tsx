@@ -144,4 +144,17 @@ export const analytics = {
       value: plan === "spark" ? 9.99 : 29.99,
     });
   },
+
+  // Track directory to builder conversion clicks
+  directoryToBuilderClick: (
+    pageType: "listing" | "city_hub" | "directory_home",
+    options?: { category?: string; city?: string }
+  ) => {
+    trackEvent("directory_to_builder_click", {
+      event_category: "conversion",
+      page_type: pageType,
+      ...(options?.category && { category: options.category }),
+      ...(options?.city && { city: options.city }),
+    });
+  },
 };

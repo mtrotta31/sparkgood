@@ -11,6 +11,7 @@ import DirectoryFooter from "@/components/resources/DirectoryFooter";
 import CitySearch from "@/components/resources/CitySearch";
 import AnimatedCounter from "@/components/resources/AnimatedCounter";
 import NewsletterSignupLight from "@/components/resources/NewsletterSignupLight";
+import DirectoryBuilderCTA from "@/components/resources/DirectoryBuilderCTA";
 
 export const metadata: Metadata = {
   title: "Business Resources Directory | Find Grants, Coworking & More",
@@ -478,8 +479,8 @@ export default async function ResourcesPage() {
                 your skills, budget, and location — then matches you with the
                 right resources to make it happen.
               </p>
-              <Link
-                href="/builder"
+              <DirectoryBuilderCTA
+                pageType="directory_home"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-spark hover:bg-spark-400 text-white font-bold rounded-full transition-all text-lg shadow-lg shadow-spark/30 hover:shadow-xl hover:shadow-spark/40"
               >
                 Build Your Launch Plan
@@ -496,7 +497,7 @@ export default async function ResourcesPage() {
                     d="M13 7l5 5m0 0l-5 5m5-5H6"
                   />
                 </svg>
-              </Link>
+              </DirectoryBuilderCTA>
             </div>
           </div>
         </section>
