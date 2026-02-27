@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
         sessionConfig = {
           customer: stripeCustomerId,
           mode: "payment",
+          allow_promotion_codes: true,
           line_items: [
             {
               price_data: {
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
         sessionConfig = {
           customer: stripeCustomerId,
           mode: "payment",
+          allow_promotion_codes: true,
           line_items: [
             {
               price_data: {
@@ -149,6 +151,7 @@ export async function POST(request: NextRequest) {
         sessionConfig = {
           customer: stripeCustomerId,
           mode: "subscription",
+          allow_promotion_codes: true,
           line_items: [
             {
               price_data: {
@@ -184,6 +187,7 @@ export async function POST(request: NextRequest) {
         sessionConfig = {
           customer: stripeCustomerId,
           mode: "subscription",
+          allow_promotion_codes: true,
           line_items: [
             {
               price_data: {
