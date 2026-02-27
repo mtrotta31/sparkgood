@@ -415,28 +415,36 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
         {location.ai_city_intro && (
           <section className="py-8 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              {(() => {
-                const text = location.ai_city_intro;
-                // First try splitting on double newlines
-                if (text.includes("\n\n")) {
-                  return text.split("\n\n").filter(Boolean).map((para, i) => (
-                    <p key={i} className="text-slate-700 text-lg leading-relaxed mb-4 last:mb-0">
-                      {para.trim()}
+              <div className="bg-white/60 rounded-xl p-6 md:p-8 border border-slate-100 shadow-sm">
+                <h3 className="text-xs uppercase tracking-wide text-slate-400 mb-4">
+                  About Starting a Business in {location.city}
+                </h3>
+                {(() => {
+                  const text = location.ai_city_intro;
+                  // First try splitting on double newlines
+                  if (text.includes("\n\n")) {
+                    return text.split("\n\n").filter(Boolean).map((para, i) => (
+                      <p key={i} className="text-[15px] text-slate-600 leading-relaxed mb-4 last:mb-0">
+                        {para.trim()}
+                      </p>
+                    ));
+                  }
+                  // Split into sentences safely (avoid breaking on decimals like "2.32" or abbreviations like "U.S.")
+                  // Only split on ". " followed by uppercase, but not when preceded by single capital or digit
+                  const sentenceRegex = /(?<=(?<![A-Z])(?<!\d)[.!?]) (?=[A-Z])/;
+                  const sentences = text.split(sentenceRegex);
+                  // Group into paragraphs of 3 sentences each
+                  const paragraphs: string[] = [];
+                  for (let i = 0; i < sentences.length; i += 3) {
+                    paragraphs.push(sentences.slice(i, i + 3).join(" ").trim());
+                  }
+                  return paragraphs.map((para, i) => (
+                    <p key={i} className="text-[15px] text-slate-600 leading-relaxed mb-4 last:mb-0">
+                      {para}
                     </p>
                   ));
-                }
-                // Otherwise split into sentences and group into paragraphs of 3-4 sentences
-                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-                const paragraphs: string[] = [];
-                for (let i = 0; i < sentences.length; i += 3) {
-                  paragraphs.push(sentences.slice(i, i + 3).join(" ").trim());
-                }
-                return paragraphs.map((para, i) => (
-                  <p key={i} className="text-slate-700 text-lg leading-relaxed mb-4 last:mb-0">
-                    {para}
-                  </p>
-                ));
-              })()}
+                })()}
+              </div>
             </div>
           </section>
         )}
