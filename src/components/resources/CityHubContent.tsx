@@ -415,9 +415,28 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
         {location.ai_city_intro && (
           <section className="py-8 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              <p className="text-slate-700 text-lg leading-relaxed whitespace-pre-line">
-                {location.ai_city_intro}
-              </p>
+              {(() => {
+                const text = location.ai_city_intro;
+                // First try splitting on double newlines
+                if (text.includes("\n\n")) {
+                  return text.split("\n\n").filter(Boolean).map((para, i) => (
+                    <p key={i} className="text-slate-700 text-lg leading-relaxed mb-4 last:mb-0">
+                      {para.trim()}
+                    </p>
+                  ));
+                }
+                // Otherwise split into sentences and group into paragraphs of 3-4 sentences
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+                const paragraphs: string[] = [];
+                for (let i = 0; i < sentences.length; i += 3) {
+                  paragraphs.push(sentences.slice(i, i + 3).join(" ").trim());
+                }
+                return paragraphs.map((para, i) => (
+                  <p key={i} className="text-slate-700 text-lg leading-relaxed mb-4 last:mb-0">
+                    {para}
+                  </p>
+                ));
+              })()}
             </div>
           </section>
         )}
