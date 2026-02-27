@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { AdvisorMessage } from "@/types";
-import { sanitizeMarkdownHTML } from "@/lib/sanitize";
 
 interface AIAdvisorProps {
   projectId: string;
@@ -198,7 +197,7 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
     sendMessage(prompt);
   };
 
-  // Format message content with basic markdown (sanitized for XSS protection)
+  // Format message content with basic markdown
   const formatMessage = (content: string) => {
     // Convert **bold** to <strong>
     let formatted = content.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
@@ -208,8 +207,7 @@ export default function AIAdvisor({ projectId, ideaName }: AIAdvisorProps) {
     formatted = formatted.replace(/^[-•]\s/gm, "<span class='text-spark'>•</span> ");
     // Convert line breaks
     formatted = formatted.replace(/\n/g, "<br />");
-    // Sanitize the final HTML to prevent XSS
-    return sanitizeMarkdownHTML(formatted);
+    return formatted;
   };
 
   if (isInitialLoading) {

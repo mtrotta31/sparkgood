@@ -25,18 +25,8 @@ export interface ClaudeMessage {
   content: string;
 }
 
-// Model tier types for cost-conscious model selection
-export type ModelTier = "haiku" | "sonnet";
-
-// Model ID mapping - update these when new model versions are released
-const MODEL_IDS: Record<ModelTier, string> = {
-  haiku: "claude-haiku-4-5-20251001",
-  sonnet: "claude-sonnet-4-5-20250929",
-};
-
 export interface ClaudeOptions {
-  model?: string;           // Direct model ID (legacy, still supported)
-  modelTier?: ModelTier;    // Use tier name for cleaner code
+  model?: string;
   maxTokens?: number;
   temperature?: number;
   systemPrompt?: string;
@@ -44,24 +34,11 @@ export interface ClaudeOptions {
 }
 
 const DEFAULT_OPTIONS: ClaudeOptions = {
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-sonnet-4-20250514",
   maxTokens: 4096,
   temperature: 0.7,
   retryOnRateLimit: false,
 };
-
-/**
- * Get the actual model ID from options
- * Supports both direct model IDs and tier names
- */
-function getModelId(options: ClaudeOptions): string {
-  // If modelTier is specified, use it
-  if (options.modelTier) {
-    return MODEL_IDS[options.modelTier];
-  }
-  // Otherwise use direct model ID or default
-  return options.model || DEFAULT_OPTIONS.model!;
-}
 
 // Helper to sleep for a specified duration
 function sleep(ms: number): Promise<void> {
@@ -91,9 +68,8 @@ export async function sendMessage(
   const anthropic = await getAnthropicClient();
 
   const makeRequest = async (): Promise<string> => {
-    const modelId = getModelId(opts);
     const response = await anthropic.messages.create({
-      model: modelId,
+      model: opts.model!,
       max_tokens: opts.maxTokens!,
       ...(opts.systemPrompt && { system: opts.systemPrompt }),
       messages: [{ role: "user", content: userMessage }],

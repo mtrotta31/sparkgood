@@ -7,7 +7,6 @@ import type {
   ChecklistProgress,
   MatchedResourceRef,
 } from "@/types";
-import { sanitizeMarkdownHTML } from "@/lib/sanitize";
 
 interface LaunchChecklistProps {
   data: LaunchChecklistData;
@@ -159,18 +158,16 @@ function ChecklistItemRow({
       {/* Expanded content */}
       {isExpanded && (
         <div className="border-t border-warmwhite/10 p-4 pt-4 space-y-4">
-          {/* Guide content (rendered as markdown-like, sanitized for XSS protection) */}
+          {/* Guide content (rendered as markdown-like) */}
           <div className="prose prose-sm prose-invert max-w-none">
             <div
               className="text-sm text-warmwhite-muted leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{
-                __html: sanitizeMarkdownHTML(
-                  item.guide
-                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-warmwhite">$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`(.*?)`/g, '<code class="bg-charcoal-light px-1 rounded text-spark">$1</code>')
-                    .replace(/\n/g, '<br/>')
-                )
+                __html: item.guide
+                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-warmwhite">$1</strong>')
+                  .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                  .replace(/`(.*?)`/g, '<code class="bg-charcoal-light px-1 rounded text-spark">$1</code>')
+                  .replace(/\n/g, '<br/>')
               }}
             />
           </div>
