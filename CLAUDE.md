@@ -758,7 +758,20 @@ The `scripts/enrich-content-seo.ts` script generates AI content for directory pa
 - **CLI flags:** `--mode` (listings|cities), `--batch-size`, `--category`, `--city`, `--force`, `--dry-run`
 - **Rate limiting:** 200ms delay between API calls to avoid rate limits
 - **Database:** Content stored in `enrichment_data` JSONB (listings) and `ai_*` columns (cities)
-- **Rendering:** City tips split on numbered pattern (`/\d+\.\s/`) and rendered as styled list items in `CityHubContent.tsx`
+
+**City Hub Page Rendering** (`CityHubContent.tsx`):
+- **City Intro Card:** Styled as info card with amber brand accents
+  - `bg-white/80 rounded-xl p-6 md:p-8 border-amber-100/50`
+  - Amber glow shadow: `shadow-[0_4px_20px_-4px_rgba(245,158,11,0.15)]`
+  - Info icon with amber-to-orange gradient (`from-amber-400 to-orange-500`)
+  - Heading: "About Starting a Business in {city}" (uppercase, tracking-wide)
+  - Text: `text-[15px] text-slate-600 leading-relaxed`
+- **Paragraph Splitting:** Intro text split into readable paragraphs
+  - First tries `\n\n` (double newlines)
+  - Falls back to sentence splitting with safe regex: `/(?<=(?<![A-Z])(?<!\d)[.!?]) (?=[A-Z])/`
+  - Avoids breaking on decimals ("2.32") or abbreviations ("U.S.")
+  - Groups sentences into chunks of 3 per paragraph
+- **City Tips:** Split on numbered pattern (`/(?=\d+\.\s)/`) and rendered as styled list items with amber number badges
 
 ### Example Deep Dive & Purchase Flow
 - `/builder/example` shows a fully interactive example using "Austin Pour Co." (mobile cocktail bar in Austin, TX)
