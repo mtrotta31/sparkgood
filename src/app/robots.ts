@@ -11,6 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           "/api/",
+          "/auth/",
           "/projects/", // User-specific pages
         ],
       },
