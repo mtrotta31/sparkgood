@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { STATE_GUIDES } from "@/data/state-guides";
 
 export const metadata: Metadata = {
-  title: "How to Start a Business in Every US State | SparkLocal",
+  title: "How to Start a Business in Every US State",
   description:
     "Complete guides to starting a business in all 50 US states. Learn about state registration, taxes, licenses, permits, and key industries for each state.",
   keywords: [
