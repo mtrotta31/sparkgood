@@ -7,11 +7,13 @@
  *   npx tsx scripts/submit-indexnow.ts --dry-run    # Preview URLs without submitting
  *   npx tsx scripts/submit-indexnow.ts --listings   # Only submit listing pages
  *   npx tsx scripts/submit-indexnow.ts --cities     # Only submit city pages
+ *   npx tsx scripts/submit-indexnow.ts --states     # Only submit state guide pages
  */
 
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { submitToIndexNowBatched } from '../src/lib/indexnow';
+import { STATE_GUIDES } from '../src/data/state-guides';
 
 // Load .env.local
 config({ path: '.env.local' });
@@ -23,6 +25,7 @@ const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
 const listingsOnly = args.includes('--listings');
 const citiesOnly = args.includes('--cities');
+const statesOnly = args.includes('--states');
 
 async function main() {
   console.log('IndexNow URL Submission Script');
@@ -53,7 +56,7 @@ async function main() {
   const urls: string[] = [];
 
   // Fetch listing slugs (paginate to get all, Supabase default limit is 1000)
-  if (!citiesOnly) {
+  if (!citiesOnly && !statesOnly) {
     console.log('Fetching listing slugs...');
     const allListings: { slug: string }[] = [];
     let offset = 0;
@@ -87,7 +90,7 @@ async function main() {
   }
 
   // Fetch city slugs
-  if (!listingsOnly) {
+  if (!listingsOnly && !statesOnly) {
     console.log('Fetching city slugs...');
     const { data: cities, error: citiesError } = await supabase
       .from('resource_locations')
@@ -105,16 +108,29 @@ async function main() {
     console.log(`  Found ${cityUrls.length} city pages`);
   }
 
+  // Add state guide pages
+  if (!listingsOnly && !citiesOnly || statesOnly) {
+    console.log('Adding state guide pages...');
+    const stateUrls = [
+      `${SITE_URL}/resources/start-business`,
+      ...STATE_GUIDES.map((s) => `${SITE_URL}/resources/start-business/${s.slug}`),
+    ];
+    urls.push(...stateUrls);
+    console.log(`  Found ${stateUrls.length} state guide pages`);
+  }
+
   // Add static pages
-  const staticPages = [
-    `${SITE_URL}/resources`,
-    `${SITE_URL}/resources/grant`,
-    `${SITE_URL}/resources/coworking`,
-    `${SITE_URL}/resources/accelerator`,
-    `${SITE_URL}/resources/sba`,
-  ];
-  urls.push(...staticPages);
-  console.log(`  Added ${staticPages.length} static pages`);
+  if (!statesOnly) {
+    const staticPages = [
+      `${SITE_URL}/resources`,
+      `${SITE_URL}/resources/grant`,
+      `${SITE_URL}/resources/coworking`,
+      `${SITE_URL}/resources/accelerator`,
+      `${SITE_URL}/resources/sba`,
+    ];
+    urls.push(...staticPages);
+    console.log(`  Added ${staticPages.length} static pages`);
+  }
 
   console.log(`\nTotal URLs to submit: ${urls.length}`);
 
