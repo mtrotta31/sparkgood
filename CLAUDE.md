@@ -47,7 +47,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 ### Resource Directory (Fully Functional)
 - **Main Directory** (`/resources`) — Homepage with hero, city search, animated stats, top cities grid, category cards
-- **Category Pages** (`/resources/[category]`) — List all resources with filters, location sidebar with accurate local counts
+- **Category Pages** (`/resources/[category]`) — List all resources with filters, location sidebar with accurate local counts, 500-600 word SEO guide content with 4 FAQs and FAQPage JSON-LD schema
 - **City Hub Pages** (`/resources/[city-slug]`) — SEO-optimized city pages (e.g., `/resources/austin-tx`) showing all resources grouped by category, AI-generated intro, tips, and FAQs
 - **Location Pages** (`/resources/[category]/[location]`) — Category + location pages (e.g., "Grants in Austin, TX")
 - **Listing Pages** (`/resources/listing/[slug]`) — Individual resource details with structured data and AI-generated descriptions
@@ -336,6 +336,7 @@ Located in `src/components/`:
 - `AnimatedCounter.tsx` — Animated stats counter
 - `NewsletterSignupLight.tsx` — Light-themed newsletter signup
 - `CategoryFiltersLight.tsx` — Filter bar for category pages
+- `CategoryGuideContent.tsx` — SEO guide content and FAQs for category landing pages (hardcoded content map for grants, coworking, accelerators, SBA)
 
 ## File Structure
 
