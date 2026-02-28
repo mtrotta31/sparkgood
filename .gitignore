@@ -68,3 +68,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Script state files
+scripts/indexing-submitted.json
+google-indexing-key.json
