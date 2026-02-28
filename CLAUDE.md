@@ -76,6 +76,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Analytics & SEO
 - **Google Analytics (GA4)** — User tracking and conversion events
 - **Google Search Console** — Site verification via meta tag in `src/app/layout.tsx`
+- **IndexNow** — Instant URL submission to Bing/Yandex (`scripts/submit-indexnow.ts`)
 - **Schema.org Structured Data** — Organization, LocalBusiness, WebSite schemas
 - **Newsletter Capture** — Email signup for updates
 
@@ -411,6 +412,7 @@ sparklocal/
 │   ├── enrich-listings.ts       # Enriches listings via Perplexity API (legacy)
 │   ├── enrich-content-seo.ts    # AI content enrichment for SEO (Claude Haiku)
 │   ├── fix-city-intros.ts       # Removes SparkLocal references from city intros
+│   ├── submit-indexnow.ts       # Submit URLs to Bing/Yandex for instant indexing
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   └── ...                      # Data files
 ├── supabase/
@@ -542,6 +544,9 @@ npx tsx scripts/enrich-content-seo.ts --mode cities --batch-size 50    # Enrich 
 npx tsx scripts/enrich-content-seo.ts --mode listings --category coworking --city "new-york-ny" --dry-run  # Test specific subset
 npx tsx scripts/fix-city-intros.ts --dry-run  # Preview city intro fixes (removes SparkLocal refs)
 npx tsx scripts/fix-city-intros.ts            # Apply city intro fixes
+
+# Search Engine Indexing
+npx tsx scripts/submit-indexnow.ts  # Submit all URLs to Bing/Yandex via IndexNow
 ```
 
 ## Environment Variables
@@ -564,6 +569,9 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 
 # Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
+
+# SEO
+INDEXNOW_API_KEY=
 ```
 
 ## Current Phase
