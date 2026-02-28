@@ -56,7 +56,8 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages (includes city hub pages)
 - **Light Theme** — Directory uses warm cream/white theme (separate from dark builder theme)
 - **Content Enrichment** — All 2,416 listings and 326 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
-- **Stats:** 2,400+ listings across 326 cities
+- **State Business Guides** — 50 "How to Start a Business in [State]" programmatic SEO pages at `/resources/start-business/[state]` with AI-generated content, FAQs, city links, and JSON-LD schemas (FAQPage, BreadcrumbList, HowTo)
+- **Stats:** 2,400+ listings across 326 cities, 50 state guides
 
 ### Authentication & User Data
 - **Supabase Auth** — Email/password authentication with magic links
@@ -364,7 +365,11 @@ sparklocal/
 │   │   │   ├── [category]/      # Category OR city hub pages
 │   │   │   │   ├── page.tsx     # Handles both category and city-slug routes
 │   │   │   │   └── [location]/  # Category + location pages
-│   │   │   └── listing/[slug]/  # Individual listing pages
+│   │   │   ├── listing/[slug]/  # Individual listing pages
+│   │   │   └── start-business/  # State business guides
+│   │   │       ├── page.tsx     # Index page with 50 state grid
+│   │   │       ├── layout.tsx   # Light theme wrapper
+│   │   │       └── [state]/     # Individual state guide pages
 │   │   ├── sites/[slug]/        # Hosted landing pages for Launch Kit
 │   │   ├── sitemap.ts           # Dynamic sitemap
 │   │   └── robots.ts            # Robots.txt
@@ -407,12 +412,15 @@ sparklocal/
 │   │   ├── idea-generation.ts   # Supports both business paths
 │   │   ├── deep-dive.ts         # Supports both business paths
 │   │   └── ...
+│   ├── data/
+│   │   └── state-guides.ts      # Generated state business guide content (50 states)
 │   └── types/                   # TypeScript types
 ├── scripts/
 │   ├── seed-directory.ts        # Seeds resource listings from data files
 │   ├── enrich-listings.ts       # Enriches listings via Perplexity API (legacy)
 │   ├── enrich-content-seo.ts    # AI content enrichment for SEO (Claude Haiku)
 │   ├── fix-city-intros.ts       # Removes SparkLocal references from city intros
+│   ├── generate-state-guides.ts # Generate 50 state business guides (Claude Haiku)
 │   ├── submit-indexnow.ts       # Submit URLs to Bing/Yandex for instant indexing
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   └── ...                      # Data files
@@ -543,6 +551,10 @@ npm run enrich:directory # Enrich listings with Perplexity API (adds description
 npx tsx scripts/enrich-content-seo.ts --mode listings --batch-size 50  # Enrich all listings
 npx tsx scripts/enrich-content-seo.ts --mode cities --batch-size 50    # Enrich all cities
 npx tsx scripts/enrich-content-seo.ts --mode listings --category coworking --city "new-york-ny" --dry-run  # Test specific subset
+
+# State Business Guides
+npx tsx scripts/generate-state-guides.ts --dry-run  # Test on 3 states (TX, CA, NY)
+npx tsx scripts/generate-state-guides.ts            # Generate all 50 state guides
 npx tsx scripts/fix-city-intros.ts --dry-run  # Preview city intro fixes (removes SparkLocal refs)
 npx tsx scripts/fix-city-intros.ts            # Apply city intro fixes
 

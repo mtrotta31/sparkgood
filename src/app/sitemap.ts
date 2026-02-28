@@ -6,6 +6,7 @@ import { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_INFO, type ResourceCategory } from "@/types/resources";
 import { getAllPostsMeta } from "@/lib/blog";
+import { STATE_GUIDES } from "@/data/state-guides";
 
 const BASE_URL = "https://sparklocal.co";
 
@@ -154,9 +155,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // State business guide pages
+  const stateGuideIndex: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/resources/start-business`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    },
+  ];
+
+  const stateGuidePages: MetadataRoute.Sitemap = STATE_GUIDES.map((state) => ({
+    url: `${BASE_URL}/resources/start-business/${state.slug}`,
+    lastModified: state.generatedAt ? new Date(state.generatedAt) : new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...staticPages,
     ...blogPages,
+    ...stateGuideIndex,
+    ...stateGuidePages,
     ...categoryPages,
     ...cityHubPages,
     ...categoryLocationPages,

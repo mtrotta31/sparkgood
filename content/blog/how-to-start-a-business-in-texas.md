@@ -138,3 +138,7 @@ Starting a business in Texas isn't complicated, but it does require attention to
 The hardest part isn't the paperwork — it's deciding what business to start in the first place. If you're still figuring that out, or you want help turning your idea into an actionable plan, [try SparkLocal's free business builder](/builder). Answer a few questions about your skills, budget, and goals, and we'll generate personalized business ideas with market research, financial projections, and a step-by-step launch checklist.
 
 Texas is waiting. Time to start something.
+
+---
+
+**Quick Reference:** See our [How to Start a Business in Texas](/resources/start-business/texas) guide for a quick overview with state-specific FAQs and links to resources in Texas cities.
