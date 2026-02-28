@@ -1,0 +1,7 @@
+[    2656ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://hwllgomgftcpnbimgrgp.supabase.co/auth/v1/token?grant_type=refresh_token:0
+[    2657ms] [ERROR] AuthApiError: Invalid Refresh Token: Refresh Token Not Found
+    at tF (https://sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:24:43051)
+    at async tV (https://sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:24:44050)
+    at async tH (https://sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:24:43706)
+    at async r (https://sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:37:25653)
+    at async https://sparklocal.co/_next/static/chunks/33-cb611cabb5a10226.js:37:25899 @ https://sparklocal.co/_next/static/chunks/117-4665cf6996612fb0.js:0

@@ -15,6 +15,7 @@ import {
 import ResourceCard from "@/components/resources/ResourceCard";
 import CategoryFiltersLight from "@/components/resources/CategoryFiltersLight";
 import CityHubContent from "@/components/resources/CityHubContent";
+import CategoryGuideContent from "@/components/resources/CategoryGuideContent";
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -507,6 +508,9 @@ async function renderCategoryPage(
           </div>
         </div>
       </section>
+
+      {/* Guide Content Section */}
+      <CategoryGuideContent category={category} />
 
       {/* Sticky Filter Bar */}
       <section className="sticky top-16 z-40 bg-gray-50 border-b border-gray-200 py-4 px-4">

@@ -1,0 +1,8 @@
+[ -412097ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ chrome-error://chromewebdata/:0
+[ -412091ms] [ERROR] Refused to display 'https://sparklocal.co/' in a frame because it set 'X-Frame-Options' to 'deny'. @ chrome-error://chromewebdata/:0
+[ -292656ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ chrome-error://chromewebdata/:0
+[ -292652ms] [ERROR] Refused to display 'https://sparklocal.co/' in a frame because it set 'X-Frame-Options' to 'deny'. @ chrome-error://chromewebdata/:0
+[ -266085ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ chrome-error://chromewebdata/:0
+[ -266082ms] [ERROR] Refused to display 'https://sparklocal.co/' in a frame because it set 'X-Frame-Options' to 'deny'. @ chrome-error://chromewebdata/:0
+[   78602ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ chrome-error://chromewebdata/:0
+[   78608ms] [ERROR] Refused to display 'https://sparklocal.co/' in a frame because it set 'X-Frame-Options' to 'deny'. @ chrome-error://chromewebdata/:0

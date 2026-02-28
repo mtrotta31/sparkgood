@@ -1,0 +1,36 @@
+[     302ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:112
+[ 2097653ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example?_rsc=1i7kf:0
+[ 5461393ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444:0
+[ 5461479ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959763464:0
+[ 5461540ms] Event
+[ 5464489ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/builder/example:0
+[ 5473853ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959775865:0
+[ 5473864ms] Event
+[ 5476855ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/builder/example:0
+[ 5484325ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959786335:0
+[ 5484337ms] Event
+[ 5487327ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/builder/example:0
+[ 5493364ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959795379:0
+[ 5493375ms] Event
+[ 5496366ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/builder/example:0
+[ 5502723ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959804737:0
+[ 5502733ms] Event
+[ 5505725ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1771959762444 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/builder/example:0
+[ 5519449ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example?_rsc=1i7kf:0
+[ 5519496ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5519515ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5520527ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5521538ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5522607ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5523617ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/builder/example:0
+[ 5524870ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1771959826841:0
+[ 5524900ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/main-app.js?v=1771959826841:0
+[ 5524900ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/app-pages-internals.js:0
+[ 5524901ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/app/builder/example/page.js:0

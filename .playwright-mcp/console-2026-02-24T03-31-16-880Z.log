@@ -1,0 +1,6 @@
+[  119082ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/css/app/layout.css?v=1771903995825:0
+[  119094ms] Event
+[  124104ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/css/app/layout.css?v=1771904000940:0
+[  124114ms] Event
+[  127934ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/css/app/layout.css?v=1771904004795:0
+[  127944ms] Event
