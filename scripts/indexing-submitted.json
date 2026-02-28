@@ -1,0 +1,1206 @@
+{
+  "lastRun": "2026-02-28T21:51:20.925Z",
+  "totalSubmitted": 200,
+  "submissions": {
+    "https://sparklocal.co/resources/listing/new-york-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/new-york-sbdc",
+      "submittedAt": "2026-02-28T21:50:24.976Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/new-york-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/maryland-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/maryland-sbdc",
+      "submittedAt": "2026-02-28T21:50:25.303Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/maryland-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/louisiana-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/louisiana-sbdc",
+      "submittedAt": "2026-02-28T21:50:25.640Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/louisiana-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/idaho-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/idaho-sbdc",
+      "submittedAt": "2026-02-28T21:50:26.051Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/idaho-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/massachusetts-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/massachusetts-sbdc",
+      "submittedAt": "2026-02-28T21:50:26.358Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/massachusetts-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/missouri-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/missouri-sbdc",
+      "submittedAt": "2026-02-28T21:50:26.665Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/missouri-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/michigan-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/michigan-sbdc",
+      "submittedAt": "2026-02-28T21:50:26.932Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/michigan-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/mississippi-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/mississippi-sbdc",
+      "submittedAt": "2026-02-28T21:50:27.235Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/mississippi-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/kentucky-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/kentucky-sbdc",
+      "submittedAt": "2026-02-28T21:50:27.555Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/kentucky-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/minnesota-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/minnesota-sbdc",
+      "submittedAt": "2026-02-28T21:50:27.821Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/minnesota-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/washington-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/washington-sbdc",
+      "submittedAt": "2026-02-28T21:50:28.134Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/washington-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/maine-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/maine-sbdc",
+      "submittedAt": "2026-02-28T21:50:28.446Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/maine-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/iowa-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/iowa-sbdc",
+      "submittedAt": "2026-02-28T21:50:28.712Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/iowa-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-chicago": {
+      "url": "https://sparklocal.co/resources/listing/score-chicago",
+      "submittedAt": "2026-02-28T21:50:29.010Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-chicago\"}}"
+    },
+    "https://sparklocal.co/resources/listing/hawaii-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/hawaii-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:29.321Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/hawaii-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/illinois-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/illinois-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:29.664Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/illinois-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-fsu": {
+      "url": "https://sparklocal.co/resources/listing/vboc-fsu",
+      "submittedAt": "2026-02-28T21:50:29.927Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-fsu\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-gulf-coast": {
+      "url": "https://sparklocal.co/resources/listing/vboc-gulf-coast",
+      "submittedAt": "2026-02-28T21:50:30.227Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-gulf-coast\"}}"
+    },
+    "https://sparklocal.co/resources/listing/indiana-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/indiana-sbdc",
+      "submittedAt": "2026-02-28T21:50:30.543Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/indiana-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-msu": {
+      "url": "https://sparklocal.co/resources/listing/vboc-msu",
+      "submittedAt": "2026-02-28T21:50:30.820Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-msu\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-psu": {
+      "url": "https://sparklocal.co/resources/listing/vboc-psu",
+      "submittedAt": "2026-02-28T21:50:31.096Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-psu\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-umd": {
+      "url": "https://sparklocal.co/resources/listing/vboc-umd",
+      "submittedAt": "2026-02-28T21:50:31.394Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-umd\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-pathway": {
+      "url": "https://sparklocal.co/resources/listing/vboc-pathway",
+      "submittedAt": "2026-02-28T21:50:31.671Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-pathway\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-odu": {
+      "url": "https://sparklocal.co/resources/listing/vboc-odu",
+      "submittedAt": "2026-02-28T21:50:31.935Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-odu\"}}"
+    },
+    "https://sparklocal.co/resources/listing/opus-virtual-offices-nashville-nashville-tn": {
+      "url": "https://sparklocal.co/resources/listing/opus-virtual-offices-nashville-nashville-tn",
+      "submittedAt": "2026-02-28T21:50:32.293Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/opus-virtual-offices-nashville-nashville-tn\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-bigsky": {
+      "url": "https://sparklocal.co/resources/listing/vboc-bigsky",
+      "submittedAt": "2026-02-28T21:50:32.640Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-bigsky\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-citadel": {
+      "url": "https://sparklocal.co/resources/listing/vboc-citadel",
+      "submittedAt": "2026-02-28T21:50:32.902Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-citadel\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-vetbiz-central": {
+      "url": "https://sparklocal.co/resources/listing/vboc-vetbiz-central",
+      "submittedAt": "2026-02-28T21:50:33.179Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-vetbiz-central\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-wwbic": {
+      "url": "https://sparklocal.co/resources/listing/vboc-wwbic",
+      "submittedAt": "2026-02-28T21:50:33.458Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-wwbic\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-nebraska": {
+      "url": "https://sparklocal.co/resources/listing/vboc-nebraska",
+      "submittedAt": "2026-02-28T21:50:33.734Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-nebraska\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-vetbiz": {
+      "url": "https://sparklocal.co/resources/listing/vboc-vetbiz",
+      "submittedAt": "2026-02-28T21:50:34.049Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-vetbiz\"}}"
+    },
+    "https://sparklocal.co/resources/listing/delaware-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/delaware-sbdc",
+      "submittedAt": "2026-02-28T21:50:34.383Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/delaware-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/espaces-nations-nashville-tn": {
+      "url": "https://sparklocal.co/resources/listing/espaces-nations-nashville-tn",
+      "submittedAt": "2026-02-28T21:50:34.737Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/espaces-nations-nashville-tn\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-alabama": {
+      "url": "https://sparklocal.co/resources/listing/score-alabama",
+      "submittedAt": "2026-02-28T21:50:35.065Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-alabama\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-socal": {
+      "url": "https://sparklocal.co/resources/listing/vboc-socal",
+      "submittedAt": "2026-02-28T21:50:35.329Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-socal\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-la": {
+      "url": "https://sparklocal.co/resources/listing/vboc-la",
+      "submittedAt": "2026-02-28T21:50:35.592Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-la\"}}"
+    },
+    "https://sparklocal.co/resources/listing/kansas-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/kansas-sbdc",
+      "submittedAt": "2026-02-28T21:50:35.946Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/kansas-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/workbox-chicago-the-loop-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/workbox-chicago-the-loop-chicago-il",
+      "submittedAt": "2026-02-28T21:50:36.309Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/workbox-chicago-the-loop-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-church-street-nashville-tn": {
+      "url": "https://sparklocal.co/resources/listing/regus-church-street-nashville-tn",
+      "submittedAt": "2026-02-28T21:50:36.573Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-church-street-nashville-tn\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-albuquerque": {
+      "url": "https://sparklocal.co/resources/listing/score-albuquerque",
+      "submittedAt": "2026-02-28T21:50:36.842Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-albuquerque\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-asheville": {
+      "url": "https://sparklocal.co/resources/listing/score-asheville",
+      "submittedAt": "2026-02-28T21:50:37.108Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-asheville\"}}"
+    },
+    "https://sparklocal.co/resources/listing/florida-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/florida-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:37.384Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/florida-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-sanfrancisco": {
+      "url": "https://sparklocal.co/resources/listing/score-sanfrancisco",
+      "submittedAt": "2026-02-28T21:50:37.645Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-sanfrancisco\"}}"
+    },
+    "https://sparklocal.co/resources/listing/my-corner-office-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/my-corner-office-chicago-il",
+      "submittedAt": "2026-02-28T21:50:37.916Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/my-corner-office-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/colorado-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/colorado-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:38.181Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/colorado-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-newmans-own": {
+      "url": "https://sparklocal.co/resources/listing/grant-newmans-own",
+      "submittedAt": "2026-02-28T21:50:38.444Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-newmans-own\"}}"
+    },
+    "https://sparklocal.co/resources/listing/georgia-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/georgia-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:38.742Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/georgia-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/alabama-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/alabama-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:39.142Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/alabama-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/connecticut-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/connecticut-sbdc",
+      "submittedAt": "2026-02-28T21:50:39.449Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/connecticut-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/arkansas-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/arkansas-sbdc",
+      "submittedAt": "2026-02-28T21:50:39.732Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/arkansas-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/arizona-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/arizona-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:40.002Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/arizona-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/california-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/california-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:40.247Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/california-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/intelligent-office-nashville-tennessee-nashville-tn": {
+      "url": "https://sparklocal.co/resources/listing/intelligent-office-nashville-tennessee-nashville-tn",
+      "submittedAt": "2026-02-28T21:50:40.524Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/intelligent-office-nashville-tennessee-nashville-tn\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-austin": {
+      "url": "https://sparklocal.co/resources/listing/score-austin",
+      "submittedAt": "2026-02-28T21:50:40.786Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-austin\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-los-angeles": {
+      "url": "https://sparklocal.co/resources/listing/score-los-angeles",
+      "submittedAt": "2026-02-28T21:50:41.060Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-los-angeles\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-phoenix": {
+      "url": "https://sparklocal.co/resources/listing/score-phoenix",
+      "submittedAt": "2026-02-28T21:50:41.334Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-phoenix\"}}"
+    },
+    "https://sparklocal.co/resources/listing/texas-sbdc-network": {
+      "url": "https://sparklocal.co/resources/listing/texas-sbdc-network",
+      "submittedAt": "2026-02-28T21:50:41.598Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/texas-sbdc-network\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-chrysler-building-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/spaces-chrysler-building-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:41.862Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-chrysler-building-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wbc-chicago": {
+      "url": "https://sparklocal.co/resources/listing/wbc-chicago",
+      "submittedAt": "2026-02-28T21:50:42.124Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wbc-chicago\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wbc-florida": {
+      "url": "https://sparklocal.co/resources/listing/wbc-florida",
+      "submittedAt": "2026-02-28T21:50:42.385Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wbc-florida\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wbc-texas": {
+      "url": "https://sparklocal.co/resources/listing/wbc-texas",
+      "submittedAt": "2026-02-28T21:50:42.663Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wbc-texas\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wbc-new-york": {
+      "url": "https://sparklocal.co/resources/listing/wbc-new-york",
+      "submittedAt": "2026-02-28T21:50:42.925Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wbc-new-york\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-san-francisco": {
+      "url": "https://sparklocal.co/resources/listing/score-san-francisco",
+      "submittedAt": "2026-02-28T21:50:43.194Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-san-francisco\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-mcnulty": {
+      "url": "https://sparklocal.co/resources/listing/vboc-mcnulty",
+      "submittedAt": "2026-02-28T21:50:43.469Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-mcnulty\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-boston": {
+      "url": "https://sparklocal.co/resources/listing/score-boston",
+      "submittedAt": "2026-02-28T21:50:43.815Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-boston\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-denver": {
+      "url": "https://sparklocal.co/resources/listing/score-denver",
+      "submittedAt": "2026-02-28T21:50:44.082Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-denver\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wbc-california": {
+      "url": "https://sparklocal.co/resources/listing/wbc-california",
+      "submittedAt": "2026-02-28T21:50:44.344Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wbc-california\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-new-york-city": {
+      "url": "https://sparklocal.co/resources/listing/score-new-york-city",
+      "submittedAt": "2026-02-28T21:50:44.714Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-new-york-city\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-farm-soho-nyc-meeting-rooms-and-conference-rooms-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-farm-soho-nyc-meeting-rooms-and-conference-rooms-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:44.991Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-farm-soho-nyc-meeting-rooms-and-conference-rooms-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/alaska-sbdc": {
+      "url": "https://sparklocal.co/resources/listing/alaska-sbdc",
+      "submittedAt": "2026-02-28T21:50:45.259Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/alaska-sbdc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-houston": {
+      "url": "https://sparklocal.co/resources/listing/score-houston",
+      "submittedAt": "2026-02-28T21:50:45.533Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-houston\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-miami": {
+      "url": "https://sparklocal.co/resources/listing/score-miami",
+      "submittedAt": "2026-02-28T21:50:45.807Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-miami\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-seattle": {
+      "url": "https://sparklocal.co/resources/listing/score-seattle",
+      "submittedAt": "2026-02-28T21:50:46.087Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-seattle\"}}"
+    },
+    "https://sparklocal.co/resources/listing/microsoft-for-startups": {
+      "url": "https://sparklocal.co/resources/listing/microsoft-for-startups",
+      "submittedAt": "2026-02-28T21:50:46.444Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/microsoft-for-startups\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-midtown-south-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/spaces-midtown-south-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:46.704Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-midtown-south-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/founder-institute": {
+      "url": "https://sparklocal.co/resources/listing/founder-institute",
+      "submittedAt": "2026-02-28T21:50:46.966Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/founder-institute\"}}"
+    },
+    "https://sparklocal.co/resources/listing/y-combinator": {
+      "url": "https://sparklocal.co/resources/listing/y-combinator",
+      "submittedAt": "2026-02-28T21:50:47.321Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/y-combinator\"}}"
+    },
+    "https://sparklocal.co/resources/listing/newchip-accelerator": {
+      "url": "https://sparklocal.co/resources/listing/newchip-accelerator",
+      "submittedAt": "2026-02-28T21:50:47.595Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/newchip-accelerator\"}}"
+    },
+    "https://sparklocal.co/resources/listing/industrious-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/industrious-chicago-il",
+      "submittedAt": "2026-02-28T21:50:47.869Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/industrious-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nyu-laguardia-student-technology-center-and-computer-lab-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/nyu-laguardia-student-technology-center-and-computer-lab-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:48.129Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nyu-laguardia-student-technology-center-and-computer-lab-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/servcorp-17-state-street-coworking-office-suites-virtual-offices-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/servcorp-17-state-street-coworking-office-suites-virtual-offices-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:48.407Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/servcorp-17-state-street-coworking-office-suites-virtual-offices-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/industrious-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/industrious-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:48.679Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/industrious-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-startup-runway": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-startup-runway",
+      "submittedAt": "2026-02-28T21:50:48.953Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-startup-runway\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-capecod": {
+      "url": "https://sparklocal.co/resources/listing/score-capecod",
+      "submittedAt": "2026-02-28T21:50:49.216Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-capecod\"}}"
+    },
+    "https://sparklocal.co/resources/listing/halcyon": {
+      "url": "https://sparklocal.co/resources/listing/halcyon",
+      "submittedAt": "2026-02-28T21:50:49.485Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/halcyon\"}}"
+    },
+    "https://sparklocal.co/resources/listing/prism-spaces-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/prism-spaces-chicago-il",
+      "submittedAt": "2026-02-28T21:50:49.759Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/prism-spaces-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/rise-new-york-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/rise-new-york-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:50.094Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/rise-new-york-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-nyc": {
+      "url": "https://sparklocal.co/resources/listing/score-nyc",
+      "submittedAt": "2026-02-28T21:50:50.368Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-nyc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/corporate-suites-nyc-park-avenue-south-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/corporate-suites-nyc-park-avenue-south-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:50.635Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/corporate-suites-nyc-park-avenue-south-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-atlanta": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-atlanta",
+      "submittedAt": "2026-02-28T21:50:50.985Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-atlanta\"}}"
+    },
+    "https://sparklocal.co/resources/listing/comcast-rise": {
+      "url": "https://sparklocal.co/resources/listing/comcast-rise",
+      "submittedAt": "2026-02-28T21:50:51.248Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/comcast-rise\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-fedex": {
+      "url": "https://sparklocal.co/resources/listing/grant-fedex",
+      "submittedAt": "2026-02-28T21:50:51.514Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-fedex\"}}"
+    },
+    "https://sparklocal.co/resources/listing/jay-suites-chelsea-flexible-office-rentals-meeting-spaces-nyc-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/jay-suites-chelsea-flexible-office-rentals-meeting-spaces-nyc-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:51.858Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/jay-suites-chelsea-flexible-office-rentals-meeting-spaces-nyc-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/quest-workspaces-48-wall-street-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/quest-workspaces-48-wall-street-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:52.204Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/quest-workspaces-48-wall-street-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grants-gov": {
+      "url": "https://sparklocal.co/resources/listing/grants-gov",
+      "submittedAt": "2026-02-28T21:50:52.563Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grants-gov\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-losangeles": {
+      "url": "https://sparklocal.co/resources/listing/score-losangeles",
+      "submittedAt": "2026-02-28T21:50:52.822Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-losangeles\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-philadelphia": {
+      "url": "https://sparklocal.co/resources/listing/score-philadelphia",
+      "submittedAt": "2026-02-28T21:50:53.099Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-philadelphia\"}}"
+    },
+    "https://sparklocal.co/resources/listing/visa-everywhere-initiative": {
+      "url": "https://sparklocal.co/resources/listing/visa-everywhere-initiative",
+      "submittedAt": "2026-02-28T21:50:53.370Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/visa-everywhere-initiative\"}}"
+    },
+    "https://sparklocal.co/resources/listing/fedex-small-business-grant": {
+      "url": "https://sparklocal.co/resources/listing/fedex-small-business-grant",
+      "submittedAt": "2026-02-28T21:50:53.638Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/fedex-small-business-grant\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-nm": {
+      "url": "https://sparklocal.co/resources/listing/vboc-nm",
+      "submittedAt": "2026-02-28T21:50:53.911Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-nm\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-ecdi": {
+      "url": "https://sparklocal.co/resources/listing/vboc-ecdi",
+      "submittedAt": "2026-02-28T21:50:54.184Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-ecdi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-vectr": {
+      "url": "https://sparklocal.co/resources/listing/vboc-vectr",
+      "submittedAt": "2026-02-28T21:50:54.458Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-vectr\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-dallas": {
+      "url": "https://sparklocal.co/resources/listing/score-dallas",
+      "submittedAt": "2026-02-28T21:50:54.719Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-dallas\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-utrgv": {
+      "url": "https://sparklocal.co/resources/listing/vboc-utrgv",
+      "submittedAt": "2026-02-28T21:50:54.982Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-utrgv\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-broward": {
+      "url": "https://sparklocal.co/resources/listing/score-broward",
+      "submittedAt": "2026-02-28T21:50:55.243Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-broward\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-pacific": {
+      "url": "https://sparklocal.co/resources/listing/vboc-pacific",
+      "submittedAt": "2026-02-28T21:50:55.516Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-pacific\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-washingtondc": {
+      "url": "https://sparklocal.co/resources/listing/score-washingtondc",
+      "submittedAt": "2026-02-28T21:50:55.776Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-washingtondc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-ny-seed": {
+      "url": "https://sparklocal.co/resources/listing/grant-ny-seed",
+      "submittedAt": "2026-02-28T21:50:56.037Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-ny-seed\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-arkansas": {
+      "url": "https://sparklocal.co/resources/listing/score-arkansas",
+      "submittedAt": "2026-02-28T21:50:56.299Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-arkansas\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-nevada": {
+      "url": "https://sparklocal.co/resources/listing/vboc-nevada",
+      "submittedAt": "2026-02-28T21:50:56.571Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-nevada\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-puerto-rico": {
+      "url": "https://sparklocal.co/resources/listing/vboc-puerto-rico",
+      "submittedAt": "2026-02-28T21:50:56.924Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-puerto-rico\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-arizona": {
+      "url": "https://sparklocal.co/resources/listing/vboc-arizona",
+      "submittedAt": "2026-02-28T21:50:57.190Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-arizona\"}}"
+    },
+    "https://sparklocal.co/resources/listing/ssbci-grants": {
+      "url": "https://sparklocal.co/resources/listing/ssbci-grants",
+      "submittedAt": "2026-02-28T21:50:57.466Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/ssbci-grants\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-akroncanton": {
+      "url": "https://sparklocal.co/resources/listing/score-akroncanton",
+      "submittedAt": "2026-02-28T21:50:57.805Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-akroncanton\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-norcal": {
+      "url": "https://sparklocal.co/resources/listing/vboc-norcal",
+      "submittedAt": "2026-02-28T21:50:58.105Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-norcal\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-binw": {
+      "url": "https://sparklocal.co/resources/listing/vboc-binw",
+      "submittedAt": "2026-02-28T21:50:58.377Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-binw\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-chrysler-building-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-chrysler-building-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:58.644Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-chrysler-building-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-square-at-205-hudson-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-square-at-205-hudson-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:58.909Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-square-at-205-hudson-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-annarborarea": {
+      "url": "https://sparklocal.co/resources/listing/score-annarborarea",
+      "submittedAt": "2026-02-28T21:50:59.172Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-annarborarea\"}}"
+    },
+    "https://sparklocal.co/resources/listing/vboc-dakotas": {
+      "url": "https://sparklocal.co/resources/listing/vboc-dakotas",
+      "submittedAt": "2026-02-28T21:50:59.432Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/vboc-dakotas\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-sandiego": {
+      "url": "https://sparklocal.co/resources/listing/score-sandiego",
+      "submittedAt": "2026-02-28T21:50:59.695Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-sandiego\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-meatpacking-district-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/spaces-meatpacking-district-new-york-ny",
+      "submittedAt": "2026-02-28T21:50:59.962Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-meatpacking-district-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-atlanta-tech-village": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-atlanta-tech-village",
+      "submittedAt": "2026-02-28T21:51:00.241Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-atlanta-tech-village\"}}"
+    },
+    "https://sparklocal.co/resources/listing/carr-workplaces-aon-center-coworking-office-space-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/carr-workplaces-aon-center-coworking-office-space-chicago-il",
+      "submittedAt": "2026-02-28T21:51:00.584Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/carr-workplaces-aon-center-coworking-office-space-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/expansive-pru-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/expansive-pru-chicago-il",
+      "submittedAt": "2026-02-28T21:51:00.847Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/expansive-pru-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/desklabs-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/desklabs-chicago-il",
+      "submittedAt": "2026-02-28T21:51:01.163Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/desklabs-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/workspace-by-rockefeller-group-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/workspace-by-rockefeller-group-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:01.472Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/workspace-by-rockefeller-group-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/capital-factory": {
+      "url": "https://sparklocal.co/resources/listing/capital-factory",
+      "submittedAt": "2026-02-28T21:51:01.754Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/capital-factory\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-plug-and-play": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-plug-and-play",
+      "submittedAt": "2026-02-28T21:51:02.027Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-plug-and-play\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-1776": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-1776",
+      "submittedAt": "2026-02-28T21:51:02.298Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-1776\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-farm-soho-nyc-virtual-mailbox-and-virtual-office-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-farm-soho-nyc-virtual-mailbox-and-virtual-office-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:02.571Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-farm-soho-nyc-virtual-mailbox-and-virtual-office-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-maryland-relief": {
+      "url": "https://sparklocal.co/resources/listing/grant-maryland-relief",
+      "submittedAt": "2026-02-28T21:51:02.845Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-maryland-relief\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-grameen-america": {
+      "url": "https://sparklocal.co/resources/listing/grant-grameen-america",
+      "submittedAt": "2026-02-28T21:51:03.103Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-grameen-america\"}}"
+    },
+    "https://sparklocal.co/resources/listing/q149-loft-office-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/q149-loft-office-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:03.366Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/q149-loft-office-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/corporate-suites-nyc-office-space-lexington-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/corporate-suites-nyc-office-space-lexington-avenue-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:03.641Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/corporate-suites-nyc-office-space-lexington-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-innosphere": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-innosphere",
+      "submittedAt": "2026-02-28T21:51:03.881Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-innosphere\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-500-global": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-500-global",
+      "submittedAt": "2026-02-28T21:51:04.129Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-500-global\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars",
+      "submittedAt": "2026-02-28T21:51:04.386Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars\"}}"
+    },
+    "https://sparklocal.co/resources/listing/second-shift-coworking-and-offices-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/second-shift-coworking-and-offices-chicago-il",
+      "submittedAt": "2026-02-28T21:51:04.662Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/second-shift-coworking-and-offices-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/jay-suites-grand-central-private-furnished-offices-for-rent-and-rooftop-event-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/jay-suites-grand-central-private-furnished-offices-for-rent-and-rooftop-event-space-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:04.924Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/jay-suites-grand-central-private-furnished-offices-for-rent-and-rooftop-event-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/co-working-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/co-working-space-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:05.203Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/co-working-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-learnlaunch": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-learnlaunch",
+      "submittedAt": "2026-02-28T21:51:05.461Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-learnlaunch\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-1871": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-1871",
+      "submittedAt": "2026-02-28T21:51:05.718Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-1871\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-unreasonable": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-unreasonable",
+      "submittedAt": "2026-02-28T21:51:05.985Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-unreasonable\"}}"
+    },
+    "https://sparklocal.co/resources/listing/soho-terrace-office-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/soho-terrace-office-space-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:06.251Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/soho-terrace-office-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/convene-one-liberty-plaza-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/convene-one-liberty-plaza-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:06.513Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/convene-one-liberty-plaza-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/everlasting-media-group-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/everlasting-media-group-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:06.778Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/everlasting-media-group-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cubico-spring-private-offices-co-working-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/cubico-spring-private-offices-co-working-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:07.118Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cubico-spring-private-offices-co-working-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-boomtown": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-boomtown",
+      "submittedAt": "2026-02-28T21:51:07.404Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-boomtown\"}}"
+    },
+    "https://sparklocal.co/resources/listing/convene-101-greenwich-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/convene-101-greenwich-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:07.675Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/convene-101-greenwich-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-hello-alice": {
+      "url": "https://sparklocal.co/resources/listing/grant-hello-alice",
+      "submittedAt": "2026-02-28T21:51:07.934Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-hello-alice\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-usda-rbdg": {
+      "url": "https://sparklocal.co/resources/listing/grant-usda-rbdg",
+      "submittedAt": "2026-02-28T21:51:08.194Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-usda-rbdg\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-ben-jerrys": {
+      "url": "https://sparklocal.co/resources/listing/grant-ben-jerrys",
+      "submittedAt": "2026-02-28T21:51:08.457Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-ben-jerrys\"}}"
+    },
+    "https://sparklocal.co/resources/listing/techstars-social-impact": {
+      "url": "https://sparklocal.co/resources/listing/techstars-social-impact",
+      "submittedAt": "2026-02-28T21:51:08.721Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/techstars-social-impact\"}}"
+    },
+    "https://sparklocal.co/resources/listing/startupbootcamp": {
+      "url": "https://sparklocal.co/resources/listing/startupbootcamp",
+      "submittedAt": "2026-02-28T21:51:08.985Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/startupbootcamp\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-farm-soho-nyc-coworking-office-space-and-private-office-lease-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-farm-soho-nyc-coworking-office-space-and-private-office-lease-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:09.247Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-farm-soho-nyc-coworking-office-space-and-private-office-lease-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/echoing-green": {
+      "url": "https://sparklocal.co/resources/listing/echoing-green",
+      "submittedAt": "2026-02-28T21:51:09.508Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/echoing-green\"}}"
+    },
+    "https://sparklocal.co/resources/listing/village-capital": {
+      "url": "https://sparklocal.co/resources/listing/village-capital",
+      "submittedAt": "2026-02-28T21:51:09.882Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/village-capital\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-100-church-street-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-100-church-street-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:10.143Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-100-church-street-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-farm-nyc-day-offices-event-venues-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-farm-nyc-day-offices-event-venues-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:10.406Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-farm-nyc-day-offices-event-venues-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/jay-suites-fifth-avenue-nyc-office-space-meeting-room-rentals-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/jay-suites-fifth-avenue-nyc-office-space-meeting-room-rentals-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:10.672Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/jay-suites-fifth-avenue-nyc-office-space-meeting-room-rentals-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/eda-grants": {
+      "url": "https://sparklocal.co/resources/listing/eda-grants",
+      "submittedAt": "2026-02-28T21:51:10.937Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/eda-grants\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nsf-grants": {
+      "url": "https://sparklocal.co/resources/listing/nsf-grants",
+      "submittedAt": "2026-02-28T21:51:11.201Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nsf-grants\"}}"
+    },
+    "https://sparklocal.co/resources/listing/sbir-sttr-program": {
+      "url": "https://sparklocal.co/resources/listing/sbir-sttr-program",
+      "submittedAt": "2026-02-28T21:51:11.463Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/sbir-sttr-program\"}}"
+    },
+    "https://sparklocal.co/resources/listing/amber-grant-for-women": {
+      "url": "https://sparklocal.co/resources/listing/amber-grant-for-women",
+      "submittedAt": "2026-02-28T21:51:11.723Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/amber-grant-for-women\"}}"
+    },
+    "https://sparklocal.co/resources/listing/jay-suites-midtown-east-flexible-office-space-and-conference-room-rentals-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/jay-suites-midtown-east-flexible-office-space-and-conference-room-rentals-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:11.985Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/jay-suites-midtown-east-flexible-office-space-and-conference-room-rentals-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-sku": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-sku",
+      "submittedAt": "2026-02-28T21:51:12.248Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-sku\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-austin": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-austin",
+      "submittedAt": "2026-02-28T21:51:12.507Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-austin\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-chicago": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-chicago",
+      "submittedAt": "2026-02-28T21:51:12.770Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-chicago\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-matter-chicago": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-matter-chicago",
+      "submittedAt": "2026-02-28T21:51:13.035Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-matter-chicago\"}}"
+    },
+    "https://sparklocal.co/resources/listing/music-city-work-club-the-nations-nashville-tn": {
+      "url": "https://sparklocal.co/resources/listing/music-city-work-club-the-nations-nashville-tn",
+      "submittedAt": "2026-02-28T21:51:13.294Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/music-city-work-club-the-nations-nashville-tn\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cre8ive-nyc-multipurpose-officestudiorehearsal-spaces-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/cre8ive-nyc-multipurpose-officestudiorehearsal-spaces-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:13.559Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cre8ive-nyc-multipurpose-officestudiorehearsal-spaces-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/tenpod-pdx-portland-or": {
+      "url": "https://sparklocal.co/resources/listing/tenpod-pdx-portland-or",
+      "submittedAt": "2026-02-28T21:51:13.822Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/tenpod-pdx-portland-or\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-136-madison-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-136-madison-avenue-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:14.087Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-136-madison-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-boulder": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-boulder",
+      "submittedAt": "2026-02-28T21:51:14.349Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-boulder\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-la": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-la",
+      "submittedAt": "2026-02-28T21:51:14.612Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-la\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-seattle": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-seattle",
+      "submittedAt": "2026-02-28T21:51:14.876Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-seattle\"}}"
+    },
+    "https://sparklocal.co/resources/listing/corporate-suites-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/corporate-suites-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:15.139Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/corporate-suites-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nedspace-portland-or": {
+      "url": "https://sparklocal.co/resources/listing/nedspace-portland-or",
+      "submittedAt": "2026-02-28T21:51:15.402Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nedspace-portland-or\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-500-miami": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-500-miami",
+      "submittedAt": "2026-02-28T21:51:15.661Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-500-miami\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-emerge-americas": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-emerge-americas",
+      "submittedAt": "2026-02-28T21:51:15.927Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-emerge-americas\"}}"
+    },
+    "https://sparklocal.co/resources/listing/law-firm-suites-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/law-firm-suites-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:16.187Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/law-firm-suites-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/hq-park-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/hq-park-avenue-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:16.455Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/hq-park-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-elemental": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-elemental",
+      "submittedAt": "2026-02-28T21:51:16.722Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-elemental\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaceworks-nyc-inc-brooklyn-ny": {
+      "url": "https://sparklocal.co/resources/listing/spaceworks-nyc-inc-brooklyn-ny",
+      "submittedAt": "2026-02-28T21:51:16.988Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaceworks-nyc-inc-brooklyn-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-startx": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-startx",
+      "submittedAt": "2026-02-28T21:51:17.246Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-startx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-greentown": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-greentown",
+      "submittedAt": "2026-02-28T21:51:17.510Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-greentown\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-halcyon": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-halcyon",
+      "submittedAt": "2026-02-28T21:51:17.780Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-halcyon\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-techstars-sustainability": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-techstars-sustainability",
+      "submittedAt": "2026-02-28T21:51:18.040Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-techstars-sustainability\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-1250-broadway-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-1250-broadway-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:18.303Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-1250-broadway-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-rock-health": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-rock-health",
+      "submittedAt": "2026-02-28T21:51:18.572Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-rock-health\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-yc-edtech": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-yc-edtech",
+      "submittedAt": "2026-02-28T21:51:18.833Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-yc-edtech\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-accion-venture-lab": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-accion-venture-lab",
+      "submittedAt": "2026-02-28T21:51:19.095Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-accion-venture-lab\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accelerator-village-capital": {
+      "url": "https://sparklocal.co/resources/listing/accelerator-village-capital",
+      "submittedAt": "2026-02-28T21:51:19.359Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accelerator-village-capital\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-sbir-sttr": {
+      "url": "https://sparklocal.co/resources/listing/grant-sbir-sttr",
+      "submittedAt": "2026-02-28T21:51:19.617Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-sbir-sttr\"}}"
+    },
+    "https://sparklocal.co/resources/listing/lina-medical-coworking-spaces-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/lina-medical-coworking-spaces-new-york-ny",
+      "submittedAt": "2026-02-28T21:51:19.878Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/lina-medical-coworking-spaces-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/moxe-coworking-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/moxe-coworking-chicago-il",
+      "submittedAt": "2026-02-28T21:51:20.144Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/moxe-coworking-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/helloalice-grants": {
+      "url": "https://sparklocal.co/resources/listing/helloalice-grants",
+      "submittedAt": "2026-02-28T21:51:20.405Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/helloalice-grants\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nase-growth-grants": {
+      "url": "https://sparklocal.co/resources/listing/nase-growth-grants",
+      "submittedAt": "2026-02-28T21:51:20.665Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nase-growth-grants\"}}"
+    },
+    "https://sparklocal.co/resources/listing/sba-community-advantage": {
+      "url": "https://sparklocal.co/resources/listing/sba-community-advantage",
+      "submittedAt": "2026-02-28T21:51:20.924Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/sba-community-advantage\"}}"
+    }
+  }
+}

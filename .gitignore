@@ -69,6 +69,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Script state files
-scripts/indexing-submitted.json
+# Script state files (note: indexing-submitted.json is tracked for GitHub Actions)
 google-indexing-key.json
