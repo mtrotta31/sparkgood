@@ -6,7 +6,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 1. **SparkLocal Web App** — A guided web experience that takes users from "I want to start something" to a complete launch package (ideas, market research, business plan, marketing assets, action roadmap). Works for any business type — from food trucks to tech startups to social enterprises. Powered by AI tools running behind the scenes (Perplexity, Claude) so users never touch a terminal.
 
-2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, and coworking spaces (2,400+ listings across 326 cities) that helps entrepreneurs find real-world support matched to their idea and location. All listings and city pages have AI-generated SEO content for better search visibility.
+2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, coworking spaces, and local business services (2,900+ listings across 326 cities) that helps entrepreneurs find real-world support matched to their idea and location. All listings and city pages have AI-generated SEO content for better search visibility.
 
 3. **SparkLocal Pro Toolkit** (Future) — A downloadable package of pre-configured Claude Code skills for advanced users who want to run the same powerful frameworks in their own environment.
 
@@ -55,9 +55,9 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Resource Matching API** — Matches resources to user's idea based on category, location, business type
 - **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages (includes city hub pages)
 - **Light Theme** — Directory uses warm cream/white theme (separate from dark builder theme)
-- **Content Enrichment** — All 2,416 listings and 326 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
+- **Content Enrichment** — All 2,900+ listings and 326 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
 - **State Business Guides** — 50 "How to Start a Business in [State]" programmatic SEO pages at `/resources/start-business/[state]` with AI-generated content, FAQs, city links, and JSON-LD schemas (FAQPage, BreadcrumbList, HowTo)
-- **Stats:** 2,400+ listings across 326 cities, 50 state guides
+- **Stats:** 2,900+ listings across 326 cities, 50 state guides
 
 ### Smart Expansion Engine (Autonomous Growth)
 - **Coverage Score Algorithm** — Prioritizes cities with highest population-to-listing ratio
@@ -361,7 +361,7 @@ Located in `src/components/`:
 - `AnimatedCounter.tsx` — Animated stats counter
 - `NewsletterSignupLight.tsx` — Light-themed newsletter signup
 - `CategoryFiltersLight.tsx` — Filter bar for category pages
-- `CategoryGuideContent.tsx` — SEO guide content and FAQs for category landing pages (hardcoded content map for grants, coworking, accelerators, SBA)
+- `CategoryGuideContent.tsx` — SEO guide content and FAQs for category landing pages (12 categories: grant, coworking, accelerator, sba, business-attorney, accountant, marketing-agency, commercial-real-estate, business-insurance, chamber-of-commerce, virtual-office, business-consultant)
 
 ## File Structure
 
@@ -644,7 +644,7 @@ The core product is fully functional with payments:
 - ✅ Rate limit resilience with partial results pattern
 - ✅ PDF export
 - ✅ User auth & saved projects
-- ✅ Resource directory with SEO (2,400+ listings)
+- ✅ Resource directory with SEO (2,900+ listings)
 - ✅ Directory redesign with light theme (premium feel)
 - ✅ City hub pages for SEO (`/resources/austin-tx`)
 - ✅ City search with autocomplete
@@ -672,12 +672,12 @@ The core product is fully functional with payments:
 - ✅ Stripe webhook idempotency (prevents duplicate credit grants)
 - ✅ Google Search Console verification
 - ✅ Model tiering (Haiku for simple tasks, Sonnet for complex)
-- ✅ Content enrichment for SEO (2,416 listings + 326 cities with AI-generated content)
+- ✅ Content enrichment for SEO (2,900+ listings + 326 cities with AI-generated content)
 - ✅ City hub tips rendered as visual list items
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
-- More resource data (currently 2,400+ listings across 326 cities, targeting 16,000+)
+- More resource data (currently 2,900+ listings across 326 cities, targeting 16,000+)
 - Email notifications
 - Team collaboration features
 - Usage analytics dashboard
