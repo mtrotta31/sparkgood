@@ -6,7 +6,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 
 1. **SparkLocal Web App** — A guided web experience that takes users from "I want to start something" to a complete launch package (ideas, market research, business plan, marketing assets, action roadmap). Works for any business type — from food trucks to tech startups to social enterprises. Powered by AI tools running behind the scenes (Perplexity, Claude) so users never touch a terminal.
 
-2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, coworking spaces, and local business services (2,900+ listings across 326 cities) that helps entrepreneurs find real-world support matched to their idea and location. All listings and city pages have AI-generated SEO content for better search visibility.
+2. **SparkLocal Resource Directory** — A comprehensive, SEO-optimized directory of grants, accelerators, SBA resources, coworking spaces, and local business services (3,800+ listings across 547 cities) that helps entrepreneurs find real-world support matched to their idea and location. All listings and city pages have AI-generated SEO content for better search visibility.
 
 3. **SparkLocal Pro Toolkit** (Future) — A downloadable package of pre-configured Claude Code skills for advanced users who want to run the same powerful frameworks in their own environment.
 
@@ -27,7 +27,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
   - **"🚀 Launch Checklist"** — 4-week "validate first, formalize later" action plan: Weeks 1-2 test demand with business-type-specific validation tasks, Weeks 3-4 formalize and launch after validation
   - **"📈 Growth Plan"** — Elevator pitch, landing page copy, social media posts (5 platforms), email templates, local marketing tactics
   - **"💰 Financial Model"** — Startup costs breakdown, monthly operating costs, revenue projections (3 scenarios), break-even analysis, pricing strategy
-  - **"📍 Local Resources"** — Matched grants, accelerators, coworking spaces, and SBA resources for user's city
+  - **"📍 Local Resources"** — Dynamically matched resources across all 11 categories (coworking, grants, accelerators, SBA, business attorneys, consultants, insurance, marketing agencies, chambers of commerce, virtual offices, commercial real estate) based on user's city
   - **"💬 AI Advisor"** — Streaming chat with personalized AI business consultant that knows the user's full plan, profile, and local resources
 - **Deep Dive V1** (legacy, still supported for existing projects):
   - **"Will This Work?"** — Viability analysis with scoring breakdown, competitors, market research
@@ -55,13 +55,13 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Resource Matching API** — Matches resources to user's idea based on category, location, business type
 - **Dynamic Sitemap** — Auto-generated sitemap for 16,000+ pages (includes city hub pages)
 - **Light Theme** — Directory uses warm cream/white theme (separate from dark builder theme)
-- **Content Enrichment** — All 2,900+ listings and 326 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
+- **Content Enrichment** — All 3,800+ listings and 547 cities have AI-generated SEO content (descriptions, FAQs, tips, meta content)
 - **State Business Guides** — 50 "How to Start a Business in [State]" programmatic SEO pages at `/resources/start-business/[state]` with AI-generated content, FAQs, city links, and JSON-LD schemas (FAQPage, BreadcrumbList, HowTo)
-- **Stats:** 2,900+ listings across 326 cities, 50 state guides
+- **Stats:** 3,800+ listings across 547 cities, 50 state guides, 11 resource categories
 
 ### Smart Expansion Engine (Autonomous Growth)
 - **Coverage Score Algorithm** — Prioritizes cities with highest population-to-listing ratio
-- **13 Resource Categories** — 4 existing (coworking, grant, accelerator, sba) + 9 new (business-attorney, accountant, marketing-agency, print-shop, commercial-real-estate, business-insurance, chamber-of-commerce, virtual-office, business-consultant)
+- **11 Resource Categories** — coworking, grant, accelerator, sba, business-attorney, business-consultant, business-insurance, marketing-agency, chamber-of-commerce, virtual-office, commercial-real-estate
 - **200 US Cities** — Top cities by population with lat/lng coordinates
 - **Budget Controls** — Hard cost cap per run (`--max-cost`), never exceeds budget
 - **30-Day Scrape Cooldown** — Won't re-scrape a city+category within 30 days
@@ -174,7 +174,7 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - `BusinessFoundationData` — marketViability (score, factors), legalStructure, startupCosts, suppliers, techStack, insurance
 - `GrowthPlanData` — elevatorPitch, landingPageCopy, socialMediaPosts, emailTemplates, localMarketing
 - `FinancialModelData` — startupCostsSummary, monthlyOperatingCosts, revenueProjections, breakEvenAnalysis, pricingStrategy
-- `LocalResourcesData` — Matched resources by category (coworking, grants, accelerators, sba) with relevance notes
+- `LocalResourcesData` — Matched resources with `byCategory` (dynamic Record<string, LocalResourceItem[]>) and `allCategories` (list of matched category slugs) plus legacy fields for backward compatibility
 - `ChecklistProgress` — Record of task IDs to boolean completion status
 - `AdvisorMessage` — Chat message (id, role, content, created_at)
 - `AdvisorContext` — Full context for AI advisor (profile, idea, checklist, foundation, growth, financial)
@@ -361,7 +361,7 @@ Located in `src/components/`:
 - `AnimatedCounter.tsx` — Animated stats counter
 - `NewsletterSignupLight.tsx` — Light-themed newsletter signup
 - `CategoryFiltersLight.tsx` — Filter bar for category pages
-- `CategoryGuideContent.tsx` — SEO guide content and FAQs for category landing pages (12 categories: grant, coworking, accelerator, sba, business-attorney, accountant, marketing-agency, commercial-real-estate, business-insurance, chamber-of-commerce, virtual-office, business-consultant)
+- `CategoryGuideContent.tsx` — SEO guide content and FAQs for category landing pages (11 categories: grant, coworking, accelerator, sba, business-attorney, business-consultant, business-insurance, marketing-agency, chamber-of-commerce, virtual-office, commercial-real-estate)
 
 ## File Structure
 
@@ -423,6 +423,7 @@ sparklocal/
 │   │   ├── format-amount.ts     # Currency formatting ($5M, $25K, etc.)
 │   │   ├── format-description.ts # Clean up listing descriptions
 │   │   ├── formatHours.ts       # Parse hours JSONB to readable format
+│   │   ├── match-resources.ts   # Dynamic resource matching for Local Resources tab
 │   │   ├── launch-kit/          # Launch Kit V2 generators
 │   │   │   ├── index.ts         # Main exports
 │   │   │   ├── types.ts         # DeepDiveData, CategoryColors, helpers
@@ -565,6 +566,20 @@ Generates single-page PDF business summary using @react-pdf/renderer:
 - **Sentence-aware truncation:** `truncate()` cuts at sentence boundaries, falls back to comma, then word boundary
 - **Category-aware colors:** Primary color from business category applied to headers, dividers, score box
 
+### `match-resources.ts`
+Dynamic resource matching for the Local Resources deep dive tab:
+- **Future-proof design:** Queries distinct categories from database, automatically includes new categories
+- **Query strategies per category:**
+  - `local-only`: coworking, virtual-office, business-attorney, business-consultant, business-insurance, marketing-agency, commercial-real-estate (matches user's city only)
+  - `local-and-nationwide`: grant, accelerator (matches city OR nationwide resources)
+  - `state-level`: sba, chamber-of-commerce (matches by state)
+- **Returns `MatchedResources`:**
+  - `byCategory`: Record<string, MatchedResource[]> — Dynamic, all categories
+  - `allCategories`: string[] — List of category slugs with matches
+  - Legacy fields (`coworking`, `grants`, `accelerators`, `sba`) for backward compatibility
+- **`formatResourcesForPrompt()`:** Formats matched resources as markdown for AI prompts
+- **Category display config:** Each category has emoji, heading, badge colors defined in both `match-resources.ts` and `LocalResources.tsx`
+
 ## Development Commands
 
 ```bash
@@ -644,7 +659,7 @@ The core product is fully functional with payments:
 - ✅ Rate limit resilience with partial results pattern
 - ✅ PDF export
 - ✅ User auth & saved projects
-- ✅ Resource directory with SEO (2,900+ listings)
+- ✅ Resource directory with SEO (3,800+ listings across 547 cities)
 - ✅ Directory redesign with light theme (premium feel)
 - ✅ City hub pages for SEO (`/resources/austin-tx`)
 - ✅ City search with autocomplete
@@ -672,12 +687,12 @@ The core product is fully functional with payments:
 - ✅ Stripe webhook idempotency (prevents duplicate credit grants)
 - ✅ Google Search Console verification
 - ✅ Model tiering (Haiku for simple tasks, Sonnet for complex)
-- ✅ Content enrichment for SEO (2,900+ listings + 326 cities with AI-generated content)
+- ✅ Content enrichment for SEO (3,800+ listings + 547 cities with AI-generated content)
 - ✅ City hub tips rendered as visual list items
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
-- More resource data (currently 2,900+ listings across 326 cities, targeting 16,000+)
+- More resource data (currently 3,800+ listings across 547 cities, targeting 16,000+)
 - Email notifications
 - Team collaboration features
 - Usage analytics dashboard
