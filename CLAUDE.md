@@ -59,6 +59,16 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **State Business Guides** — 50 "How to Start a Business in [State]" programmatic SEO pages at `/resources/start-business/[state]` with AI-generated content, FAQs, city links, and JSON-LD schemas (FAQPage, BreadcrumbList, HowTo)
 - **Stats:** 2,400+ listings across 326 cities, 50 state guides
 
+### Smart Expansion Engine (Autonomous Growth)
+- **Coverage Score Algorithm** — Prioritizes cities with highest population-to-listing ratio
+- **13 Resource Categories** — 4 existing (coworking, grant, accelerator, sba) + 9 new (business-attorney, accountant, marketing-agency, print-shop, commercial-real-estate, business-insurance, chamber-of-commerce, virtual-office, business-consultant)
+- **200 US Cities** — Top cities by population with lat/lng coordinates
+- **Budget Controls** — Hard cost cap per run (`--max-cost`), never exceeds budget
+- **30-Day Scrape Cooldown** — Won't re-scrape a city+category within 30 days
+- **Deduplication** — Checks Google Place ID against existing listings
+- **Automated Pipeline** — Weekly GitHub Action runs expansion + enrichment + IndexNow
+- **Webhook Notifications** — Optional Slack-compatible notifications on completion
+
 ### Authentication & User Data
 - **Supabase Auth** — Email/password authentication with magic links
 - **User Profiles** — Save intake preferences
@@ -227,6 +237,20 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 ### Security
 - `rate_limits` — API rate limiting (user_id, endpoint, requested_at)
 - `webhook_events` — Stripe webhook idempotency (event_id, processed_at)
+
+### Expansion Tracking
+- `expansion_tracking` — Tracks scraping history per city+category
+  - `city_slug`: City identifier (e.g., 'new-york-ny')
+  - `category`: Resource category slug
+  - `last_scraped_at`: When this combo was last scraped
+  - `results_count`: Number of results from Outscraper
+  - `new_listings_count`: Number of new listings added
+  - `api_cost`: Estimated API cost for this scrape
+  - `status`: 'success' | 'error' | 'no_results'
+- **Helper Functions:**
+  - `needs_scraping(city_slug, category, days)` — Returns true if not scraped within N days
+  - `record_scrape(...)` — Records a scrape attempt with upsert
+- **View:** `expansion_coverage_gaps` — Shows cities ordered by coverage gap score
 
 ## Builder Flow Paths
 
@@ -413,7 +437,8 @@ sparklocal/
 │   │   ├── deep-dive.ts         # Supports both business paths
 │   │   └── ...
 │   ├── data/
-│   │   └── state-guides.ts      # Generated state business guide content (50 states)
+│   │   ├── state-guides.ts      # Generated state business guide content (50 states)
+│   │   └── expansion-config.ts  # Smart Expansion categories (13) and US cities (200)
 │   └── types/                   # TypeScript types
 ├── scripts/
 │   ├── seed-directory.ts        # Seeds resource listings from data files
@@ -423,6 +448,10 @@ sparklocal/
 │   ├── generate-state-guides.ts # Generate 50 state business guides (Claude Haiku)
 │   ├── submit-indexnow.ts       # Submit URLs to Bing/Yandex for instant indexing
 │   ├── sync-locations.ts        # Syncs location pages for SEO
+│   ├── smart-expand.ts          # Smart Expansion Engine (coverage scoring, Outscraper API)
+│   ├── post-expand-pipeline.ts  # Post-expansion enrichment + IndexNow
+│   ├── expansion-report.ts      # View expansion stats and coverage gaps
+│   ├── expansion-logs/          # JSON logs from expansion runs
 │   └── ...                      # Data files
 ├── supabase/
 │   └── migrations/
@@ -436,7 +465,8 @@ sparklocal/
 │       ├── 20240225_add_matched_resources_column.sql  # Local resources column
 │       ├── 20240226_add_advisor_tables.sql            # AI Advisor chat tables
 │       ├── 20240227_launch_kit_v2.sql                 # Launch Kit V2 storage
-│       └── 20260226_webhook_idempotency.sql           # Stripe webhook deduplication
+│       ├── 20260226_webhook_idempotency.sql           # Stripe webhook deduplication
+│       └── 20260228_expansion_tracking.sql            # Smart Expansion tracking table
 └── public/                      # Static assets
 ```
 
@@ -560,6 +590,15 @@ npx tsx scripts/fix-city-intros.ts            # Apply city intro fixes
 
 # Search Engine Indexing
 npx tsx scripts/submit-indexnow.ts  # Submit all URLs to Bing/Yandex via IndexNow
+
+# Smart Expansion Engine
+npx tsx scripts/smart-expand.ts --dry-run                    # Preview what would be scraped
+npx tsx scripts/smart-expand.ts --max-cost=15 --max-cities=30 --category=auto  # Live run
+npx tsx scripts/smart-expand.ts --category=coworking         # Expand specific category
+npx tsx scripts/post-expand-pipeline.ts                      # Run enrichment + IndexNow after expansion
+npx tsx scripts/post-expand-pipeline.ts --skip-enrichment    # Skip AI enrichment step
+npx tsx scripts/expansion-report.ts                          # View expansion stats and coverage gaps
+npx tsx scripts/expansion-report.ts --export=csv             # Export coverage gaps to CSV
 ```
 
 ## Environment Variables

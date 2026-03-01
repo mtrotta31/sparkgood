@@ -1,4 +1,4 @@
-name: Weekly Listing Expansion
+name: Weekly Smart Expansion
 
 on:
   schedule:
@@ -6,31 +6,51 @@ on:
     - cron: '0 6 * * 1'
   workflow_dispatch:
     inputs:
-      category:
-        description: 'Category to expand'
+      max_cost:
+        description: 'Maximum API cost ($)'
         required: false
-        default: 'coworking'
+        default: '15'
+        type: string
+      max_cities:
+        description: 'Maximum cities to process'
+        required: false
+        default: '30'
+        type: string
+      category:
+        description: 'Category to expand (auto = all categories based on coverage gaps)'
+        required: false
+        default: 'auto'
         type: choice
         options:
+          - auto
           - coworking
           - grant
           - accelerator
           - sba
-      limit:
-        description: 'Limit per city'
+          - business-attorney
+          - accountant
+          - marketing-agency
+          - print-shop
+          - commercial-real-estate
+          - business-insurance
+          - chamber-of-commerce
+          - virtual-office
+          - business-consultant
+      skip_enrichment:
+        description: 'Skip AI content enrichment'
         required: false
-        default: '50'
-        type: string
-      min_listings:
-        description: 'Min listings threshold for auto mode'
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Dry run (no actual API calls)'
         required: false
-        default: '5'
-        type: string
+        default: false
+        type: boolean
 
 jobs:
-  expand-listings:
+  smart-expand:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - name: Checkout repository
@@ -45,54 +65,155 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Step 1: Run Outscraper API expansion
-      - name: Expand listings via Outscraper API
+      # Step 1: Run Smart Expansion
+      - name: Smart Expansion
+        id: expand
+        continue-on-error: true
         env:
           OUTSCRAPER_API_KEY: ${{ secrets.OUTSCRAPER_API_KEY }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          CATEGORY="${{ github.event.inputs.category || 'coworking' }}"
-          LIMIT="${{ github.event.inputs.limit || '50' }}"
-          MIN_LISTINGS="${{ github.event.inputs.min_listings || '5' }}"
+          MAX_COST="${{ github.event.inputs.max_cost || '15' }}"
+          MAX_CITIES="${{ github.event.inputs.max_cities || '30' }}"
+          CATEGORY="${{ github.event.inputs.category || 'auto' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
 
-          echo "Running expansion for category: $CATEGORY"
-          echo "Limit per city: $LIMIT"
-          echo "Min listings threshold: $MIN_LISTINGS"
+          echo "=== Smart Expansion ==="
+          echo "Max Cost: \$$MAX_COST"
+          echo "Max Cities: $MAX_CITIES"
+          echo "Category: $CATEGORY"
+          echo "Dry Run: $DRY_RUN"
+          echo ""
 
-          npx tsx scripts/outscraper-api-expand.ts \
-            --category="$CATEGORY" \
-            --cities=auto \
-            --limit="$LIMIT" \
-            --min-listings="$MIN_LISTINGS"
+          CMD="npx tsx scripts/smart-expand.ts --max-cost=$MAX_COST --max-cities=$MAX_CITIES --category=$CATEGORY"
 
-      # Step 2: Enrich new listings with AI content
-      - name: Enrich new listings with AI content
+          if [ "$DRY_RUN" = "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+
+          eval $CMD
+
+          echo "expand_success=true" >> $GITHUB_OUTPUT
+
+      # Step 2: Run Post-Expansion Pipeline
+      - name: Post-Expansion Pipeline
+        id: pipeline
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          CATEGORY="${{ github.event.inputs.category || 'coworking' }}"
-
-          echo "Enriching new listings for category: $CATEGORY"
-
-          npx tsx scripts/enrich-content-seo.ts \
-            --mode=listings \
-            --category="$CATEGORY" \
-            --batch-size=50
-
-      # Step 3: Recalculate location counts
-      - name: Recalculate location counts
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npx tsx scripts/recalc-location-counts.ts
-
-      # Step 4: Submit new URLs to search engines
-      - name: Submit URLs to IndexNow
-        env:
           INDEXNOW_API_KEY: ${{ secrets.INDEXNOW_API_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npx tsx scripts/submit-indexnow.ts --listings
+        run: |
+          SKIP_ENRICHMENT="${{ github.event.inputs.skip_enrichment || 'false' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+
+          echo "=== Post-Expansion Pipeline ==="
+
+          CMD="npx tsx scripts/post-expand-pipeline.ts"
+
+          if [ "$SKIP_ENRICHMENT" = "true" ]; then
+            CMD="$CMD --skip-enrichment"
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+
+          eval $CMD
+
+          echo "pipeline_success=true" >> $GITHUB_OUTPUT
+
+      # Step 3: Commit expansion logs
+      - name: Commit expansion logs
+        continue-on-error: true
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Check if there are changes to commit
+          if [ -d "scripts/expansion-logs" ] && [ "$(ls -A scripts/expansion-logs 2>/dev/null)" ]; then
+            git add scripts/expansion-logs/
+            git diff --staged --quiet || git commit -m "chore: update expansion logs [skip ci]"
+            git push || echo "Failed to push logs (might be a conflict)"
+          else
+            echo "No expansion logs to commit"
+          fi
+
+      # Step 4: Send webhook notification (if configured)
+      - name: Send webhook notification
+        if: always()
+        env:
+          EXPANSION_WEBHOOK_URL: ${{ secrets.EXPANSION_WEBHOOK_URL }}
+        run: |
+          if [ -z "$EXPANSION_WEBHOOK_URL" ]; then
+            echo "No webhook URL configured, skipping notification"
+            exit 0
+          fi
+
+          # Determine overall status
+          EXPAND_STATUS="${{ steps.expand.outcome }}"
+          PIPELINE_STATUS="${{ steps.pipeline.outcome }}"
+
+          if [ "$EXPAND_STATUS" = "success" ] && [ "$PIPELINE_STATUS" = "success" ]; then
+            STATUS="✅ Success"
+            COLOR="good"
+          elif [ "$EXPAND_STATUS" = "failure" ] || [ "$PIPELINE_STATUS" = "failure" ]; then
+            STATUS="❌ Failed"
+            COLOR="danger"
+          else
+            STATUS="⚠️ Partial"
+            COLOR="warning"
+          fi
+
+          # Read latest log file for stats
+          LOG_FILE=$(ls -t scripts/expansion-logs/*.json 2>/dev/null | head -1)
+          if [ -f "$LOG_FILE" ]; then
+            STATS=$(cat "$LOG_FILE" | jq -r '"New: \(.newListings // 0), Cost: $\(.totalCost // 0 | tostring)"' 2>/dev/null || echo "Stats unavailable")
+          else
+            STATS="No log file found"
+          fi
+
+          # Send webhook (Slack-compatible format)
+          curl -X POST "$EXPANSION_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"SparkLocal Expansion Report\",
+              \"attachments\": [{
+                \"color\": \"$COLOR\",
+                \"fields\": [
+                  {\"title\": \"Status\", \"value\": \"$STATUS\", \"short\": true},
+                  {\"title\": \"Stats\", \"value\": \"$STATS\", \"short\": true},
+                  {\"title\": \"Expand Step\", \"value\": \"$EXPAND_STATUS\", \"short\": true},
+                  {\"title\": \"Pipeline Step\", \"value\": \"$PIPELINE_STATUS\", \"short\": true}
+                ],
+                \"footer\": \"GitHub Actions\",
+                \"ts\": $(date +%s)
+              }]
+            }" || echo "Webhook notification failed"
+
+      # Step 5: Generate summary
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## 📊 Expansion Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Smart Expansion | ${{ steps.expand.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Post-Expansion Pipeline | ${{ steps.pipeline.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Include configuration
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Max Cost: \$${{ github.event.inputs.max_cost || '15' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Max Cities: ${{ github.event.inputs.max_cities || '30' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Category: ${{ github.event.inputs.category || 'auto' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Try to include stats from log file
+          if [ -f "scripts/expansion-logs/$(date +%Y-%m-%d).json" ]; then
+            echo "### Results" >> $GITHUB_STEP_SUMMARY
+            cat "scripts/expansion-logs/$(date +%Y-%m-%d).json" | jq -r '"- New Listings: \(.newListings // 0)\n- Total Results: \(.totalResults // 0)\n- API Cost: $\(.totalCost // 0)\n- Errors: \(.errors // 0)"' >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "- Unable to parse results" >> $GITHUB_STEP_SUMMARY
+          fi
