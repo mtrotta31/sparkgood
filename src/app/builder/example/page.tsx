@@ -491,6 +491,31 @@ const EXAMPLE_LOCAL_RESOURCES: LocalResourcesData = {
     { id: "score-austin", name: "SCORE Austin", slug: "score-austin", category: "sba", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "SCORE's free mentoring pairs you with experienced business owners. Request a mentor with food & beverage or event industry experience. They'll help with your business plan, pricing strategy, and growth planning.", isFree: true, services: ["Free mentoring", "Business plan review", "Pricing strategy"] },
     { id: "ut-sbdc", name: "UT Austin SBDC", slug: "ut-austin-sbdc", category: "sba", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "The Small Business Development Center at UT offers free consulting, workshops on bookkeeping and marketing, and can help you apply for local grants.", isFree: true, services: ["Free consulting", "Workshops", "Grant applications"] },
   ],
+  // Dynamic categories - populated from byCategory for the example
+  byCategory: {
+    coworking: [
+      { id: "cf-austin", name: "Capital Factory", slug: "capital-factory-austin", category: "coworking", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "Capital Factory is Austin's premier startup hub. Their events and networking could connect Austin Pour Co. with corporate clients who regularly host catered events. Their rooftop space even hosts events that need bar service.", rating: 4.7, priceRange: "$300-500/month" },
+      { id: "ww-soco", name: "WeWork South Congress", slug: "wework-south-congress", category: "coworking", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "Affordable hot desk for administrative work. WeWork's community events could be a direct source of corporate event leads for your bar service.", rating: 4.3, priceRange: "$300-500/month" },
+      { id: "createscape", name: "Createscape", slug: "createscape-austin", category: "coworking", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "Creative coworking space that hosts regular community events. Perfect for working on your business while networking with other Austin creatives and event professionals.", rating: 4.8, priceRange: "$200/month" },
+    ],
+    grant: [
+      { id: "wf-open", name: "Wells Fargo Open for Business Fund", slug: "wells-fargo-open-business", category: "grant", city: null, state: null, isNationwide: true, relevanceNote: "This small business grant could fund your TABC permit, initial equipment, and first month of marketing. Food & beverage businesses are a strong fit.", amountRange: "$5K-$25K", deadline: "Various" },
+      { id: "fedex-grant", name: "FedEx Small Business Grant", slug: "fedex-small-business-grant", category: "grant", city: null, state: null, isNationwide: true, relevanceNote: "The $15K-$50K grant could fund a custom mobile bar trailer — transforming your setup from a portable table to a head-turning branded experience.", amountRange: "$15K-$50K", deadline: "Annual (typically February-March)" },
+      { id: "comcast-rise", name: "Comcast RISE Grant Program", slug: "comcast-rise-grant", category: "grant", city: null, state: null, isNationwide: true, relevanceNote: "Includes marketing services that could fund professional photography of your bar setups and an ad campaign targeting Austin event planners.", amountRange: "$5K-$10K", deadline: "Rolling" },
+      { id: "usda-vap", name: "USDA Value-Added Producer Grant", slug: "usda-value-added-producer-grant", category: "grant", city: null, state: null, isNationwide: true, relevanceNote: "If you source local Texas spirits and ingredients, you may qualify. This grant specifically supports businesses that add value to agricultural products.", amountRange: "Up to $75K" },
+      { id: "austin-sb", name: "City of Austin Small Business Grant", slug: "city-austin-small-business-grant", category: "grant", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "Austin's local grant program supports new businesses in food & beverage. Check austintexas.gov/smallbusiness for current application windows.", amountRange: "Up to $40K" },
+    ],
+    accelerator: [
+      { id: "techstars", name: "Techstars", slug: "techstars", category: "accelerator", city: null, state: null, isNationwide: true, relevanceNote: "Techstars' Austin programs could help if you plan to build a tech-enabled booking platform or expand to a franchise model.", fundingAmount: "$120K", deadline: "Varies by program" },
+      { id: "sku-austin", name: "SKU", slug: "sku-austin", category: "accelerator", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "SKU is Austin's premier CPG accelerator. If you develop a bottled cocktail line, this is the program to apply to." },
+      { id: "cap-factory-accel", name: "Capital Factory Accelerator", slug: "capital-factory-accelerator", category: "accelerator", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "Austin's largest accelerator. Their network of mentors and investors could help scale Austin Pour Co. into a multi-city operation." },
+    ],
+    sba: [
+      { id: "score-austin", name: "SCORE Austin", slug: "score-austin", category: "sba", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "SCORE's free mentoring pairs you with experienced business owners. Request a mentor with food & beverage or event industry experience. They'll help with your business plan, pricing strategy, and growth planning.", isFree: true, services: ["Free mentoring", "Business plan review", "Pricing strategy"] },
+      { id: "ut-sbdc", name: "UT Austin SBDC", slug: "ut-austin-sbdc", category: "sba", city: "Austin", state: "TX", isNationwide: false, relevanceNote: "The Small Business Development Center at UT offers free consulting, workshops on bookkeeping and marketing, and can help you apply for local grants.", isFree: true, services: ["Free consulting", "Workshops", "Grant applications"] },
+    ],
+  },
+  allCategories: ["coworking", "grant", "accelerator", "sba"],
   citySlug: "austin-tx",
   cityName: "Austin",
   state: "TX",

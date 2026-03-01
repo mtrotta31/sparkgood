@@ -494,10 +494,15 @@ export interface ChecklistProgress {
 
 // Tab 5: Local Resources Types
 export interface LocalResourcesData {
+  // Legacy fields for backward compatibility
   coworking: LocalResourceItem[];
   grants: LocalResourceItem[];
   accelerators: LocalResourceItem[];
   sba: LocalResourceItem[];
+  // Dynamic categories - any category from the database
+  byCategory: Record<string, LocalResourceItem[]>;
+  allCategories: string[]; // List of category slugs that have resources
+  // Location info
   citySlug: string;
   cityName: string;
   state: string;
@@ -508,19 +513,21 @@ export interface LocalResourceItem {
   id: string;
   name: string;
   slug: string;
-  category: string; // ResourceCategory - coworking, grant, accelerator, sba, etc.
+  category: string; // ResourceCategory - coworking, grant, accelerator, sba, business-attorney, etc.
   city: string | null;
   state: string | null;
   isNationwide: boolean;
   relevanceNote: string; // AI-generated explanation of why this is relevant
+  website?: string; // Resource website
   // Category-specific details
   rating?: number; // Coworking
-  priceRange?: string; // Coworking
+  priceRange?: string; // Coworking, Virtual Office
   amountRange?: string; // Grant
   deadline?: string; // Grant/Accelerator
   fundingAmount?: string; // Accelerator
   services?: string[]; // SBA
   isFree?: boolean; // SBA
+  specialty?: string; // Attorneys, Consultants, etc.
 }
 
 // Tab 6: AI Advisor Types

@@ -8,15 +8,42 @@ interface LocalResourcesProps {
   isLoading?: boolean;
 }
 
+// Category configuration: display properties for each category
+const CATEGORY_CONFIG: Record<string, { bg: string; text: string; label: string; emoji: string; heading: string }> = {
+  coworking: { bg: "bg-blue-500/10", text: "text-blue-400", label: "Coworking", emoji: "🏢", heading: "Coworking Spaces Near You" },
+  "virtual-office": { bg: "bg-indigo-500/10", text: "text-indigo-400", label: "Virtual Office", emoji: "💼", heading: "Virtual Office Solutions" },
+  grant: { bg: "bg-green-500/10", text: "text-green-400", label: "Grant", emoji: "💵", heading: "Grants You May Qualify For" },
+  accelerator: { bg: "bg-orange-500/10", text: "text-orange-400", label: "Accelerator", emoji: "🚀", heading: "Accelerator Programs" },
+  sba: { bg: "bg-red-500/10", text: "text-red-400", label: "SBA", emoji: "🏛️", heading: "Free SBA Mentorship" },
+  "chamber-of-commerce": { bg: "bg-amber-500/10", text: "text-amber-400", label: "Chamber", emoji: "🤝", heading: "Chamber of Commerce" },
+  "business-attorney": { bg: "bg-purple-500/10", text: "text-purple-400", label: "Attorney", emoji: "⚖️", heading: "Business Attorneys" },
+  "business-consultant": { bg: "bg-cyan-500/10", text: "text-cyan-400", label: "Consultant", emoji: "📋", heading: "Business Consultants" },
+  "business-insurance": { bg: "bg-teal-500/10", text: "text-teal-400", label: "Insurance", emoji: "🛡️", heading: "Business Insurance" },
+  "marketing-agency": { bg: "bg-pink-500/10", text: "text-pink-400", label: "Marketing", emoji: "📣", heading: "Marketing Agencies" },
+  accountant: { bg: "bg-emerald-500/10", text: "text-emerald-400", label: "Accountant", emoji: "📊", heading: "Accountants & CPAs" },
+  "commercial-real-estate": { bg: "bg-rose-500/10", text: "text-rose-400", label: "Real Estate", emoji: "🏬", heading: "Commercial Real Estate" },
+};
+
 // Category badge colors
 function getCategoryBadge(category: string) {
-  const styles: Record<string, { bg: string; text: string; label: string }> = {
-    coworking: { bg: "bg-blue-500/10", text: "text-blue-400", label: "Coworking" },
-    grant: { bg: "bg-green-500/10", text: "text-green-400", label: "Grant" },
-    accelerator: { bg: "bg-orange-500/10", text: "text-orange-400", label: "Accelerator" },
-    sba: { bg: "bg-red-500/10", text: "text-red-400", label: "SBA" },
-  };
-  return styles[category] || { bg: "bg-warmwhite/10", text: "text-warmwhite", label: category };
+  const config = CATEGORY_CONFIG[category];
+  if (config) {
+    return { bg: config.bg, text: config.text, label: config.label };
+  }
+  // Fallback for unknown categories
+  const label = category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  return { bg: "bg-warmwhite/10", text: "text-warmwhite", label };
+}
+
+// Get section info for a category
+function getSectionInfo(category: string) {
+  const config = CATEGORY_CONFIG[category];
+  if (config) {
+    return { emoji: config.emoji, heading: config.heading };
+  }
+  // Fallback for unknown categories
+  const heading = category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  return { emoji: "📌", heading };
 }
 
 // Resource Card Component
@@ -52,8 +79,8 @@ function ResourceCard({ resource }: { resource: LocalResourceItem }) {
 
       {/* Category-specific details */}
       <div className="flex flex-wrap gap-2 mb-3">
-        {/* Coworking: Rating & Price */}
-        {resource.category === "coworking" && (
+        {/* Coworking & Virtual Office: Rating & Price */}
+        {(resource.category === "coworking" || resource.category === "virtual-office") && (
           <>
             {resource.rating && (
               <span className="flex items-center gap-1 text-xs text-yellow-400">
@@ -93,8 +120,8 @@ function ResourceCard({ resource }: { resource: LocalResourceItem }) {
           </>
         )}
 
-        {/* SBA: FREE badge & Services */}
-        {resource.category === "sba" && (
+        {/* SBA & Chamber: FREE badge & Services */}
+        {(resource.category === "sba" || resource.category === "chamber-of-commerce") && (
           <>
             {resource.isFree && (
               <span className="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-0.5 rounded">FREE</span>
@@ -104,6 +131,17 @@ function ResourceCard({ resource }: { resource: LocalResourceItem }) {
             )}
           </>
         )}
+
+        {/* Professional Services: Specialty */}
+        {["business-attorney", "business-consultant", "accountant", "marketing-agency", "business-insurance"].includes(resource.category) && (
+          <>
+            {resource.specialty && (
+              <span className="text-xs text-warmwhite-muted">{resource.specialty}</span>
+            )}
+          </>
+        )}
+
+        {/* Commercial Real Estate: No specific details yet */}
       </div>
 
       {/* Relevance note */}
@@ -184,52 +222,71 @@ export default function LocalResources({ data, isLoading }: LocalResourcesProps)
         </p>
       </div>
 
-      {/* Coworking Spaces */}
-      {data.coworking.length > 0 && (
-        <section>
-          <SectionHeader emoji="🏢" title="Coworking Spaces Near You" count={data.coworking.length} />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.coworking.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Render all categories dynamically */}
+      {(data.allCategories || Object.keys(data.byCategory || {})).map((category) => {
+        const resources = data.byCategory?.[category] || [];
+        if (resources.length === 0) return null;
 
-      {/* Grants */}
-      {data.grants.length > 0 && (
-        <section>
-          <SectionHeader emoji="💵" title="Grants You May Qualify For" count={data.grants.length} />
-          <div className="grid gap-4 md:grid-cols-2">
-            {data.grants.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        </section>
-      )}
+        const { emoji, heading } = getSectionInfo(category);
+        // Use 2-column grid for grants (more info), 3-column for others
+        const gridCols = category === "grant" ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-3";
 
-      {/* Accelerators */}
-      {data.accelerators.length > 0 && (
-        <section>
-          <SectionHeader emoji="🚀" title="Accelerator Programs" count={data.accelerators.length} />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.accelerators.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        </section>
-      )}
+        return (
+          <section key={category}>
+            <SectionHeader emoji={emoji} title={heading} count={resources.length} />
+            <div className={`grid gap-4 ${gridCols}`}>
+              {resources.map((resource) => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
-      {/* SBA Resources */}
-      {data.sba.length > 0 && (
-        <section>
-          <SectionHeader emoji="🏛️" title="Free SBA Mentorship" count={data.sba.length} />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.sba.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        </section>
+      {/* Fallback: Render legacy fields if byCategory is empty (backward compatibility) */}
+      {(!data.byCategory || Object.keys(data.byCategory).length === 0) && (
+        <>
+          {data.coworking.length > 0 && (
+            <section>
+              <SectionHeader emoji="🏢" title="Coworking Spaces Near You" count={data.coworking.length} />
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {data.coworking.map((resource) => (
+                  <ResourceCard key={resource.id} resource={resource} />
+                ))}
+              </div>
+            </section>
+          )}
+          {data.grants.length > 0 && (
+            <section>
+              <SectionHeader emoji="💵" title="Grants You May Qualify For" count={data.grants.length} />
+              <div className="grid gap-4 md:grid-cols-2">
+                {data.grants.map((resource) => (
+                  <ResourceCard key={resource.id} resource={resource} />
+                ))}
+              </div>
+            </section>
+          )}
+          {data.accelerators.length > 0 && (
+            <section>
+              <SectionHeader emoji="🚀" title="Accelerator Programs" count={data.accelerators.length} />
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {data.accelerators.map((resource) => (
+                  <ResourceCard key={resource.id} resource={resource} />
+                ))}
+              </div>
+            </section>
+          )}
+          {data.sba.length > 0 && (
+            <section>
+              <SectionHeader emoji="🏛️" title="Free SBA Mentorship" count={data.sba.length} />
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {data.sba.map((resource) => (
+                  <ResourceCard key={resource.id} resource={resource} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       {/* Explore more link */}

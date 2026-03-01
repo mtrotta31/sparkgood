@@ -119,6 +119,7 @@ function transformResource(
     state: resource.state,
     isNationwide: resource.is_nationwide,
     relevanceNote: relevanceNote || resource.short_description || "A valuable resource for your business.",
+    website: resource.website || undefined,
     // Category-specific fields
     rating: resource.rating,
     priceRange: formatPriceRange(resource.details.price_monthly_min, resource.details.price_monthly_max),
@@ -129,6 +130,7 @@ function transformResource(
       : undefined,
     services: resource.details.services,
     isFree: resource.category === "sba", // SBA resources are free
+    specialty: resource.details.specialty,
   };
 }
 
@@ -197,6 +199,8 @@ export async function POST(
           grants: [],
           accelerators: [],
           sba: [],
+          byCategory: {},
+          allCategories: [],
           citySlug: "",
           cityName: "",
           state: "",
@@ -227,11 +231,22 @@ export async function POST(
     const transformWithNotes = (resources: MatchedResource[]): LocalResourceItem[] =>
       resources.map((r) => transformResource(r, relevanceNotes[r.id] || ""));
 
+    // Transform byCategory dynamically
+    const byCategory: Record<string, LocalResourceItem[]> = {};
+    for (const [category, resources] of Object.entries(matchedResources.byCategory)) {
+      byCategory[category] = transformWithNotes(resources);
+    }
+
     const result: LocalResourcesData = {
+      // Legacy fields for backward compatibility
       coworking: transformWithNotes(matchedResources.coworking),
       grants: transformWithNotes(matchedResources.grants),
       accelerators: transformWithNotes(matchedResources.accelerators),
       sba: transformWithNotes(matchedResources.sba),
+      // Dynamic categories
+      byCategory,
+      allCategories: matchedResources.allCategories,
+      // Location info
       citySlug: generateCitySlug(profile.location.city, profile.location.state),
       cityName: profile.location.city,
       state: profile.location.state,

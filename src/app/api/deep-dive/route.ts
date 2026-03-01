@@ -427,6 +427,8 @@ export async function POST(request: NextRequest) {
       grants: [],
       accelerators: [],
       sba: [],
+      byCategory: {},
+      allCategories: [],
       totalMatched: 0,
     };
 

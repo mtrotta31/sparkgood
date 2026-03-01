@@ -2247,8 +2247,25 @@ CRITICAL: You must respond with ONLY a valid JSON object. No explanation text be
 // These output structured JSON for the new 4-tab deep dive
 // ============================================================================
 
+// Category headings for prompt formatting
+const CATEGORY_HEADINGS: Record<string, string> = {
+  coworking: "Workspace Options",
+  "virtual-office": "Virtual Office Solutions",
+  grant: "Available Grants",
+  accelerator: "Accelerator Programs",
+  sba: "Free SBA Resources",
+  "chamber-of-commerce": "Chamber of Commerce",
+  "business-attorney": "Business Attorneys",
+  "business-consultant": "Business Consultants",
+  "business-insurance": "Business Insurance",
+  "marketing-agency": "Marketing Agencies",
+  accountant: "Accountants & CPAs",
+  "commercial-real-estate": "Commercial Real Estate",
+};
+
 /**
  * Helper to format matched resources for prompts
+ * FUTURE-PROOF: Handles all categories dynamically
  */
 function formatResourcesForPromptV2(resources: MatchedResources): string {
   if (resources.totalMatched === 0) {
@@ -2257,63 +2274,91 @@ function formatResourcesForPromptV2(resources: MatchedResources): string {
 
   let formatted = "";
 
-  if (resources.coworking.length > 0) {
-    formatted += "\n### Workspace Options:\n";
-    resources.coworking.forEach((r: MatchedResource) => {
+  // Process categories from byCategory if available, otherwise fall back to legacy fields
+  const categoriesToProcess = resources.byCategory && Object.keys(resources.byCategory).length > 0
+    ? resources.byCategory
+    : {
+        coworking: resources.coworking,
+        grant: resources.grants,
+        accelerator: resources.accelerators,
+        sba: resources.sba,
+      };
+
+  for (const [category, categoryResources] of Object.entries(categoriesToProcess)) {
+    if (!categoryResources || categoryResources.length === 0) continue;
+
+    const heading = CATEGORY_HEADINGS[category] || category.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+    formatted += `\n### ${heading}:\n`;
+
+    categoryResources.forEach((r: MatchedResource) => {
+      formatted += formatResourceLineV2(r, category);
+    });
+  }
+
+  return formatted;
+}
+
+/**
+ * Format a single resource line based on its category
+ */
+function formatResourceLineV2(r: MatchedResource, category: string): string {
+  let line = `- ${r.name}`;
+
+  // Add location scope for certain categories
+  if (["grant", "accelerator"].includes(category)) {
+    const scope = r.is_nationwide ? "(Nationwide)" : `(${r.city}, ${r.state})`;
+    line += ` ${scope}`;
+  }
+
+  // Category-specific details
+  switch (category) {
+    case "coworking":
+    case "virtual-office": {
       const price = r.details.price_monthly_min
         ? `$${r.details.price_monthly_min}${r.details.price_monthly_max ? `-${r.details.price_monthly_max}` : ""}/month`
         : "Price varies";
       const rating = r.rating ? ` (${r.rating}★)` : "";
-      formatted += `- ${r.name}${rating}: ${price}`;
-      if (r.website) formatted += ` — ${r.website}`;
-      formatted += "\n";
-    });
-  }
-
-  if (resources.grants.length > 0) {
-    formatted += "\n### Available Grants:\n";
-    resources.grants.forEach((r: MatchedResource) => {
+      line += `${rating}: ${price}`;
+      break;
+    }
+    case "grant": {
       const amount = formatGrantAmountV2(r.details.amount_min, r.details.amount_max);
-      const scope = r.is_nationwide ? "(Nationwide)" : `(${r.city}, ${r.state})`;
-      formatted += `- ${r.name} ${scope}`;
-      if (amount) formatted += `: ${amount}`;
-      if (r.details.deadline) formatted += ` — Deadline: ${r.details.deadline}`;
-      if (r.website) formatted += ` — ${r.website}`;
-      formatted += "\n";
-    });
-  }
-
-  if (resources.accelerators.length > 0) {
-    formatted += "\n### Accelerator Programs:\n";
-    resources.accelerators.forEach((r: MatchedResource) => {
+      if (amount) line += `: ${amount}`;
+      if (r.details.deadline) line += ` — Deadline: ${r.details.deadline}`;
+      break;
+    }
+    case "accelerator": {
       const funding = r.details.funding_provided
         ? `$${(r.details.funding_provided / 1000).toFixed(0)}K funding`
         : "";
       const equity = r.details.equity_taken ? `${r.details.equity_taken}% equity` : "";
       const terms = [funding, equity].filter(Boolean).join(", ");
-      const scope = r.is_nationwide ? "(Nationwide)" : `(${r.city}, ${r.state})`;
-      formatted += `- ${r.name} ${scope}`;
-      if (terms) formatted += `: ${terms}`;
-      if (r.details.next_deadline) formatted += ` — Next deadline: ${r.details.next_deadline}`;
-      if (r.website) formatted += ` — ${r.website}`;
-      formatted += "\n";
-    });
-  }
-
-  if (resources.sba.length > 0) {
-    formatted += "\n### Free SBA Resources:\n";
-    resources.sba.forEach((r: MatchedResource) => {
+      if (terms) line += `: ${terms}`;
+      if (r.details.next_deadline) line += ` — Next deadline: ${r.details.next_deadline}`;
+      break;
+    }
+    case "sba":
+    case "chamber-of-commerce": {
       const type = r.details.sba_type ? `(${r.details.sba_type})` : "";
-      formatted += `- ${r.name} ${type}`;
+      if (type) line += ` ${type}`;
       if (r.details.services && r.details.services.length > 0) {
-        formatted += `: ${r.details.services.slice(0, 3).join(", ")}`;
+        line += `: ${r.details.services.slice(0, 3).join(", ")}`;
       }
-      if (r.website) formatted += ` — ${r.website}`;
-      formatted += "\n";
-    });
+      break;
+    }
+    default: {
+      // For professional services and other categories
+      if (r.short_description) {
+        line += `: ${r.short_description.slice(0, 80)}${r.short_description.length > 80 ? "..." : ""}`;
+      }
+      break;
+    }
   }
 
-  return formatted;
+  if (r.website) line += ` — ${r.website}`;
+  line += "\n";
+
+  return line;
 }
 
 /**
