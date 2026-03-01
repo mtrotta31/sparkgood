@@ -61,12 +61,18 @@ function BreadcrumbStructuredData({
       {
         "@type": "ListItem",
         position: 1,
+        name: "Home",
+        item: "https://sparklocal.co",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
         name: "Resources",
         item: "https://sparklocal.co/resources",
       },
       {
         "@type": "ListItem",
-        position: 2,
+        position: 3,
         name: cityName,
         item: `https://sparklocal.co/resources/${citySlug}`,
       },
@@ -482,14 +488,12 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                     </p>
                   </div>
                 </div>
-                {section.count > 6 && (
-                  <Link
-                    href={`/resources/${section.category}?city=${encodeURIComponent(location.city)}&state=${location.state}`}
-                    className="text-spark hover:text-spark-600 font-medium text-sm transition-colors"
-                  >
-                    View all {section.count} →
-                  </Link>
-                )}
+                <Link
+                  href={`/resources/${section.category}?city=${encodeURIComponent(location.city)}&state=${location.state}`}
+                  className="text-spark hover:text-spark-600 font-medium text-sm transition-colors"
+                >
+                  {section.count > 6 ? `View all ${section.count}` : "Browse"} →
+                </Link>
               </div>
 
               {/* Listings Grid */}
@@ -696,6 +700,38 @@ export default async function CityHubContent({ location }: CityHubContentProps) 
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
+            </div>
+          </section>
+        )}
+
+        {/* Browse by Category - Internal Links for SEO */}
+        {categorySections.length > 0 && (
+          <section className="py-12 px-4 sm:px-6 border-t border-slate-200">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-800 mb-6">
+                Browse {location.city} Resources by Category
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {categorySections.map((section) => (
+                  <Link
+                    key={section.category}
+                    href={`/resources/${section.category}?city=${encodeURIComponent(location.city)}&state=${location.state}`}
+                    className={`flex items-center gap-3 p-4 rounded-xl border ${section.borderColor} ${section.bgColor} hover:shadow-warm transition-all group`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${section.textColor}`}>
+                      {section.icon}
+                    </div>
+                    <div>
+                      <span className={`block font-medium ${section.textColor} group-hover:underline`}>
+                        {section.plural}
+                      </span>
+                      <span className="text-sm text-slate-500">
+                        {section.count} in {location.city}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
         )}

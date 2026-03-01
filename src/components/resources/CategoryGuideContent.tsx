@@ -214,6 +214,34 @@ const CATEGORY_GUIDES: Record<string, CategoryGuide> = {
       }
     ]
   },
+  "print-shop": {
+    heading: "Working with Print Shops",
+    content: [
+      "Print shops provide essential services for businesses that need physical marketing materials, signage, packaging, and promotional items. While digital marketing dominates many conversations, printed materials remain powerful tools for local businesses, events, trade shows, and brand building. Understanding print shop capabilities helps you get quality results at fair prices.",
+      "Print shops vary in their specializations. Commercial printers handle high-volume jobs like brochures, catalogs, and direct mail. Quick print shops focus on fast turnaround for business cards, flyers, and small runs. Large format printers produce banners, signage, vehicle wraps, and trade show displays. Specialty printers offer unique services like embossing, foil stamping, or custom packaging. Some shops are full-service while others specialize in specific products.",
+      "Understanding print terminology helps you communicate effectively. Resolution (DPI/PPI) affects image quality—300 DPI is standard for print. CMYK color mode is used for printing, while RGB is for screens. Bleeds extend artwork past the trim line to avoid white edges. Paper stock varies by weight (measured in pounds or GSM) and finish (matte, gloss, uncoated). Proofs are test prints to verify colors and layout before the full run.",
+      "Getting accurate quotes requires providing complete specifications. Quantity affects pricing significantly—per-unit costs drop with larger runs. Paper stock, size, number of colors, and finishing (folding, binding, coating) all impact price. Turnaround time matters—rush jobs cost more. Request quotes from multiple shops for comparison, but don't choose solely on price—quality and reliability matter. Ask to see samples of similar work.",
+      "Building a relationship with a reliable print shop pays dividends. They'll learn your brand standards, catch errors before printing, and may offer better pricing for repeat customers. Provide print-ready files when possible to avoid setup charges. Allow adequate time—rushed timelines lead to mistakes and premium pricing. Review proofs carefully before approving—once printed, errors are expensive to fix."
+    ],
+    faqs: [
+      {
+        question: "How do I prepare files for printing?",
+        answer: "For best results: use CMYK color mode (not RGB), set resolution to 300 DPI minimum, include bleeds (usually 0.125 inches) for edge-to-edge printing, convert fonts to outlines or embed them, and save in PDF format. Most print shops provide file specifications and templates. If you're using design software like Canva, use their print-ready export options. When in doubt, ask your print shop for their specific requirements—they'd rather help upfront than fix problems later."
+      },
+      {
+        question: "What's the difference between digital and offset printing?",
+        answer: "Digital printing prints directly from files with no setup, making it cost-effective for small runs (under 500-1,000 pieces) and variable data printing. Offset printing uses plates and is more economical for large runs with lower per-unit costs at high volumes. Offset traditionally offered better color accuracy, though digital quality has improved significantly. For most small business needs—business cards, brochures, flyers—digital printing works well and offers faster turnaround."
+      },
+      {
+        question: "How much do common print materials cost?",
+        answer: "Costs vary by quantity, quality, and location. Rough estimates: business cards ($30-100 for 500), brochures ($200-500 for 1,000 tri-fold), flyers ($150-300 for 1,000), banners ($50-150 for a standard size), postcards ($100-250 for 1,000). Large format and specialty printing costs more. Get quotes for your specific needs—quantity discounts can be significant. Compare total cost including shipping rather than just per-unit price."
+      },
+      {
+        question: "How far in advance should I order print materials?",
+        answer: "Standard turnaround for simple jobs is 3-7 business days. Complex jobs, large runs, or specialty printing may take 2-3 weeks. Add shipping time if materials are being delivered. For important events or launches, order at least 2-3 weeks ahead to allow for proofing, revisions, and unexpected delays. Rush services are available but cost significantly more. Building a relationship with a local printer can help when you need faster turnaround."
+      }
+    ]
+  },
   "commercial-real-estate": {
     heading: "Finding Commercial Real Estate",
     content: [

@@ -86,6 +86,8 @@ function generateStructuredData(listing: ResourceListing): Record<string, unknow
             longitude: listing.longitude,
           },
         }),
+        // AggregateRating for coworking with reviews
+        ...getAggregateRating(listing),
         // Coworking-specific
         ...(listing.category === "coworking" && {
           "@type": "LocalBusiness",
@@ -256,6 +258,29 @@ function getFundingInfo(listing: ResourceListing): Record<string, unknown> {
       "@type": "MonetaryAmount",
       currency: "USD",
       value: details.funding_provided,
+    },
+  };
+}
+
+// Get AggregateRating for coworking spaces with reviews
+function getAggregateRating(listing: ResourceListing): Record<string, unknown> {
+  const details = listing.details as {
+    rating?: number;
+    review_count?: number;
+  };
+
+  // Only add if we have both rating and review count
+  if (!details.rating || !details.review_count || details.review_count < 1) {
+    return {};
+  }
+
+  return {
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: details.rating,
+      bestRating: 5,
+      worstRating: 1,
+      reviewCount: details.review_count,
     },
   };
 }

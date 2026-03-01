@@ -3,6 +3,7 @@
 // Also handles city hub pages when param is a location slug (e.g., austin-tx)
 
 import Link from "next/link";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -591,8 +592,76 @@ async function renderCategoryPage(
   // Build breadcrumb if filtered to a city
   const showBreadcrumb = filters.city || filters.state;
 
+  // Build BreadcrumbList schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://sparklocal.co",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Resources",
+        item: "https://sparklocal.co/resources",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: categoryInfo.plural,
+        item: `https://sparklocal.co/resources/${category}`,
+      },
+      // Add location if filtered
+      ...(showBreadcrumb
+        ? [
+            {
+              "@type": "ListItem",
+              position: 4,
+              name: filters.city || filters.state,
+              item: `https://sparklocal.co/resources/${category}?${filters.city ? `city=${encodeURIComponent(filters.city)}` : `state=${encodeURIComponent(filters.state || "")}`}`,
+            },
+          ]
+        : []),
+    ],
+  };
+
+  // Build ItemList schema for resource listings
+  const itemListSchema = listings && listings.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${categoryInfo.plural}${filters.city ? ` in ${filters.city}` : filters.state ? ` in ${filters.state}` : ""}`,
+    description: categoryInfo.description,
+    numberOfItems: totalCount || listings.length,
+    itemListElement: listings.slice(0, 10).map((listing, index) => ({
+      "@type": "ListItem",
+      position: offset + index + 1,
+      name: listing.name,
+      url: `https://sparklocal.co/resources/listing/${listing.slug}`,
+    })),
+  } : null;
+
   return (
     <main className="min-h-screen bg-white">
+      {/* BreadcrumbList Schema */}
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
+      {/* ItemList Schema */}
+      {itemListSchema && (
+        <Script
+          id="itemlist-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
+
       {/* Hero Section */}
       <section className={`pt-24 pb-12 px-4 bg-gradient-to-b ${getCategoryHeroStyle(category)}`}>
         <div className="max-w-6xl mx-auto">
