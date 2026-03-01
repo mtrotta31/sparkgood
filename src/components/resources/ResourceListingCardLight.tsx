@@ -73,6 +73,52 @@ const CATEGORY_LIGHT_COLORS: Record<
     text: "text-sky-700",
     border: "border-sky-200",
   },
+  // New expansion categories
+  "business-attorney": {
+    bg: "bg-violet-50",
+    text: "text-violet-700",
+    border: "border-violet-200",
+  },
+  accountant: {
+    bg: "bg-teal-50",
+    text: "text-teal-700",
+    border: "border-teal-200",
+  },
+  "marketing-agency": {
+    bg: "bg-pink-50",
+    text: "text-pink-700",
+    border: "border-pink-200",
+  },
+  "print-shop": {
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    border: "border-amber-200",
+  },
+  "commercial-real-estate": {
+    bg: "bg-sky-50",
+    text: "text-sky-700",
+    border: "border-sky-200",
+  },
+  "business-insurance": {
+    bg: "bg-lime-50",
+    text: "text-lime-700",
+    border: "border-lime-200",
+  },
+  "chamber-of-commerce": {
+    bg: "bg-rose-50",
+    text: "text-rose-700",
+    border: "border-rose-200",
+  },
+  "virtual-office": {
+    bg: "bg-fuchsia-50",
+    text: "text-fuchsia-700",
+    border: "border-fuchsia-200",
+  },
+  "business-consultant": {
+    bg: "bg-indigo-50",
+    text: "text-indigo-700",
+    border: "border-indigo-200",
+  },
 };
 
 interface Props {

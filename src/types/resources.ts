@@ -12,7 +12,17 @@ export type ResourceCategory =
   | "legal"
   | "accounting"
   | "marketing"
-  | "investor";
+  | "investor"
+  // New expansion categories
+  | "business-attorney"
+  | "accountant"
+  | "marketing-agency"
+  | "print-shop"
+  | "commercial-real-estate"
+  | "business-insurance"
+  | "chamber-of-commerce"
+  | "virtual-office"
+  | "business-consultant";
 
 export type EnrichmentStatus = "raw" | "enriched" | "verified";
 
@@ -311,6 +321,106 @@ export const CATEGORY_INFO: Record<ResourceCategory, CategoryInfo> = {
     bgColor: "bg-cyan-600",
     borderColor: "border-cyan-600",
     lightBgColor: "bg-cyan-50",
+  },
+  // New expansion categories
+  "business-attorney": {
+    slug: "business-attorney",
+    name: "Business Attorney",
+    plural: "Business Attorneys",
+    description: "Legal counsel for incorporation, contracts, and IP",
+    icon: "scale",
+    color: "text-violet-600",
+    bgColor: "bg-violet-600",
+    borderColor: "border-violet-600",
+    lightBgColor: "bg-violet-50",
+  },
+  accountant: {
+    slug: "accountant",
+    name: "Accountant",
+    plural: "Accountants & CPAs",
+    description: "Financial services and tax planning for small businesses",
+    icon: "calculator",
+    color: "text-teal-600",
+    bgColor: "bg-teal-600",
+    borderColor: "border-teal-600",
+    lightBgColor: "bg-teal-50",
+  },
+  "marketing-agency": {
+    slug: "marketing-agency",
+    name: "Marketing Agency",
+    plural: "Marketing Agencies",
+    description: "Digital marketing, SEO, and branding services",
+    icon: "megaphone",
+    color: "text-pink-600",
+    bgColor: "bg-pink-600",
+    borderColor: "border-pink-600",
+    lightBgColor: "bg-pink-50",
+  },
+  "print-shop": {
+    slug: "print-shop",
+    name: "Print Shop",
+    plural: "Print & Design Shops",
+    description: "Business cards, signage, and promotional materials",
+    icon: "printer",
+    color: "text-amber-600",
+    bgColor: "bg-amber-600",
+    borderColor: "border-amber-600",
+    lightBgColor: "bg-amber-50",
+  },
+  "commercial-real-estate": {
+    slug: "commercial-real-estate",
+    name: "Commercial Real Estate",
+    plural: "Commercial Real Estate",
+    description: "Office, retail, and industrial space for your business",
+    icon: "building-office",
+    color: "text-sky-600",
+    bgColor: "bg-sky-600",
+    borderColor: "border-sky-600",
+    lightBgColor: "bg-sky-50",
+  },
+  "business-insurance": {
+    slug: "business-insurance",
+    name: "Business Insurance",
+    plural: "Business Insurance",
+    description: "Liability, property, and workers comp coverage",
+    icon: "shield-check",
+    color: "text-lime-600",
+    bgColor: "bg-lime-600",
+    borderColor: "border-lime-600",
+    lightBgColor: "bg-lime-50",
+  },
+  "chamber-of-commerce": {
+    slug: "chamber-of-commerce",
+    name: "Chamber of Commerce",
+    plural: "Chambers of Commerce",
+    description: "Local business networking and advocacy organizations",
+    icon: "users",
+    color: "text-rose-600",
+    bgColor: "bg-rose-600",
+    borderColor: "border-rose-600",
+    lightBgColor: "bg-rose-50",
+  },
+  "virtual-office": {
+    slug: "virtual-office",
+    name: "Virtual Office",
+    plural: "Virtual Offices",
+    description: "Professional business addresses and mail services",
+    icon: "envelope",
+    color: "text-fuchsia-600",
+    bgColor: "bg-fuchsia-600",
+    borderColor: "border-fuchsia-600",
+    lightBgColor: "bg-fuchsia-50",
+  },
+  "business-consultant": {
+    slug: "business-consultant",
+    name: "Business Consultant",
+    plural: "Business Consultants",
+    description: "Strategy, operations, and growth advisory services",
+    icon: "briefcase",
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-600",
+    borderColor: "border-indigo-600",
+    lightBgColor: "bg-indigo-50",
   },
 };
 

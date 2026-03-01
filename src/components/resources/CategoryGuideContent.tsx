@@ -129,6 +129,230 @@ const CATEGORY_GUIDES: Record<string, CategoryGuide> = {
         answer: "SBA resource centers (SBDCs, SCORE, WBCs) serve anyone interested in starting or growing a small business—no eligibility requirements beyond showing up. For SBA loans, businesses must meet size standards (varying by industry), operate for profit, do business in the U.S., have reasonable owner equity, and demonstrate need for financing. Some programs specifically target underserved groups including minorities, women, veterans, and rural businesses."
       }
     ]
+  },
+  "business-attorney": {
+    heading: "Finding the Right Business Attorney",
+    content: [
+      "A business attorney is one of the most valuable professional relationships an entrepreneur can establish. While many founders delay hiring legal counsel to save money, early legal guidance often prevents costly mistakes—from choosing the wrong business structure to signing problematic contracts. The right attorney becomes a strategic partner who protects your interests as you grow.",
+      "Business attorneys handle a range of critical functions. Entity formation—deciding between LLC, S-Corp, C-Corp, or other structures—has significant tax and liability implications that depend on your specific situation. Contract drafting and review ensures agreements with co-founders, employees, vendors, and customers protect your interests. Intellectual property protection covers trademarks, patents, and copyrights that may be central to your competitive advantage.",
+      "When to engage an attorney matters. Before incorporating, get advice on entity structure and state of incorporation. Before signing any significant contract—lease, vendor agreement, partnership deal—have an attorney review it. When bringing on co-founders or key employees, proper agreements prevent disputes later. When raising investment, legal counsel is essential for navigating securities laws and investment documents.",
+      "Finding the right attorney involves several factors. Look for experience with businesses similar to yours in industry and stage. Many attorneys offer free initial consultations—use these to assess fit and get preliminary guidance. Ask about billing structure: hourly rates, flat fees for specific services, or retainer arrangements. Small business attorneys often charge $200-500/hour, but flat-fee packages for common services like LLC formation can be more predictable.",
+      "Local attorneys offer advantages for businesses operating in specific jurisdictions—they understand state-specific regulations, have relationships with local courts and agencies, and can meet face-to-face. However, for specialized needs like patent law or securities, you may need to look beyond your city. Many successful businesses maintain relationships with both a general business attorney and specialists for specific needs."
+    ],
+    faqs: [
+      {
+        question: "When should a startup hire a business attorney?",
+        answer: "Ideally, consult an attorney before incorporating to ensure you choose the right business structure for your situation. At minimum, engage an attorney before signing any significant contracts (leases, partnerships, vendor agreements), bringing on co-founders or investors, or dealing with intellectual property. Many founders regret not getting legal advice earlier—fixing poorly structured agreements or entities is more expensive than getting it right initially."
+      },
+      {
+        question: "How much does a business attorney cost?",
+        answer: "Business attorneys typically charge $200-500/hour depending on location and experience. Many offer flat-fee packages for common services: LLC formation ($500-1,500), contract review ($300-1,000), trademark registration ($1,000-2,000). Some attorneys offer monthly retainer arrangements for ongoing advice. Many provide free initial consultations. For early-stage startups, some attorneys defer payment until funding or offer reduced rates in exchange for equity."
+      },
+      {
+        question: "What's the difference between a business attorney and a corporate attorney?",
+        answer: "Business attorney is a general term for lawyers who work with businesses of all sizes. Corporate attorneys specifically focus on corporations and often work with larger companies on complex transactions, mergers, securities, and governance. For most small businesses and startups, a business attorney who handles entity formation, contracts, and general business law is the right fit. As you grow or raise significant investment, you may need more specialized corporate counsel."
+      },
+      {
+        question: "Should I use an online legal service instead of an attorney?",
+        answer: "Online legal services (LegalZoom, Rocket Lawyer, etc.) can be cost-effective for simple, standard documents like basic LLC formation or standard contracts. However, they don't provide customized legal advice for your specific situation. For anything non-standard—partnership agreements, investor documents, intellectual property strategy, or complex contracts—working with an attorney who understands your business provides much better protection. Many businesses use a hybrid approach: online services for simple documents, attorney for complex or high-stakes matters."
+      }
+    ]
+  },
+  "accountant": {
+    heading: "Working with Accountants & CPAs",
+    content: [
+      "A good accountant does far more than file taxes—they become a financial advisor who helps you understand your numbers, plan for growth, and make smarter business decisions. For most small business owners, hiring an accountant is one of the best investments you can make, saving time, avoiding costly mistakes, and often paying for themselves through tax savings and better financial management.",
+      "Understanding the difference between accountants and CPAs matters. Certified Public Accountants (CPAs) have passed rigorous exams, met experience requirements, and maintain ongoing education. They can represent you before the IRS, perform audits, and provide attested financial statements. Regular accountants and bookkeepers handle day-to-day financial record keeping but may not have the same credentials. Many businesses use bookkeepers for routine work and CPAs for tax planning and compliance.",
+      "Key services accountants provide include bookkeeping (recording transactions, reconciling accounts, managing payables/receivables), tax planning and preparation (minimizing tax liability within the law), financial statement preparation (income statements, balance sheets, cash flow), payroll processing, and strategic financial advice. Some specialize in specific industries or business types, bringing valuable knowledge about industry-specific deductions, benchmarks, and best practices.",
+      "When choosing an accountant, look for experience with businesses similar to yours. Ask about their technology stack—cloud accounting software like QuickBooks Online or Xero enables real-time collaboration and better visibility into your finances. Understand their communication style and availability—you want someone responsive when questions arise, not just at tax time. Discuss fees upfront: expect $75-200/hour for bookkeepers, $150-400/hour for CPAs, or monthly retainer packages.",
+      "The right time to engage an accountant is ideally before you launch—they can help set up proper accounting systems and advise on business structure decisions. At minimum, get professional help before your first tax filing. As your business grows, the value of good financial counsel compounds. Regular financial reviews help you understand trends, identify problems early, and make data-driven decisions."
+    ],
+    faqs: [
+      {
+        question: "What's the difference between a CPA and a regular accountant?",
+        answer: "CPAs (Certified Public Accountants) have passed a rigorous exam, met state experience requirements, and maintain continuing education. They can represent you before the IRS, perform audits, and issue attested financial statements. Regular accountants or bookkeepers may be skilled professionals but lack these credentials. For tax planning, IRS issues, or audited financials, you need a CPA. For routine bookkeeping, a non-CPA accountant or bookkeeper may be sufficient and more cost-effective."
+      },
+      {
+        question: "How much should I expect to pay for accounting services?",
+        answer: "Costs vary by service type and location. Bookkeeping services typically run $200-500/month for small businesses. Tax preparation for a simple business return might cost $500-2,000; complex returns can be several thousand dollars. CPA hourly rates range from $150-400. Monthly accounting packages that include bookkeeping, payroll, and tax planning often provide the best value for growing businesses, typically $500-2,000/month depending on complexity."
+      },
+      {
+        question: "Can I handle my own bookkeeping with software?",
+        answer: "Many small business owners successfully use accounting software like QuickBooks, Xero, or FreshBooks for basic bookkeeping. However, DIY bookkeeping has risks: categorization errors, missed deductions, and compliance issues. A common approach is handling day-to-day transactions yourself while having an accountant review your books quarterly and handle tax preparation. This balances cost savings with professional oversight. As your business grows, professional bookkeeping becomes more valuable."
+      },
+      {
+        question: "When should I switch from DIY accounting to hiring a professional?",
+        answer: "Consider hiring an accountant when: your revenue exceeds $50,000-100,000, you're spending more than 5 hours/month on bookkeeping, you have employees or contractors, you're making inventory or significant equipment purchases, you're raising investment, or you simply don't understand your financial statements. The cost of professional help is usually offset by time savings, tax optimization, and better financial decisions."
+      }
+    ]
+  },
+  "marketing-agency": {
+    heading: "Partnering with Marketing Agencies",
+    content: [
+      "Marketing agencies help businesses reach customers and grow revenue through strategic promotional activities. For small business owners who lack marketing expertise or time, the right agency partnership can accelerate growth significantly. However, the marketing agency landscape is crowded with varying quality—understanding what to look for and how to work effectively with agencies is essential.",
+      "Marketing agencies specialize in different areas. Full-service agencies handle everything from strategy to execution across multiple channels. Digital marketing agencies focus on online channels: SEO, paid ads, social media, email, and content marketing. Creative agencies emphasize branding, design, and advertising creative. PR agencies manage media relations and public perception. Many small businesses start with specialists in one or two channels before expanding.",
+      "Choosing the right agency starts with clarity on your goals. Are you trying to generate leads, build brand awareness, launch a product, or enter a new market? Different objectives require different capabilities. Ask potential agencies about their experience with businesses similar to yours—same industry, similar size, comparable budgets. Request case studies with specific results and references you can contact.",
+      "Understanding agency pricing models matters. Retainer arrangements provide ongoing services for a monthly fee, typically $2,000-10,000+ for small businesses. Project-based pricing covers specific deliverables like a website redesign or campaign launch. Performance-based models tie compensation to results, though these come with trade-offs. Be wary of agencies that won't explain how they'll spend your budget or can't articulate expected outcomes.",
+      "Successful agency relationships require clear communication and realistic expectations. Define success metrics upfront. Establish regular check-ins and reporting cadences. Understand that marketing results rarely happen overnight—most channels require 3-6 months to show meaningful results. The best agencies will be honest about what's achievable with your budget and timeline rather than over-promising. Start with a smaller engagement to test the relationship before committing to long-term contracts."
+    ],
+    faqs: [
+      {
+        question: "How much should a small business budget for marketing?",
+        answer: "A common guideline is 5-10% of revenue for established businesses maintaining their position, or 10-20% for businesses actively growing or launching new products. For early-stage businesses without significant revenue, budget what you can sustainably invest while testing channels. Agency retainers for small businesses typically start around $2,000-5,000/month. Factor in ad spend separately—agencies manage the strategy, but paid advertising requires additional budget for the platforms themselves."
+      },
+      {
+        question: "What results should I expect from a marketing agency?",
+        answer: "Realistic expectations depend on your goals and channels. SEO typically takes 6-12 months to show significant results. Paid advertising can generate immediate traffic, but optimization takes 2-3 months. Content marketing and social media build over time. Any agency promising guaranteed results or overnight success is a red flag. Good agencies will establish baseline metrics, set realistic targets, and provide regular reporting on progress. Ask about typical results for clients similar to you."
+      },
+      {
+        question: "Should I hire a marketing agency or build an in-house team?",
+        answer: "For most small businesses, agencies offer advantages: immediate access to expertise across multiple disciplines, no hiring/training overhead, and easier scalability. In-house makes more sense when marketing is central to your business model, when you have enough work to justify full-time staff, or when deep institutional knowledge matters. Many businesses use a hybrid approach: in-house for strategy and day-to-day execution, agencies for specialized services or campaigns."
+      },
+      {
+        question: "What should I look for in a marketing agency contract?",
+        answer: "Key contract elements include: clear scope of work and deliverables, pricing and payment terms, reporting and communication expectations, intellectual property ownership (you should own creative work product), minimum commitment period (avoid long lock-ins initially), termination clauses (30-60 day notice is reasonable), and confidentiality provisions. Avoid contracts with automatic renewals without your approval or unclear ownership of ad accounts and creative assets."
+      }
+    ]
+  },
+  "commercial-real-estate": {
+    heading: "Finding Commercial Real Estate",
+    content: [
+      "Finding the right commercial space—whether retail storefront, office, warehouse, or industrial—is one of the most significant decisions a business will make. Location affects customer access, operational efficiency, employee recruitment, and brand perception. Understanding commercial real estate basics helps you navigate this complex market and find space that supports your business goals.",
+      "Commercial real estate comes in several categories. Office space ranges from traditional buildings to modern flex spaces and executive suites. Retail includes storefronts, shopping centers, and pop-up locations. Industrial encompasses warehouses, distribution centers, and manufacturing facilities. Mixed-use properties combine residential and commercial space. Each type has different lease structures, zoning considerations, and cost factors.",
+      "Commercial leases differ significantly from residential. Terms typically run 3-10 years, though shorter terms may be available at premium rates. Understand the lease structure: gross leases include most expenses in the base rent; net leases (NNN) add property taxes, insurance, and maintenance on top of base rent. Common Area Maintenance (CAM) charges cover shared space upkeep. Build-out allowances (Tenant Improvement or TI) may be negotiated for customization.",
+      "Working with a commercial real estate agent costs you nothing as a tenant—landlords pay the commission. A good agent knows the market, has access to off-market listings, and can negotiate favorable terms. Look for agents who specialize in your property type and understand your business needs. They can help you compare true occupancy costs, understand lease terms, and avoid common pitfalls.",
+      "Before committing to space, consider growth projections—can you expand in the building if successful? Understand zoning and use restrictions—can you legally operate your business there? Assess parking, accessibility, and visibility. Review the landlord's reputation with current or former tenants. Factor in all costs: rent, utilities, buildout, signage, parking. Getting the right space at the right terms sets your business up for success; the wrong space can drain resources and limit your potential."
+    ],
+    faqs: [
+      {
+        question: "How much should a small business budget for commercial rent?",
+        answer: "A common guideline is that rent should not exceed 5-10% of gross revenue for most businesses. However, this varies significantly by industry—retail businesses with high foot traffic may justify higher rent percentages. Consider total occupancy cost, not just base rent: add utilities, CAM charges, insurance, and maintenance. In addition to monthly costs, budget for security deposits (often 2-3 months rent), first and last month's rent, and any build-out costs."
+      },
+      {
+        question: "What's the difference between a gross lease and a triple net (NNN) lease?",
+        answer: "In a gross lease, the landlord includes most operating expenses (taxes, insurance, maintenance) in the base rent—you pay one predictable amount. In a triple net (NNN) lease, you pay base rent plus your share of property taxes, building insurance, and common area maintenance separately. NNN leases appear cheaper but total costs can be comparable or higher. Modified gross leases fall in between. Always calculate total occupancy cost to compare options fairly."
+      },
+      {
+        question: "Should I use a commercial real estate agent?",
+        answer: "Yes, for most businesses. Tenant representation costs you nothing—landlords pay the commission. A good commercial agent knows the market, has access to listings you won't find online, understands lease terms, and negotiates on your behalf. They can help you compare true costs across different properties and lease structures. Look for agents specializing in your property type (retail, office, industrial) who understand your business needs."
+      },
+      {
+        question: "What should I negotiate in a commercial lease?",
+        answer: "Key negotiation points include: rent rate and escalation clauses (how much rent increases annually), lease term and renewal options, tenant improvement allowance for build-out, rent abatement periods (free rent during build-out or ramping up), personal guarantee limitations (especially important for LLCs), subleasing rights, signage rights, parking allocations, exclusive use clauses (preventing competing tenants), and termination or exit clauses. Everything is negotiable—don't accept the first offer."
+      }
+    ]
+  },
+  "business-insurance": {
+    heading: "Understanding Business Insurance",
+    content: [
+      "Business insurance protects your company from financial losses due to accidents, lawsuits, property damage, and other risks. While it might seem like an expense you can defer, operating without proper coverage puts everything you've built at risk. Understanding the types of coverage available helps you make informed decisions about protecting your business.",
+      "Several types of business insurance are commonly needed. General liability insurance covers third-party claims for bodily injury or property damage—essential for any business with customers, clients, or public interactions. Professional liability (errors and omissions) protects service businesses against claims of negligence or inadequate work. Property insurance covers your physical assets, inventory, and equipment. Workers' compensation is required in most states if you have employees.",
+      "Additional coverage types depend on your business model. Commercial auto insurance covers vehicles used for business. Cyber liability protects against data breaches and cyber attacks. Business interruption insurance replaces income if you can't operate due to a covered event. Product liability is essential if you manufacture or sell physical products. Directors and officers (D&O) insurance protects leadership from personal liability for business decisions.",
+      "Insurance costs vary based on your industry, revenue, number of employees, coverage limits, and claims history. A home-based consultant might pay $500-1,500/year for basic coverage. A retail store might pay $2,000-5,000. Restaurants and contractors with higher liability risks pay more. Bundle policies (Business Owner's Policy or BOP) often provide better value than purchasing separately. Deductibles affect premiums—higher deductibles mean lower premiums but more out-of-pocket when claims occur.",
+      "Work with an insurance agent who understands small business needs. Independent agents can compare policies from multiple carriers. Discuss your specific risks and operations so they can recommend appropriate coverage. Review policies annually as your business changes. Understand what's covered and what's excluded—the cheapest policy isn't always the best value if it leaves significant gaps in protection."
+    ],
+    faqs: [
+      {
+        question: "What business insurance do I legally need?",
+        answer: "Requirements vary by state and business type. Workers' compensation is required in most states if you have employees. Commercial auto insurance is required for business vehicles. Some industries require professional liability insurance. Beyond legal requirements, general liability insurance is essential for most businesses—landlords often require it, and clients may require proof of coverage. Consult with an insurance agent about requirements for your specific situation."
+      },
+      {
+        question: "How much does small business insurance cost?",
+        answer: "Costs vary significantly by coverage type and business risk. General liability for a low-risk business might cost $300-600/year. Professional liability ranges from $500-3,000/year. A Business Owner's Policy (BOP) bundling property and liability typically costs $500-3,000/year for small businesses. High-risk industries (restaurants, construction, healthcare) pay considerably more. Get quotes from multiple carriers and consider working with an independent agent who can compare options."
+      },
+      {
+        question: "What's a Business Owner's Policy (BOP)?",
+        answer: "A BOP bundles general liability and commercial property insurance into a single policy, typically at a lower cost than purchasing separately. Most BOPs include business interruption coverage as well. They're designed for small to mid-sized businesses and offer convenient, cost-effective basic protection. However, BOPs have limitations—you may need additional policies for professional liability, cyber coverage, workers' comp, or industry-specific risks."
+      },
+      {
+        question: "Do I need insurance if I work from home?",
+        answer: "Yes—your homeowner's or renter's insurance typically doesn't cover business activities. If you have clients visit, use business equipment, store inventory, or conduct any business operations at home, you need coverage. At minimum, consider a home-based business endorsement to your homeowner's policy, or a separate business policy. Professional liability is especially important for consultants and service providers working from home."
+      }
+    ]
+  },
+  "chamber-of-commerce": {
+    heading: "Joining Your Chamber of Commerce",
+    content: [
+      "Chambers of commerce are membership organizations that advocate for local businesses and provide networking, resources, and community connections. While sometimes seen as old-fashioned, chambers remain valuable for many businesses—particularly those serving local markets or seeking to build community presence. Understanding what chambers offer helps you decide if membership makes sense for your business.",
+      "Chambers vary significantly in size and focus. Major metropolitan chambers may have thousands of members and substantial staffs providing sophisticated programming. Small-town chambers might operate with volunteer leadership and more limited offerings. Some chambers focus on advocacy and government relations, others on networking and events, still others on business resources and education. Research your local chamber to understand what they actually provide.",
+      "Common chamber benefits include networking events (mixers, luncheons, after-hours events), member directories and referral opportunities, business education and workshops, advertising in chamber publications, use of chamber meeting facilities, group purchasing programs for insurance or office supplies, and advocacy on business-friendly policies. Some chambers offer programs specifically for small businesses, women-owned businesses, or specific industries.",
+      "Membership costs vary widely—from $200/year for basic small business membership to several thousand for larger businesses or premium tiers. Many chambers offer tiered membership with additional benefits at higher levels, including sponsorship opportunities and committee leadership roles. Calculate the value by considering which benefits you'll actually use. Networking and referral benefits often deliver the most value for small businesses.",
+      "Getting value from chamber membership requires active participation. Simply paying dues rarely produces results. Attend events regularly. Volunteer for committees that align with your interests. Build genuine relationships rather than just collecting business cards. Give referrals to other members. The businesses that benefit most from chambers are those that invest time and engagement, not just money."
+    ],
+    faqs: [
+      {
+        question: "Is chamber of commerce membership worth it for small businesses?",
+        answer: "It depends on your business model and how actively you'll participate. Chambers provide the most value for businesses serving local markets (retail, restaurants, professional services), businesses where referrals matter, and owners who will actually attend events and build relationships. If you're an online business with national customers or unlikely to participate in networking, chamber membership may not deliver sufficient ROI. Many chambers offer trial memberships or allow you to attend events before joining."
+      },
+      {
+        question: "How much does chamber membership cost?",
+        answer: "Membership fees vary by chamber and business size. Small business memberships typically range from $200-500/year. Mid-sized businesses might pay $500-1,500. Large businesses and premium memberships can cost several thousand dollars. Most chambers offer tiered membership levels with additional benefits at higher tiers, including sponsorship opportunities, event tickets, and committee leadership roles. Compare the benefits at each level to determine the best value."
+      },
+      {
+        question: "What's the difference between a chamber of commerce and a business association?",
+        answer: "Chambers of commerce are typically geographically focused—representing businesses in a city, county, or region regardless of industry. Business associations (also called trade associations) are industry-focused—representing a specific type of business (restaurants, retailers, manufacturers) regardless of location. Some businesses join both. Chambers excel at local networking and community presence; trade associations provide industry-specific resources, advocacy, and peer connections."
+      },
+      {
+        question: "How do I get the most value from chamber membership?",
+        answer: "Active participation is key. Attend events regularly—consistency builds relationships. Volunteer for committees aligned with your interests and expertise. Use the member directory for referrals and introductions. Promote your membership (chamber logos, member listings) for credibility. Give before you ask—refer business to other members. Consider sponsoring events for visibility. Track your engagement and results to evaluate ROI. The members who benefit most treat chambers as relationship-building opportunities, not just directories."
+      }
+    ]
+  },
+  "virtual-office": {
+    heading: "Using Virtual Office Services",
+    content: [
+      "Virtual offices provide professional business amenities—mailing addresses, phone services, meeting rooms—without the cost of traditional office space. For remote workers, home-based businesses, and companies establishing presence in new markets, virtual offices offer flexibility and professional credibility. Understanding the options helps you choose services that match your needs.",
+      "Core virtual office services include professional business addresses for mail receipt, mail handling and forwarding, business phone numbers with answering services, and access to meeting rooms or day offices when needed. Some providers offer additional services like live receptionists, administrative support, and coworking access. Packages range from basic mail-only services to comprehensive solutions mimicking a full-service executive suite.",
+      "A professional business address offers several benefits. It separates your business from your home address, providing privacy and professionalism. It enables business registration in locations where you don't have physical presence. It creates credibility with clients who may be wary of home-based businesses. Some addresses in prestigious locations or buildings may enhance your brand perception.",
+      "Virtual office costs typically range from $50-300/month depending on location and services included. Basic mail handling might cost $50-100/month. Add phone answering services for another $50-150/month. Meeting room access often comes with limited hours included, with additional hours available for purchase. Consider the true costs: mail forwarding fees, per-minute charges for phone services, and meeting room rates can add up.",
+      "When choosing a virtual office provider, consider location—is it convenient for occasional in-person meetings? How professional is the address and building? What are the specific mail handling procedures and turnaround times? How does phone answering work, and how professional are the receptionists? Are meeting rooms modern and well-equipped? Visit the facility before committing. The cheapest option isn't always the best if it undermines your professional image."
+    ],
+    faqs: [
+      {
+        question: "Can I use a virtual office address to register my business?",
+        answer: "Generally yes, but with caveats. Most states allow virtual office addresses for business registration, but some states require a registered agent with a physical address in that state. Banks may require additional verification when opening accounts for businesses using virtual addresses. Some professional licenses require physical office presence. Check specific requirements for your state and industry before committing. A reputable virtual office provider can often advise on what's permissible."
+      },
+      {
+        question: "How much does a virtual office cost?",
+        answer: "Virtual office pricing varies by location and services. Basic mail handling starts around $50-75/month. Mid-tier packages with a premium address and phone services run $100-200/month. Comprehensive packages including live receptionist and meeting room hours can cost $200-400+/month. Location matters—a Manhattan address costs more than a suburban one. Watch for additional fees: mail forwarding, package handling, phone minutes, and meeting room overages."
+      },
+      {
+        question: "What's the difference between a virtual office and a coworking membership?",
+        answer: "Virtual offices provide business services (address, mail, phone) without dedicated workspace—you work elsewhere. Coworking memberships provide actual workspace (hot desk, dedicated desk, or private office) in a shared environment. Some providers offer both, or hybrid packages combining virtual office services with limited coworking access. Choose based on whether you need a place to work or just business services and occasional meeting space."
+      },
+      {
+        question: "Will clients know I'm using a virtual office?",
+        answer: "Professional virtual offices shouldn't be obviously identifiable as such. Quality providers use prestigious addresses in real office buildings, not PO boxes. Phone answering services respond with your company name professionally. Meeting rooms should be well-appointed and suitable for client meetings. However, if clients visit frequently or expect dedicated office space, a virtual office may not be appropriate. Be honest about your setup if asked directly—most clients understand and accept remote and flexible work arrangements."
+      }
+    ]
+  },
+  "business-consultant": {
+    heading: "Working with Business Consultants",
+    content: [
+      "Business consultants help companies solve problems, improve operations, and accelerate growth by bringing outside expertise and perspective. Whether you're struggling with a specific challenge or seeking to take your business to the next level, the right consultant can provide valuable guidance. Understanding how consulting relationships work helps you get maximum value from the engagement.",
+      "Consultants specialize in different areas. Strategy consultants help with business planning, market entry, and competitive positioning. Operations consultants optimize processes, supply chains, and efficiency. Marketing consultants develop customer acquisition and brand strategies. Financial consultants address cash flow, pricing, fundraising, and financial planning. HR consultants help with hiring, culture, and organizational development. Some consultants are generalists who work across multiple areas with small businesses.",
+      "Consultants typically work in several formats. Project-based engagements address specific problems or initiatives with defined deliverables. Retainer arrangements provide ongoing access to expertise for a monthly fee. Advisory relationships offer periodic guidance without hands-on implementation. Some consultants offer intensive workshops or assessments. Choose a format that matches your needs—complex transformations need sustained engagement; specific questions might need just a few hours.",
+      "Consultant costs vary widely based on expertise and engagement type. Independent consultants working with small businesses might charge $100-300/hour or $1,000-5,000 for short projects. Established firms charge $200-500/hour or more. Retainer arrangements provide predictable monthly costs, typically $1,000-5,000 for small business engagements. Always discuss fees upfront and understand what's included. The cheapest option isn't always the best value if they lack relevant experience.",
+      "Getting value from consulting relationships requires clarity and collaboration. Define your goals and expected outcomes before engaging. Choose consultants with relevant experience in your industry or problem area. Be honest about your situation—consultants can't help if they don't understand the real challenges. Implement recommendations—the best advice is worthless without action. Maintain communication and provide feedback throughout the engagement. The most successful consulting relationships are partnerships where both sides are invested in results."
+    ],
+    faqs: [
+      {
+        question: "When should a small business hire a consultant?",
+        answer: "Consider hiring a consultant when: you face a specific challenge outside your expertise (entering new markets, improving operations, raising capital), you need objective outside perspective on your business, you're stuck and need to break through a growth plateau, you have a one-time need that doesn't justify a full-time hire, or you want to accelerate results by leveraging proven expertise. Consultants make less sense for ongoing operational needs better suited to employees or when you can't clearly articulate the problem you need help solving."
+      },
+      {
+        question: "How much do business consultants charge?",
+        answer: "Consultant fees vary significantly. Independent consultants working with small businesses typically charge $100-300/hour. Established consulting firms may charge $200-500/hour or more. Project-based fees depend on scope—expect $2,000-10,000+ for defined projects. Monthly retainer arrangements for ongoing advisory typically run $1,000-5,000 for small businesses. Always discuss fees upfront, understand what's included, and get agreements in writing. Consider value relative to results rather than just comparing hourly rates."
+      },
+      {
+        question: "How do I choose the right business consultant?",
+        answer: "Look for: relevant experience with similar businesses or problems (ask for specific examples and references), clear explanation of their approach and methodology, chemistry and communication style that works for you, transparent pricing and clear agreements, and realistic expectations about what they can deliver. Avoid consultants who promise guaranteed results, won't provide references, or can't clearly explain how they'll help. A good fit matters as much as credentials—you'll be sharing sensitive business information."
+      },
+      {
+        question: "What should I expect from a consulting engagement?",
+        answer: "Expect an initial discovery phase where the consultant learns about your business and clarifies goals. They should provide clear recommendations or deliverables based on analysis. For implementation engagements, expect regular check-ins, progress tracking, and adjustments as needed. Good consultants are responsive, meet commitments, and proactively communicate. You should see measurable progress toward defined goals. If you're not getting value, address it directly—reputable consultants want successful outcomes and will adjust their approach."
+      }
+    ]
   }
 };
 
@@ -143,6 +367,24 @@ function getIconColorClass(category: string): string {
       return "from-orange-400 to-orange-600";
     case "sba":
       return "from-red-400 to-red-600";
+    case "business-attorney":
+      return "from-violet-400 to-violet-600";
+    case "accountant":
+      return "from-teal-400 to-teal-600";
+    case "marketing-agency":
+      return "from-pink-400 to-pink-600";
+    case "print-shop":
+      return "from-amber-400 to-amber-600";
+    case "commercial-real-estate":
+      return "from-sky-400 to-sky-600";
+    case "business-insurance":
+      return "from-lime-400 to-lime-600";
+    case "chamber-of-commerce":
+      return "from-rose-400 to-rose-600";
+    case "virtual-office":
+      return "from-fuchsia-400 to-fuchsia-600";
+    case "business-consultant":
+      return "from-indigo-400 to-indigo-600";
     default:
       return "from-gray-400 to-gray-600";
   }
@@ -159,6 +401,24 @@ function getCategoryAccentClasses(category: string): string {
       return "border-orange-100/50 shadow-[0_4px_20px_-4px_rgba(234,88,12,0.15)]";
     case "sba":
       return "border-red-100/50 shadow-[0_4px_20px_-4px_rgba(220,38,38,0.15)]";
+    case "business-attorney":
+      return "border-violet-100/50 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.15)]";
+    case "accountant":
+      return "border-teal-100/50 shadow-[0_4px_20px_-4px_rgba(20,184,166,0.15)]";
+    case "marketing-agency":
+      return "border-pink-100/50 shadow-[0_4px_20px_-4px_rgba(236,72,153,0.15)]";
+    case "print-shop":
+      return "border-amber-100/50 shadow-[0_4px_20px_-4px_rgba(245,158,11,0.15)]";
+    case "commercial-real-estate":
+      return "border-sky-100/50 shadow-[0_4px_20px_-4px_rgba(14,165,233,0.15)]";
+    case "business-insurance":
+      return "border-lime-100/50 shadow-[0_4px_20px_-4px_rgba(132,204,22,0.15)]";
+    case "chamber-of-commerce":
+      return "border-rose-100/50 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.15)]";
+    case "virtual-office":
+      return "border-fuchsia-100/50 shadow-[0_4px_20px_-4px_rgba(217,70,239,0.15)]";
+    case "business-consultant":
+      return "border-indigo-100/50 shadow-[0_4px_20px_-4px_rgba(99,102,241,0.15)]";
     default:
       return "border-gray-100/50 shadow-[0_4px_20px_-4px_rgba(107,114,128,0.15)]";
   }

@@ -366,22 +366,27 @@ async function getExistingSourceIds(): Promise<Set<string>> {
   return ids;
 }
 
-// Generate unique slug
-async function generateUniqueSlug(baseSlug: string): Promise<string> {
+// Generate unique slug (checks both database and provided set of already-used slugs)
+async function generateUniqueSlug(baseSlug: string, usedSlugs: Set<string>): Promise<string> {
   let slug = baseSlug;
   let counter = 1;
 
   while (true) {
-    const { data } = await supabase
-      .from('resource_listings')
-      .select('slug')
-      .eq('slug', slug)
-      .single();
+    // Check if slug is already used in current batch
+    if (!usedSlugs.has(slug)) {
+      // Check database
+      const { data } = await supabase
+        .from('resource_listings')
+        .select('slug')
+        .eq('slug', slug)
+        .single();
 
-    if (!data) {
-      return slug;
+      if (!data) {
+        return slug;
+      }
     }
 
+    // Slug is taken, try next counter
     slug = `${baseSlug}-${counter}`;
     counter++;
 
@@ -396,9 +401,14 @@ async function generateUniqueSlug(baseSlug: string): Promise<string> {
 async function insertListings(listings: any[]): Promise<number> {
   if (listings.length === 0) return 0;
 
-  // Generate unique slugs
+  // Track slugs used in this batch to prevent collisions within the batch
+  const usedSlugs = new Set<string>();
+
+  // Generate unique slugs for each listing
   for (const listing of listings) {
-    listing.slug = await generateUniqueSlug(listing.slug);
+    const uniqueSlug = await generateUniqueSlug(listing.slug, usedSlugs);
+    listing.slug = uniqueSlug;
+    usedSlugs.add(uniqueSlug);
   }
 
   const { data, error } = await supabase
