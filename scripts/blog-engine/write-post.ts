@@ -396,6 +396,25 @@ function extractFAQs(markdown: string): { question: string; answer: string }[] {
   return faqs;
 }
 
+function addFeaturedImageToFrontmatter(markdown: string, slug: string): string {
+  // Add featuredImage field to frontmatter if not present
+  const featuredImagePath = `/blog/images/${slug}-featured.png`;
+
+  // Check if already has featuredImage
+  if (/^featuredImage:/m.test(markdown) || /^featured_image:/m.test(markdown)) {
+    return markdown;
+  }
+
+  // Insert before the closing ---
+  const frontmatterEnd = markdown.indexOf('---', 3);
+  if (frontmatterEnd === -1) return markdown;
+
+  const beforeEnd = markdown.slice(0, frontmatterEnd);
+  const afterEnd = markdown.slice(frontmatterEnd);
+
+  return `${beforeEnd}featuredImage: "${featuredImagePath}"\n${afterEnd}`;
+}
+
 async function main() {
   console.log('Blog Engine: Write Post');
   console.log('=======================');
@@ -527,6 +546,9 @@ async function main() {
       console.warn('  Warning: Publishing despite validation issues');
     }
   }
+
+  // Add featuredImage to frontmatter
+  markdown = addFeaturedImageToFrontmatter(markdown, topic.slug);
 
   // Ensure blog directory exists
   if (!fs.existsSync(BLOG_DIR)) {

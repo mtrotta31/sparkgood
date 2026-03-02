@@ -5,6 +5,7 @@ description: "Find out which business insurance types you actually need for your
 date: "2026-03-02"
 tags: ["business-insurance", "startup-basics", "risk-management", "small-business-planning"]
 author: "SparkLocal"
+featuredImage: "/blog/images/what-business-insurance-do-i-need-featured.png"
 ---
 
 You're starting a business, and someone just asked if you have insurance. You froze. The truth is, not every business needs the same coverage, and buying the wrong policies wastes money while buying too little leaves you exposed. The right insurance depends on your industry, employee count, liability risk, and whether you own physical assets.

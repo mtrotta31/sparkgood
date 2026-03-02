@@ -5,6 +5,7 @@ description: "Real startup costs for 10 business types, plus ways to reduce expe
 date: "2026-03-02"
 tags: ["startup costs", "business planning", "entrepreneurship", "funding", "small business"]
 author: "SparkLocal"
+featuredImage: "/blog/images/how-much-does-it-cost-to-start-a-business-featured.png"
 ---
 
 The honest answer: it depends. A freelance consulting business might cost you $500 to launch, while a restaurant could run $250,000+. But there's a middle ground for most entrepreneurs—and ways to cut costs at every stage.

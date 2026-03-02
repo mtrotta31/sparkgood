@@ -5,6 +5,7 @@ description: "Get a small business grant in 6 steps. Find federal, state, and lo
 date: "2026-03-02"
 tags: ["grants", "funding", "small business", "free money", "entrepreneurs"]
 author: "SparkLocal"
+featuredImage: "/blog/images/how-to-get-a-small-business-grant-featured.png"
 ---
 
 A small business grant is essentially free money from the government or private organizations—you don't have to repay it. Unlike loans, grants don't require monthly payments or interest charges. Most are competitive, which means thousands of businesses apply for the same funding. The good news? If you understand what funders actually want and you're willing to put in the application work, you can get one.
