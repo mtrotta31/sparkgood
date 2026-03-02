@@ -14,6 +14,7 @@ export interface BlogPost {
   date: string;
   author: string;
   tags: string[];
+  featuredImage?: string; // Optional custom featured image path
   content: string; // Raw markdown
   htmlContent?: string; // Rendered HTML
 }
@@ -116,6 +117,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     date: data.date || "",
     author: data.author || "SparkLocal",
     tags: data.tags || [],
+    featuredImage: data.featured_image || data.featuredImage || undefined,
     content,
     htmlContent,
   };
@@ -133,4 +135,56 @@ export function formatBlogDate(dateString: string): string {
     month: "long",
     day: "numeric",
   });
+}
+
+/**
+ * Extract FAQ items from markdown content
+ * Looks for H2 headings that end with a question mark
+ */
+export function extractFAQsFromContent(
+  content: string
+): { question: string; answer: string }[] {
+  const faqs: { question: string; answer: string }[] = [];
+
+  // Split content by H2 headings
+  const sections = content.split(/^## /m);
+
+  for (const section of sections) {
+    if (!section.trim()) continue;
+
+    // Split first line (heading) from rest
+    const lines = section.split("\n");
+    const heading = lines[0].trim();
+
+    // Check if heading ends with ?
+    if (!heading.endsWith("?")) continue;
+
+    // Get the first paragraph as the answer
+    const restContent = lines.slice(1).join("\n").trim();
+    const paragraphs = restContent.split(/\n\n/);
+    const firstParagraph = paragraphs[0]?.trim();
+
+    // Skip if answer is too short or is another heading
+    if (
+      !firstParagraph ||
+      firstParagraph.length < 50 ||
+      firstParagraph.startsWith("#")
+    ) {
+      continue;
+    }
+
+    // Clean up the answer (remove markdown links, bold, etc.)
+    const cleanAnswer = firstParagraph
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove links, keep text
+      .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove bold
+      .replace(/\*([^*]+)\*/g, "$1") // Remove italic
+      .replace(/`([^`]+)`/g, "$1"); // Remove code
+
+    faqs.push({
+      question: heading,
+      answer: cleanAnswer,
+    });
+  }
+
+  return faqs;
 }
