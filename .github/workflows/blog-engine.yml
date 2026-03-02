@@ -1,0 +1,233 @@
+name: Automated Blog Engine
+
+on:
+  schedule:
+    # MWF at 6 AM EST (11 AM UTC)
+    - cron: '0 11 * * 1,3,5'
+  workflow_dispatch:
+    inputs:
+      skip_discovery:
+        description: 'Skip keyword discovery (reuse existing pool)'
+        required: false
+        default: 'false'
+        type: boolean
+      dry_run:
+        description: 'Dry run (no git push, no index submission)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  publish-blog-post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+      DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      INDEXNOW_API_KEY: ${{ secrets.INDEXNOW_KEY }}
+      GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Use GH_PAT if available for push access, fall back to GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT || github.token }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure git
+        run: |
+          git config user.name "SparkLocal Bot"
+          git config user.email "bot@sparklocal.co"
+
+      - name: Determine if discovery should run
+        id: discovery_check
+        run: |
+          # Skip discovery on Wednesday (3) and Friday (5) to save DataForSEO costs
+          # Only run discovery on Monday (1)
+          DAY_OF_WEEK=$(date +%u)
+
+          # Manual trigger can override
+          if [ "${{ github.event.inputs.skip_discovery }}" == "true" ]; then
+            echo "skip_discovery=true" >> $GITHUB_OUTPUT
+            echo "Skipping discovery (manual override)"
+          elif [ "$DAY_OF_WEEK" == "3" ] || [ "$DAY_OF_WEEK" == "5" ]; then
+            echo "skip_discovery=true" >> $GITHUB_OUTPUT
+            echo "Skipping discovery (Wed/Fri - reusing keyword pool)"
+          else
+            echo "skip_discovery=false" >> $GITHUB_OUTPUT
+            echo "Running discovery (Monday)"
+          fi
+
+      - name: Discover keywords
+        if: steps.discovery_check.outputs.skip_discovery != 'true'
+        id: discover
+        continue-on-error: true
+        run: |
+          npx tsx scripts/blog-engine/discover-keywords.ts
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Check keyword pool exists
+        id: pool_check
+        run: |
+          if [ -f "data/blog-engine/keyword-pool.json" ]; then
+            KEYWORD_COUNT=$(cat data/blog-engine/keyword-pool.json | jq '.keywords | length')
+            if [ "$KEYWORD_COUNT" -gt "0" ]; then
+              echo "has_keywords=true" >> $GITHUB_OUTPUT
+              echo "Keyword pool has $KEYWORD_COUNT keywords"
+            else
+              echo "has_keywords=false" >> $GITHUB_OUTPUT
+              echo "Keyword pool is empty"
+            fi
+          else
+            echo "has_keywords=false" >> $GITHUB_OUTPUT
+            echo "No keyword pool found"
+          fi
+
+      - name: Select topic
+        if: steps.pool_check.outputs.has_keywords == 'true'
+        id: select
+        continue-on-error: true
+        run: |
+          npx tsx scripts/blog-engine/select-topic.ts
+          if [ -f "data/blog-engine/selected-topic.json" ]; then
+            KEYWORD=$(cat data/blog-engine/selected-topic.json | jq -r '.keyword')
+            echo "keyword=$KEYWORD" >> $GITHUB_OUTPUT
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "Selected topic: $KEYWORD"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "Failed to select topic"
+          fi
+
+      - name: Write blog post
+        if: steps.select.outputs.status == 'success'
+        id: write
+        continue-on-error: true
+        run: |
+          npx tsx scripts/blog-engine/write-post.ts
+          if [ $? -eq 0 ]; then
+            SLUG=$(cat data/blog-engine/selected-topic.json | jq -r '.slug')
+            if [ -f "content/blog/$SLUG.md" ]; then
+              echo "status=success" >> $GITHUB_OUTPUT
+              echo "slug=$SLUG" >> $GITHUB_OUTPUT
+              echo "Blog post written: $SLUG"
+            else
+              echo "status=failed" >> $GITHUB_OUTPUT
+              echo "Blog post file not found"
+            fi
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "write-post.ts failed"
+          fi
+
+      - name: Generate images
+        if: steps.write.outputs.status == 'success'
+        id: images
+        continue-on-error: true
+        run: |
+          npx tsx scripts/blog-engine/generate-images.ts
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Publish (git commit and push)
+        if: steps.write.outputs.status == 'success' && github.event.inputs.dry_run != 'true'
+        id: publish
+        continue-on-error: true
+        run: |
+          # Run publish script (handles git add and commit)
+          npx tsx scripts/blog-engine/publish-post.ts
+
+          # Push to main
+          git push origin main
+
+          if [ $? -eq 0 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "Published and pushed to main"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "Failed to push"
+          fi
+
+      - name: Submit to search engines
+        if: steps.publish.outputs.status == 'success' && github.event.inputs.dry_run != 'true'
+        id: index
+        continue-on-error: true
+        run: |
+          npx tsx scripts/blog-engine/submit-indexes.ts
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Blog Engine Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.discovery_check.outputs.skip_discovery }}" == "true" ]; then
+            echo "| Discover Keywords | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.discover.outputs.status }}" == "success" ]; then
+            echo "| Discover Keywords | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Discover Keywords | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.pool_check.outputs.has_keywords }}" != "true" ]; then
+            echo "| Select Topic | ❌ No keywords |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.select.outputs.status }}" == "success" ]; then
+            echo "| Select Topic | ✅ ${{ steps.select.outputs.keyword }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Select Topic | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.write.outputs.status }}" == "success" ]; then
+            echo "| Write Post | ✅ ${{ steps.write.outputs.slug }} |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.select.outputs.status }}" != "success" ]; then
+            echo "| Write Post | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Write Post | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.images.outputs.status }}" == "success" ]; then
+            echo "| Generate Images | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.write.outputs.status }}" != "success" ]; then
+            echo "| Generate Images | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Generate Images | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+            echo "| Publish | ⏭️ Dry run |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.publish.outputs.status }}" == "success" ]; then
+            echo "| Publish | ✅ Pushed to main |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.write.outputs.status }}" != "success" ]; then
+            echo "| Publish | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Publish | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+            echo "| Submit Indexes | ⏭️ Dry run |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.index.outputs.status }}" == "success" ]; then
+            echo "| Submit Indexes | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.publish.outputs.status }}" != "success" ]; then
+            echo "| Submit Indexes | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Submit Indexes | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run completed at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
