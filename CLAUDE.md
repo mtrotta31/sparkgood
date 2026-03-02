@@ -498,7 +498,11 @@ sparklocal/
 │       ├── 20240227_launch_kit_v2.sql                 # Launch Kit V2 storage
 │       ├── 20260226_webhook_idempotency.sql           # Stripe webhook deduplication
 │       └── 20260228_expansion_tracking.sql            # Smart Expansion tracking table
-└── public/                      # Static assets
+├── content/
+│   └── blog/                    # Markdown blog posts
+│       └── *.md                 # Posts with frontmatter (title, slug, description, date, tags, featuredImage)
+└── public/
+    └── blog/images/             # Featured images ({slug}-featured.png)
 ```
 
 ## Utility Functions (`src/lib/`)
@@ -942,3 +946,16 @@ The `scripts/enrich-content-seo.ts` script generates AI content for directory pa
   - `keyword-pool.json` — Discovered keywords with volume, difficulty, CPC, intent
   - `selected-topic.json` — Current topic with mapped internal links
   - `last-post-faqs.json` — Extracted FAQs for schema markup
+
+### Blog Post Infrastructure (`src/lib/blog.ts`)
+- **BlogPost interface:** slug, title, description, date, author, tags, `featuredImage` (optional path), content, htmlContent
+- **`getPostBySlug()`:** Reads markdown, parses frontmatter via gray-matter, converts content to HTML via remark
+- **`featuredImage` field:** Parsed from frontmatter (`featured_image` or `featuredImage`); write-post.ts always adds this field
+- **`extractFAQsFromContent()`:** Extracts Q&A pairs from H2 headings ending with `?` for FAQPage schema markup
+- **FAQ extraction logic:** First paragraph after question heading becomes answer; skips answers <50 chars or starting with `#`
+
+### Blog Post Page (`src/app/blog/[slug]/page.tsx`)
+- **Featured images:** Always displayed; defaults to `/blog/images/{slug}-featured.png` if no frontmatter field
+- **No filesystem checks:** Removed `fs.existsSync` which doesn't work on Vercel serverless environment
+- **Schema markup:** Article, BreadcrumbList, and FAQPage (auto-extracted from Q&A headings)
+- **OG images:** Uses featuredImage path for OpenGraph and Twitter cards
