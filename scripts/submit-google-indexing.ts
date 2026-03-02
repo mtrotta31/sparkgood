@@ -65,9 +65,19 @@ import { STATE_GUIDES } from '../src/data/state-guides';
 config({ path: '.env.local' });
 
 const SITE_URL = 'https://sparklocal.co';
-const DAILY_QUOTA = 200;
+// Daily quota is 200, but we reserve 10 for blog engine's submit-indexes step (~3 posts/week)
+const DAILY_QUOTA = 190;
 const SUBMITTED_FILE = path.join(__dirname, 'indexing-submitted.json');
 const BLOG_DIR = path.join(__dirname, '../content/blog');
+
+// Google quota error patterns
+const QUOTA_ERROR_PATTERNS = [
+  'quota',
+  'rateLimitExceeded',
+  'RESOURCE_EXHAUSTED',
+  'too many requests',
+  '429',
+];
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -353,6 +363,8 @@ async function main() {
   const startTime = Date.now();
   let successCount = 0;
   let errorCount = 0;
+  let quotaErrorCount = 0;
+  let hitQuotaLimit = false;
 
   for (let i = 0; i < urlsToSubmit.length; i++) {
     const url = urlsToSubmit[i];
@@ -360,22 +372,45 @@ async function main() {
 
     const result = await submitUrl(indexing, url);
 
-    history.submissions[url] = {
-      url,
-      submittedAt: new Date().toISOString(),
-      status: result.success ? 'success' : 'error',
-      response: result.response,
-    };
+    // Check if this is a quota error
+    const isQuotaError = result.response &&
+      QUOTA_ERROR_PATTERNS.some(pattern =>
+        result.response!.toLowerCase().includes(pattern.toLowerCase())
+      );
 
     if (result.success) {
+      history.submissions[url] = {
+        url,
+        submittedAt: new Date().toISOString(),
+        status: 'success',
+        response: result.response,
+      };
       successCount++;
       console.log(`${progress} OK: ${url}`);
+      history.totalSubmitted++;
+    } else if (isQuotaError) {
+      // Don't record quota errors as submissions - we'll retry tomorrow
+      quotaErrorCount++;
+      console.log(`${progress} QUOTA: ${url} - Daily limit reached`);
+
+      // Stop submitting once we hit quota - remaining URLs will all fail
+      if (!hitQuotaLimit) {
+        hitQuotaLimit = true;
+        console.log('\n⚠️  Daily quota reached. Stopping submissions.');
+        console.log(`   Remaining ${urlsToSubmit.length - i - 1} URLs will be submitted tomorrow.`);
+      }
+      break; // Exit loop - no point continuing
     } else {
+      history.submissions[url] = {
+        url,
+        submittedAt: new Date().toISOString(),
+        status: 'error',
+        response: result.response,
+      };
       errorCount++;
       console.log(`${progress} ERROR: ${url} - ${result.response}`);
+      history.totalSubmitted++;
     }
-
-    history.totalSubmitted++;
 
     // Save progress every 10 URLs
     if ((i + 1) % 10 === 0) {
@@ -393,20 +428,31 @@ async function main() {
   saveSubmissionHistory(history);
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const remainingCount = pendingUrls.length - successCount;
 
   console.log('\n=====================================');
   console.log('Submission Complete');
   console.log(`  Submitted: ${successCount}`);
-  console.log(`  Errors: ${errorCount}`);
+  if (quotaErrorCount > 0) {
+    console.log(`  Quota limit hit: ${quotaErrorCount} URLs skipped`);
+  }
+  if (errorCount > 0) {
+    console.log(`  Errors: ${errorCount}`);
+  }
   console.log(`  Time: ${elapsed}s`);
-  console.log(`  Remaining: ${pendingUrls.length - urlsToSubmit.length}`);
+  console.log(`  Remaining: ${remainingCount}`);
 
-  if (pendingUrls.length > DAILY_QUOTA) {
+  if (remainingCount > 0) {
     console.log(`\nRun again tomorrow to submit more URLs.`);
   }
 
+  // Only exit with error code for real failures (auth errors, network errors, etc.)
+  // Quota exhaustion is expected behavior, not a failure
   if (errorCount > 0) {
+    console.log('\n❌ Exiting with error due to non-quota failures.');
     process.exit(1);
+  } else {
+    console.log('\n✓ Success (quota limit is expected behavior)');
   }
 }
 
