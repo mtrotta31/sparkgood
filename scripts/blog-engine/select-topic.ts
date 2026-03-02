@@ -183,7 +183,7 @@ async function getExistingPostSlugs(): Promise<string[]> {
 
 async function mapInternalLinks(
   keyword: string,
-  supabase: ReturnType<typeof createClient>,
+  supabase: ReturnType<typeof createClient> | null,
   existingPosts: string[]
 ): Promise<SelectedTopic['internalLinks']> {
   const links: SelectedTopic['internalLinks'] = {
@@ -251,8 +251,8 @@ async function mapInternalLinks(
     }
   }
 
-  // Get top cities for city page links (if location-related keyword)
-  if (/city|cities|location|local|where/.test(lowerKeyword)) {
+  // Get top cities for city page links (if location-related keyword and Supabase available)
+  if (/city|cities|location|local|where/.test(lowerKeyword) && supabase) {
     try {
       const { data: cities } = await supabase
         .from('resource_locations')
@@ -300,16 +300,16 @@ async function main() {
     console.log('DRY RUN MODE - No changes will be saved\n');
   }
 
-  // Validate environment
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Supabase is optional for topic selection (only used for city links)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('Error: Missing Supabase environment variables');
-    process.exit(1);
+  let supabase: ReturnType<typeof createClient> | null = null;
+  if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  } else {
+    console.log('Note: Supabase not configured - city page links will be skipped');
   }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Load config and keyword pool
   const blogConfig: Config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));

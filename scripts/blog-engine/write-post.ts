@@ -404,13 +404,14 @@ async function main() {
     console.log('DRY RUN MODE - No content will be written\n');
   }
 
-  // Validate environment
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Validate environment (accept both Next.js and GitHub Actions env var names)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     console.error('Error: Missing Supabase environment variables');
+    console.error('  Set NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY');
     process.exit(1);
   }
 
