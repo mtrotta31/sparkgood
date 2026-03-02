@@ -69,6 +69,20 @@ SparkLocal is a **dual-product platform** that helps aspiring entrepreneurs turn
 - **Automated Pipeline** — Weekly GitHub Action runs expansion + enrichment + IndexNow
 - **Webhook Notifications** — Optional Slack-compatible notifications on completion
 
+### Automated Blog Engine (SEO Content Pipeline)
+- **Fully Automated MWF Schedule** — GitHub Action publishes 3 posts/week at 6 AM EST
+- **Keyword Discovery** — DataForSEO API finds low-competition keywords (100-10K volume, <40 difficulty)
+- **Topic Selection** — Scoring algorithm: `searchVolume / (difficulty + 1) * clusterBonus`
+- **Cannibalization Prevention** — Filters out keywords that would compete with programmatic pages
+- **Content Generation** — Claude Haiku writes 1,500-2,500 word SEO posts with directory data
+- **Quality Gates** — Auto-validates word count, internal links, keyword density, filler phrase blocklist
+- **Featured Images** — Satori generates branded 1200x630 OG images
+- **Cross-Linking** — Automatically updates related posts with links to new content
+- **Search Submission** — IndexNow + Google Indexing API for instant indexing
+- **Cost Efficiency** — ~$8-15/month for 12 posts (DataForSEO ~$1.50, Claude Haiku ~$6-12)
+- **Scripts:** `scripts/blog-engine/` (discover-keywords, select-topic, write-post, generate-images, publish-post, submit-indexes, run-all)
+- **Config:** `data/blog-engine/config.json` (cluster weights, filler blocklist, keyword filters)
+
 ### Authentication & User Data
 - **Supabase Auth** — Email/password authentication with magic links
 - **User Profiles** — Save intake preferences
@@ -461,6 +475,14 @@ sparklocal/
 │   ├── post-expand-pipeline.ts  # Post-expansion enrichment + IndexNow
 │   ├── expansion-report.ts      # View expansion stats and coverage gaps
 │   ├── expansion-logs/          # JSON logs from expansion runs
+│   ├── blog-engine/             # Automated blog content pipeline
+│   │   ├── discover-keywords.ts # DataForSEO keyword discovery
+│   │   ├── select-topic.ts      # Topic scoring and selection
+│   │   ├── write-post.ts        # Claude Haiku content generation
+│   │   ├── generate-images.ts   # Satori featured image generation
+│   │   ├── publish-post.ts      # Git commit + cross-linking
+│   │   ├── submit-indexes.ts    # IndexNow + Google Indexing API
+│   │   └── run-all.ts           # Full pipeline orchestrator
 │   └── ...                      # Data files
 ├── supabase/
 │   └── migrations/
@@ -622,6 +644,18 @@ npx tsx scripts/post-expand-pipeline.ts                      # Run enrichment + 
 npx tsx scripts/post-expand-pipeline.ts --skip-enrichment    # Skip AI enrichment step
 npx tsx scripts/expansion-report.ts                          # View expansion stats and coverage gaps
 npx tsx scripts/expansion-report.ts --export=csv             # Export coverage gaps to CSV
+
+# Automated Blog Engine
+npx tsx scripts/blog-engine/run-all.ts                       # Full pipeline (discover → write → publish)
+npx tsx scripts/blog-engine/run-all.ts --skip-discovery      # Skip keyword discovery, reuse pool
+npx tsx scripts/blog-engine/run-all.ts --dry-run             # Preview without writing files
+npx tsx scripts/blog-engine/discover-keywords.ts             # Discover keywords from DataForSEO
+npx tsx scripts/blog-engine/select-topic.ts                  # Select best keyword from pool
+npx tsx scripts/blog-engine/write-post.ts                    # Generate blog post content
+npx tsx scripts/blog-engine/write-post.ts --force            # Overwrite existing post
+npx tsx scripts/blog-engine/generate-images.ts               # Generate featured image
+npx tsx scripts/blog-engine/publish-post.ts                  # Git commit (no push)
+npx tsx scripts/blog-engine/submit-indexes.ts                # Submit to search engines
 ```
 
 ## Environment Variables
@@ -647,6 +681,11 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=
 
 # SEO
 INDEXNOW_API_KEY=
+
+# Blog Engine (keyword discovery)
+DATAFORSEO_LOGIN=
+DATAFORSEO_PASSWORD=
+GOOGLE_SERVICE_ACCOUNT_KEY=   # For Google Indexing API
 ```
 
 ## Current Phase
@@ -697,6 +736,10 @@ The core product is fully functional with payments:
 - ✅ Model tiering (Haiku for simple tasks, Sonnet for complex)
 - ✅ Content enrichment for SEO (1,000+ listings + 547 cities with AI-generated content)
 - ✅ City hub tips rendered as visual list items
+- ✅ Automated Blog Engine (MWF schedule, keyword discovery, AI content, auto-publish)
+- ✅ Blog featured images via Satori
+- ✅ Blog cross-linking (new posts link to related, old posts updated)
+- ✅ GitHub Actions workflow for fully automated blog publishing
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
@@ -882,3 +925,20 @@ The `scripts/enrich-content-seo.ts` script generates AI content for directory pa
   - Builder page restores state from sessionStorage and navigates to deep_dive step
 - When accessed from other entry points (Welcome, IdeaList, direct URL):
   - Generic CTAs pointing to `/builder`
+
+### Automated Blog Engine
+- **GitHub Action:** `.github/workflows/blog-engine.yml` runs MWF at 6 AM EST (11 AM UTC)
+- **Keyword Discovery Strategy:** Only runs on Monday to save DataForSEO costs; Wed/Fri reuse existing pool
+- **Scoring Formula:** `searchVolume / (difficulty + 1) * clusterBonus`
+- **Cluster Weights:** funding (1.0), getting-started (1.0), location (0.8), services (0.8), industry (0.7)
+- **Cannibalization Patterns:** Filters keywords matching directory pages (`coworking in [city]`) or state guides (`how to start a business in [state]`)
+- **Quality Gates:** Word count (1,200-3,500), internal links (≥3), keyword occurrences (≥2), SparkLocal mentions (≤2), filler phrase blocklist
+- **SparkLocal Mentions:** Prompt requires exactly 1-2 mentions; auto-replacement reduces excess (>3 → 2)
+- **Internal Link Mapping:** `select-topic.ts` maps keywords to category pages, state guides, and related blog posts
+- **Cross-Linking:** `publish-post.ts` updates up to 2 related posts with links to new content
+- **Featured Images:** 1200x630 PNG with dark gradient, SparkLocal branding, title, and tag pills
+- **Config:** `data/blog-engine/config.json` contains cluster weights, filler blocklist, keyword filters, seed keywords
+- **Data Files:**
+  - `keyword-pool.json` — Discovered keywords with volume, difficulty, CPC, intent
+  - `selected-topic.json` — Current topic with mapped internal links
+  - `last-post-faqs.json` — Extracted FAQs for schema markup
