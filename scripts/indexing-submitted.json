@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-02-28T21:51:20.925Z",
-  "totalSubmitted": 200,
+  "lastRun": "2026-03-02T08:42:45.986Z",
+  "totalSubmitted": 390,
   "submissions": {
     "https://sparklocal.co/resources/listing/new-york-sbdc": {
       "url": "https://sparklocal.co/resources/listing/new-york-sbdc",
@@ -1201,6 +1201,1146 @@
       "submittedAt": "2026-02-28T21:51:20.924Z",
       "status": "success",
       "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/sba-community-advantage\"}}"
+    },
+    "https://sparklocal.co/resources/listing/ignite-sparked-by-bbb-san-diego-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/ignite-sparked-by-bbb-san-diego-ca-1",
+      "submittedAt": "2026-03-02T08:42:01.133Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/ignite-sparked-by-bbb-san-diego-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/ansir-innovation-center-san-diego-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/ansir-innovation-center-san-diego-ca-1",
+      "submittedAt": "2026-03-02T08:42:01.416Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/ansir-innovation-center-san-diego-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/rosen-law-group-lp-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/rosen-law-group-lp-houston-tx",
+      "submittedAt": "2026-03-02T08:42:01.698Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/rosen-law-group-lp-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/haynes-and-boone-llp-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/haynes-and-boone-llp-houston-tx",
+      "submittedAt": "2026-03-02T08:42:01.984Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/haynes-and-boone-llp-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/3545-consulting-houston-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/3545-consulting-houston-houston-tx",
+      "submittedAt": "2026-03-02T08:42:02.237Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/3545-consulting-houston-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/uc-san-diego-entrepreneurship-center-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/uc-san-diego-entrepreneurship-center-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:02.512Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/uc-san-diego-entrepreneurship-center-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/launch-factory-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/launch-factory-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:02.804Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/launch-factory-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/jlabs-san-diego-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/jlabs-san-diego-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:03.061Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/jlabs-san-diego-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nest-cowork-san-diego-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/nest-cowork-san-diego-ca-1",
+      "submittedAt": "2026-03-02T08:42:03.293Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nest-cowork-san-diego-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cleantech-san-diego-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/cleantech-san-diego-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:03.564Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cleantech-san-diego-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/joe-vi-jacobs-center-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/joe-vi-jacobs-center-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:03.841Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/joe-vi-jacobs-center-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-lavin-entrepreneurship-center-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/the-lavin-entrepreneurship-center-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:04.057Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-lavin-entrepreneurship-center-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-basement-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/the-basement-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:04.289Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-basement-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/sd-startup-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/sd-startup-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:04.591Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/sd-startup-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/san-diego-orange-imperial-apex-accelerator-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/san-diego-orange-imperial-apex-accelerator-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:04.816Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/san-diego-orange-imperial-apex-accelerator-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/incubate-ventures-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/incubate-ventures-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:05.041Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/incubate-ventures-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/us-china-chamber-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/us-china-chamber-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:05.266Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/us-china-chamber-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/office-depot-coworking-los-gatos-ca": {
+      "url": "https://sparklocal.co/resources/listing/office-depot-coworking-los-gatos-ca",
+      "submittedAt": "2026-03-02T08:42:05.529Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/office-depot-coworking-los-gatos-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-middlegeorgia": {
+      "url": "https://sparklocal.co/resources/listing/score-middlegeorgia",
+      "submittedAt": "2026-03-02T08:42:05.759Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-middlegeorgia\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-naturecoastfl": {
+      "url": "https://sparklocal.co/resources/listing/score-naturecoastfl",
+      "submittedAt": "2026-03-02T08:42:06.031Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-naturecoastfl\"}}"
+    },
+    "https://sparklocal.co/resources/listing/trace-consulting-phoenix-az": {
+      "url": "https://sparklocal.co/resources/listing/trace-consulting-phoenix-az",
+      "submittedAt": "2026-03-02T08:42:06.306Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/trace-consulting-phoenix-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-negeorgia": {
+      "url": "https://sparklocal.co/resources/listing/score-negeorgia",
+      "submittedAt": "2026-03-02T08:42:06.547Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-negeorgia\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-mississippi": {
+      "url": "https://sparklocal.co/resources/listing/score-mississippi",
+      "submittedAt": "2026-03-02T08:42:06.773Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-mississippi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-northchicago": {
+      "url": "https://sparklocal.co/resources/listing/score-northchicago",
+      "submittedAt": "2026-03-02T08:42:06.999Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-northchicago\"}}"
+    },
+    "https://sparklocal.co/resources/listing/us-commerce-department-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/us-commerce-department-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:07.241Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/us-commerce-department-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/japanese-chamber-of-commerce-and-industry-of-new-york-inc-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/japanese-chamber-of-commerce-and-industry-of-new-york-inc-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:07.483Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/japanese-chamber-of-commerce-and-industry-of-new-york-inc-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/korean-chamber-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/korean-chamber-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:07.713Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/korean-chamber-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/amg-marketing-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/amg-marketing-houston-tx",
+      "submittedAt": "2026-03-02T08:42:07.954Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/amg-marketing-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/sage-law-firm-tax-law-and-business-consulting-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/sage-law-firm-tax-law-and-business-consulting-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:08.184Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/sage-law-firm-tax-law-and-business-consulting-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/lieb-lieb-attorneys-at-law-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/lieb-lieb-attorneys-at-law-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:08.412Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/lieb-lieb-attorneys-at-law-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/panakos-law-apc-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/panakos-law-apc-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:08.670Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/panakos-law-apc-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/san-diego-corporate-law-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/san-diego-corporate-law-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:08.895Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/san-diego-corporate-law-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-post-workspaces-tucson-az": {
+      "url": "https://sparklocal.co/resources/listing/the-post-workspaces-tucson-az",
+      "submittedAt": "2026-03-02T08:42:09.122Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-post-workspaces-tucson-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/4-10-printing-center-san-antonio-tx": {
+      "url": "https://sparklocal.co/resources/listing/4-10-printing-center-san-antonio-tx",
+      "submittedAt": "2026-03-02T08:42:09.348Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/4-10-printing-center-san-antonio-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/micro-chamber-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/micro-chamber-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:09.568Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/micro-chamber-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/usa-sri-lanka-chamber-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/usa-sri-lanka-chamber-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:09.808Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/usa-sri-lanka-chamber-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/kazakhstan-chamber-of-commerce-in-the-usa-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/kazakhstan-chamber-of-commerce-in-the-usa-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:10.038Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/kazakhstan-chamber-of-commerce-in-the-usa-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/turkish-american-chamber-of-commerce-and-industry-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/turkish-american-chamber-of-commerce-and-industry-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:10.264Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/turkish-american-chamber-of-commerce-and-industry-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/greyworks-coworking-milwaukee-wi": {
+      "url": "https://sparklocal.co/resources/listing/greyworks-coworking-milwaukee-wi",
+      "submittedAt": "2026-03-02T08:42:10.507Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/greyworks-coworking-milwaukee-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/bernales-law-firm-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/bernales-law-firm-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:10.749Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/bernales-law-firm-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-lane-law-firm-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/the-lane-law-firm-houston-tx",
+      "submittedAt": "2026-03-02T08:42:10.993Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-lane-law-firm-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-devenere-law-collective-pllc-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/the-devenere-law-collective-pllc-houston-tx",
+      "submittedAt": "2026-03-02T08:42:11.223Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-devenere-law-collective-pllc-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/nmw-law-firm-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/nmw-law-firm-houston-tx",
+      "submittedAt": "2026-03-02T08:42:11.450Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/nmw-law-firm-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-stone-law-group-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/the-stone-law-group-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:11.678Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-stone-law-group-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/pokala-law-apc-employment-attorney-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/pokala-law-apc-employment-attorney-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:11.912Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/pokala-law-apc-employment-attorney-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/los-angeles-area-chamber-of-commerce-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/los-angeles-area-chamber-of-commerce-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:12.156Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/los-angeles-area-chamber-of-commerce-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/pm-law-firm-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/pm-law-firm-houston-tx",
+      "submittedAt": "2026-03-02T08:42:12.394Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/pm-law-firm-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/roger-g-jain-associates-p-c-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/roger-g-jain-associates-p-c-houston-tx",
+      "submittedAt": "2026-03-02T08:42:12.635Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/roger-g-jain-associates-p-c-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/elia-law-firm-apc-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/elia-law-firm-apc-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:12.863Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/elia-law-firm-apc-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/worksocial-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/worksocial-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:13.104Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/worksocial-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/845-third-avenue-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/845-third-avenue-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:13.350Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/845-third-avenue-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/opus-virtual-offices-downtown-los-angeles-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/opus-virtual-offices-downtown-los-angeles-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:13.578Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/opus-virtual-offices-downtown-los-angeles-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/centrl-office-downtown-los-angeles-los-angeles-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/centrl-office-downtown-los-angeles-los-angeles-ca-1",
+      "submittedAt": "2026-03-02T08:42:13.820Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/centrl-office-downtown-los-angeles-los-angeles-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/premier-workspaces-los-angeles-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/premier-workspaces-los-angeles-ca-1",
+      "submittedAt": "2026-03-02T08:42:14.064Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/premier-workspaces-los-angeles-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-city-national-plaza-los-angeles-ca-1": {
+      "url": "https://sparklocal.co/resources/listing/spaces-city-national-plaza-los-angeles-ca-1",
+      "submittedAt": "2026-03-02T08:42:14.289Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-city-national-plaza-los-angeles-ca-1\"}}"
+    },
+    "https://sparklocal.co/resources/listing/hkm-employment-attorneys-llp-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/hkm-employment-attorneys-llp-houston-tx",
+      "submittedAt": "2026-03-02T08:42:14.516Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/hkm-employment-attorneys-llp-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/irontek-beloit-wi": {
+      "url": "https://sparklocal.co/resources/listing/irontek-beloit-wi",
+      "submittedAt": "2026-03-02T08:42:14.748Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/irontek-beloit-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/brew-chamber-co-working-offices-brookfield-wi": {
+      "url": "https://sparklocal.co/resources/listing/brew-chamber-co-working-offices-brookfield-wi",
+      "submittedAt": "2026-03-02T08:42:14.976Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/brew-chamber-co-working-offices-brookfield-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-fox-point-wi": {
+      "url": "https://sparklocal.co/resources/listing/regus-fox-point-wi",
+      "submittedAt": "2026-03-02T08:42:15.210Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-fox-point-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/pedal-milwaukee-milwaukee-wi": {
+      "url": "https://sparklocal.co/resources/listing/pedal-milwaukee-milwaukee-wi",
+      "submittedAt": "2026-03-02T08:42:15.440Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/pedal-milwaukee-milwaukee-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/first-virtual-office-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/first-virtual-office-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:15.688Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/first-virtual-office-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/dusk-digital-phoenix-az": {
+      "url": "https://sparklocal.co/resources/listing/dusk-digital-phoenix-az",
+      "submittedAt": "2026-03-02T08:42:15.930Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/dusk-digital-phoenix-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/lavidge-phoenix-az": {
+      "url": "https://sparklocal.co/resources/listing/lavidge-phoenix-az",
+      "submittedAt": "2026-03-02T08:42:16.154Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/lavidge-phoenix-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/12th-floor-executive-suites-psb-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/12th-floor-executive-suites-psb-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:16.393Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/12th-floor-executive-suites-psb-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-longbeach": {
+      "url": "https://sparklocal.co/resources/listing/score-longbeach",
+      "submittedAt": "2026-03-02T08:42:16.632Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-longbeach\"}}"
+    },
+    "https://sparklocal.co/resources/listing/and-they-re-off-consulting-services-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/and-they-re-off-consulting-services-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:16.865Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/and-they-re-off-consulting-services-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/axxess-business-consulting-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/axxess-business-consulting-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:17.095Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/axxess-business-consulting-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-southgeorgia": {
+      "url": "https://sparklocal.co/resources/listing/score-southgeorgia",
+      "submittedAt": "2026-03-02T08:42:17.329Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-southgeorgia\"}}"
+    },
+    "https://sparklocal.co/resources/listing/atomic-social-phoenix-az": {
+      "url": "https://sparklocal.co/resources/listing/atomic-social-phoenix-az",
+      "submittedAt": "2026-03-02T08:42:17.559Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/atomic-social-phoenix-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/amity-coworking-northville-mi": {
+      "url": "https://sparklocal.co/resources/listing/amity-coworking-northville-mi",
+      "submittedAt": "2026-03-02T08:42:17.801Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/amity-coworking-northville-mi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-salisbury-rd-jacksonville-fl": {
+      "url": "https://sparklocal.co/resources/listing/regus-salisbury-rd-jacksonville-fl",
+      "submittedAt": "2026-03-02T08:42:18.062Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-salisbury-rd-jacksonville-fl\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-space-between-jacksonville-fl": {
+      "url": "https://sparklocal.co/resources/listing/the-space-between-jacksonville-fl",
+      "submittedAt": "2026-03-02T08:42:18.288Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-space-between-jacksonville-fl\"}}"
+    },
+    "https://sparklocal.co/resources/listing/bgm-consultancy-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/bgm-consultancy-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:18.518Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/bgm-consultancy-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/quality-printing-company-houston-tx": {
+      "url": "https://sparklocal.co/resources/listing/quality-printing-company-houston-tx",
+      "submittedAt": "2026-03-02T08:42:18.745Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/quality-printing-company-houston-tx\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cowork-jax-jacksonville-fl": {
+      "url": "https://sparklocal.co/resources/listing/cowork-jax-jacksonville-fl",
+      "submittedAt": "2026-03-02T08:42:18.979Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cowork-jax-jacksonville-fl\"}}"
+    },
+    "https://sparklocal.co/resources/listing/fresh-cowork-jacksonville-fl": {
+      "url": "https://sparklocal.co/resources/listing/fresh-cowork-jacksonville-fl",
+      "submittedAt": "2026-03-02T08:42:19.221Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/fresh-cowork-jacksonville-fl\"}}"
+    },
+    "https://sparklocal.co/resources/listing/score-centralny": {
+      "url": "https://sparklocal.co/resources/listing/score-centralny",
+      "submittedAt": "2026-03-02T08:42:19.461Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/score-centralny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/bct-consulting-inc-support-los-angeles-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/bct-consulting-inc-support-los-angeles-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:19.706Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/bct-consulting-inc-support-los-angeles-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/enterprise-consultants-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/enterprise-consultants-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:19.946Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/enterprise-consultants-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/kagabo-consulting-accounting-tax-professionals-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/kagabo-consulting-accounting-tax-professionals-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:20.187Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/kagabo-consulting-accounting-tax-professionals-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/colab-by-village-mke-milwaukee-wi": {
+      "url": "https://sparklocal.co/resources/listing/colab-by-village-mke-milwaukee-wi",
+      "submittedAt": "2026-03-02T08:42:20.430Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/colab-by-village-mke-milwaukee-wi\"}}"
+    },
+    "https://sparklocal.co/resources/listing/honig-conte-porrino-insurance-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/honig-conte-porrino-insurance-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:20.665Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/honig-conte-porrino-insurance-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/suites-success-executive-office-suites-tucson-az": {
+      "url": "https://sparklocal.co/resources/listing/suites-success-executive-office-suites-tucson-az",
+      "submittedAt": "2026-03-02T08:42:20.893Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/suites-success-executive-office-suites-tucson-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/la-suprema-works-events-tucson-az": {
+      "url": "https://sparklocal.co/resources/listing/la-suprema-works-events-tucson-az",
+      "submittedAt": "2026-03-02T08:42:21.132Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/la-suprema-works-events-tucson-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/boston-consulting-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/boston-consulting-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:21.375Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/boston-consulting-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/genesis-consulting-inc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/genesis-consulting-inc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:21.622Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/genesis-consulting-inc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/daniels-consulting-firm-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/daniels-consulting-firm-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:21.851Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/daniels-consulting-firm-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/ram-business-consulting-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/ram-business-consulting-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:22.089Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/ram-business-consulting-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/google-impact-challenge": {
+      "url": "https://sparklocal.co/resources/listing/google-impact-challenge",
+      "submittedAt": "2026-03-02T08:42:22.316Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/google-impact-challenge\"}}"
+    },
+    "https://sparklocal.co/resources/listing/shawn-halimi-consulting-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/shawn-halimi-consulting-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:22.540Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/shawn-halimi-consulting-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/a-v-business-services-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/a-v-business-services-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:22.780Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/a-v-business-services-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/dream-go-consulting-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/dream-go-consulting-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:23.023Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/dream-go-consulting-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/mandarin-consulting-international-la-office-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/mandarin-consulting-international-la-office-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:23.250Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/mandarin-consulting-international-la-office-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/thxphil-business-management-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/thxphil-business-management-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:23.473Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/thxphil-business-management-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/bevmax-office-centers-midtown-east-office-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/bevmax-office-centers-midtown-east-office-space-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:23.716Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/bevmax-office-centers-midtown-east-office-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/momo-s-hr-consulting-firm-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/momo-s-hr-consulting-firm-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:23.936Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/momo-s-hr-consulting-firm-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/black-founders-matter": {
+      "url": "https://sparklocal.co/resources/listing/black-founders-matter",
+      "submittedAt": "2026-03-02T08:42:24.163Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/black-founders-matter\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-park-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/spaces-park-avenue-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:24.404Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-park-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/evolution-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/evolution-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:24.646Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/evolution-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/business-consultant-services-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/business-consultant-services-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:24.873Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/business-consultant-services-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/l-e-k-consulting-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/l-e-k-consulting-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:25.103Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/l-e-k-consulting-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/summit-business-advisors-llc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/summit-business-advisors-llc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:25.344Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/summit-business-advisors-llc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-eda": {
+      "url": "https://sparklocal.co/resources/listing/grant-eda",
+      "submittedAt": "2026-03-02T08:42:25.583Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-eda\"}}"
+    },
+    "https://sparklocal.co/resources/listing/bain-company-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/bain-company-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:25.824Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/bain-company-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-amber": {
+      "url": "https://sparklocal.co/resources/listing/grant-amber",
+      "submittedAt": "2026-03-02T08:42:26.059Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-amber\"}}"
+    },
+    "https://sparklocal.co/resources/listing/rysen-marketing-agency-seo-services-of-phoenix-phoenix-az": {
+      "url": "https://sparklocal.co/resources/listing/rysen-marketing-agency-seo-services-of-phoenix-phoenix-az",
+      "submittedAt": "2026-03-02T08:42:26.293Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/rysen-marketing-agency-seo-services-of-phoenix-phoenix-az\"}}"
+    },
+    "https://sparklocal.co/resources/listing/estolano-advisors-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/estolano-advisors-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:26.527Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/estolano-advisors-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/franchise-consulting-group-inc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/franchise-consulting-group-inc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:26.752Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/franchise-consulting-group-inc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wework-office-space-coworking-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/wework-office-space-coworking-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:26.979Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wework-office-space-coworking-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-nase": {
+      "url": "https://sparklocal.co/resources/listing/grant-nase",
+      "submittedAt": "2026-03-02T08:42:27.205Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-nase\"}}"
+    },
+    "https://sparklocal.co/resources/listing/business-talent-group-llc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/business-talent-group-llc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:27.435Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/business-talent-group-llc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/first-choice-business-brokers-los-angeles-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/first-choice-business-brokers-los-angeles-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:27.675Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/first-choice-business-brokers-los-angeles-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/avail-consultants-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/avail-consultants-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:27.921Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/avail-consultants-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-farm-nomad-nyc-coworking-office-space-and-private-offices-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/the-farm-nomad-nyc-coworking-office-space-and-private-offices-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:28.155Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-farm-nomad-nyc-coworking-office-space-and-private-offices-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-california-relief": {
+      "url": "https://sparklocal.co/resources/listing/grant-california-relief",
+      "submittedAt": "2026-03-02T08:42:28.396Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-california-relief\"}}"
+    },
+    "https://sparklocal.co/resources/listing/emerge212-premium-nyc-office-space-rentals-meeting-rooms-3-columbus-cir-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/emerge212-premium-nyc-office-space-rentals-meeting-rooms-3-columbus-cir-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:28.640Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/emerge212-premium-nyc-office-space-rentals-meeting-rooms-3-columbus-cir-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/mackenzie-international-business-consultants-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/mackenzie-international-business-consultants-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:28.864Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/mackenzie-international-business-consultants-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/accenture-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/accenture-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:29.093Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/accenture-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/semler-brossy-consulting-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/semler-brossy-consulting-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:29.323Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/semler-brossy-consulting-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-texas-enterprise-fund": {
+      "url": "https://sparklocal.co/resources/listing/grant-texas-enterprise-fund",
+      "submittedAt": "2026-03-02T08:42:29.555Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-texas-enterprise-fund\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-google-impact-challenge": {
+      "url": "https://sparklocal.co/resources/listing/grant-google-impact-challenge",
+      "submittedAt": "2026-03-02T08:42:29.782Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-google-impact-challenge\"}}"
+    },
+    "https://sparklocal.co/resources/listing/platform-coworking-chicago-il": {
+      "url": "https://sparklocal.co/resources/listing/platform-coworking-chicago-il",
+      "submittedAt": "2026-03-02T08:42:30.009Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/platform-coworking-chicago-il\"}}"
+    },
+    "https://sparklocal.co/resources/listing/blender-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/blender-space-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:30.239Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/blender-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/toussi-international-career-coaching-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/toussi-international-career-coaching-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:30.485Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/toussi-international-career-coaching-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/emptyspace-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/emptyspace-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:30.716Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/emptyspace-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/la-fleur-caf-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/la-fleur-caf-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:30.945Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/la-fleur-caf-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/331-pas-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/331-pas-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:31.172Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/331-pas-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-florida-bridge": {
+      "url": "https://sparklocal.co/resources/listing/grant-florida-bridge",
+      "submittedAt": "2026-03-02T08:42:31.398Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-florida-bridge\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-streetshares-veteran": {
+      "url": "https://sparklocal.co/resources/listing/grant-streetshares-veteran",
+      "submittedAt": "2026-03-02T08:42:31.630Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-streetshares-veteran\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-illinois-jobs": {
+      "url": "https://sparklocal.co/resources/listing/grant-illinois-jobs",
+      "submittedAt": "2026-03-02T08:42:31.865Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-illinois-jobs\"}}"
+    },
+    "https://sparklocal.co/resources/listing/grant-walmart-spark-good": {
+      "url": "https://sparklocal.co/resources/listing/grant-walmart-spark-good",
+      "submittedAt": "2026-03-02T08:42:32.095Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/grant-walmart-spark-good\"}}"
+    },
+    "https://sparklocal.co/resources/listing/workbox-washington-dc-dupont-circle-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/workbox-washington-dc-dupont-circle-washington-dc",
+      "submittedAt": "2026-03-02T08:42:32.334Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/workbox-washington-dc-dupont-circle-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/office-space-in-dc-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/office-space-in-dc-washington-dc",
+      "submittedAt": "2026-03-02T08:42:32.565Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/office-space-in-dc-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/mindspace-washington-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/mindspace-washington-washington-dc",
+      "submittedAt": "2026-03-02T08:42:32.800Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/mindspace-washington-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/and-consulting-llc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/and-consulting-llc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:33.040Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/and-consulting-llc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/consultants-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/consultants-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:33.272Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/consultants-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/venice-consulting-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/venice-consulting-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:33.514Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/venice-consulting-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/new-school-restaurant-bar-consulting-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/new-school-restaurant-bar-consulting-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:33.758Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/new-school-restaurant-bar-consulting-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/conaxion-inc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/conaxion-inc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:33.994Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/conaxion-inc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/calm-space-nyc-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/calm-space-nyc-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:34.225Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/calm-space-nyc-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/advantedge-workspaces-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/advantedge-workspaces-washington-dc",
+      "submittedAt": "2026-03-02T08:42:34.454Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/advantedge-workspaces-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/district-offices-coworking-office-space-georgetown-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/district-offices-coworking-office-space-georgetown-washington-dc",
+      "submittedAt": "2026-03-02T08:42:34.696Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/district-offices-coworking-office-space-georgetown-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-yard-coworking-office-space-washington-dc-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/the-yard-coworking-office-space-washington-dc-washington-dc",
+      "submittedAt": "2026-03-02T08:42:34.926Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-yard-coworking-office-space-washington-dc-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/carr-workplaces-georgetown-coworking-office-space-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/carr-workplaces-georgetown-coworking-office-space-washington-dc",
+      "submittedAt": "2026-03-02T08:42:35.166Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/carr-workplaces-georgetown-coworking-office-space-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/kbk-management-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/kbk-management-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:35.402Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/kbk-management-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/alternative-small-business-consultants-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/alternative-small-business-consultants-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:35.634Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/alternative-small-business-consultants-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/new-york-jewish-chamber-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/new-york-jewish-chamber-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:35.876Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/new-york-jewish-chamber-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/new-bridge-consulting-group-llc-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/new-bridge-consulting-group-llc-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:36.104Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/new-bridge-consulting-group-llc-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/caglar-law-firm-pc-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/caglar-law-firm-pc-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:36.335Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/caglar-law-firm-pc-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/deskpass-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/deskpass-washington-dc",
+      "submittedAt": "2026-03-02T08:42:36.566Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/deskpass-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wework-office-space-coworking-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/wework-office-space-coworking-washington-dc",
+      "submittedAt": "2026-03-02T08:42:36.799Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wework-office-space-coworking-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/eaton-house-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/eaton-house-washington-dc",
+      "submittedAt": "2026-03-02T08:42:37.040Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/eaton-house-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-washington-dc-connecticut-avenue-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/regus-washington-dc-connecticut-avenue-washington-dc",
+      "submittedAt": "2026-03-02T08:42:37.277Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-washington-dc-connecticut-avenue-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/edeska-business-consultants-ppc-agency-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/edeska-business-consultants-ppc-agency-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:37.518Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/edeska-business-consultants-ppc-agency-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/brilliant-consulting-group-los-angeles-ca": {
+      "url": "https://sparklocal.co/resources/listing/brilliant-consulting-group-los-angeles-ca",
+      "submittedAt": "2026-03-02T08:42:37.760Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/brilliant-consulting-group-los-angeles-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/new-york-state-coalition-of-hispanic-chambers-of-commerce-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/new-york-state-coalition-of-hispanic-chambers-of-commerce-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:37.988Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/new-york-state-coalition-of-hispanic-chambers-of-commerce-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-477-madison-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-477-madison-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:38.212Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-477-madison-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/open-gov-hub-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/open-gov-hub-washington-dc",
+      "submittedAt": "2026-03-02T08:42:38.439Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/open-gov-hub-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/district-offices-pennsylvania-avenue-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/district-offices-pennsylvania-avenue-washington-dc",
+      "submittedAt": "2026-03-02T08:42:38.678Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/district-offices-pennsylvania-avenue-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/oval-offices-dc-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/oval-offices-dc-washington-dc",
+      "submittedAt": "2026-03-02T08:42:38.917Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/oval-offices-dc-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/servcorp-pennsylvania-avenue-coworking-office-suites-virtual-offices-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/servcorp-pennsylvania-avenue-coworking-office-suites-virtual-offices-washington-dc",
+      "submittedAt": "2026-03-02T08:42:39.163Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/servcorp-pennsylvania-avenue-coworking-office-suites-virtual-offices-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/metro-offices-washington-dc": {
+      "url": "https://sparklocal.co/resources/listing/metro-offices-washington-dc",
+      "submittedAt": "2026-03-02T08:42:39.394Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/metro-offices-washington-dc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/breather-nyc-hq-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/breather-nyc-hq-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:39.616Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/breather-nyc-hq-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/united-states-mexico-chamber-of-commerce-northeast-chapter-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/united-states-mexico-chamber-of-commerce-northeast-chapter-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:39.843Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/united-states-mexico-chamber-of-commerce-northeast-chapter-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/hygge-coworking-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/hygge-coworking-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:40.073Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/hygge-coworking-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/venture-x-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/venture-x-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:40.314Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/venture-x-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-connect-coworking-by-souder-properties-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/the-connect-coworking-by-souder-properties-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:40.556Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-connect-coworking-by-souder-properties-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/the-mill-coworking-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/the-mill-coworking-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:40.785Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/the-mill-coworking-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cocotiv-coworking-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/cocotiv-coworking-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:41.026Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cocotiv-coworking-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/two-ninety-two-madison-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/two-ninety-two-madison-avenue-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:41.267Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/two-ninety-two-madison-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/regus-new-york-city-americas-tower-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/regus-new-york-city-americas-tower-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:41.499Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/regus-new-york-city-americas-tower-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/switchyards-oakhurst-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/switchyards-oakhurst-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:41.732Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/switchyards-oakhurst-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/packard-place-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/packard-place-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:41.961Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/packard-place-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/premier-workspaces-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/premier-workspaces-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:42.204Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/premier-workspaces-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/apt-cowork-at-cottonwood-reserve-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/apt-cowork-at-cottonwood-reserve-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:42.445Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/apt-cowork-at-cottonwood-reserve-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/suites-by-nylo-medical-co-working-space-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/suites-by-nylo-medical-co-working-space-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:42.687Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/suites-by-nylo-medical-co-working-space-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/midtown-executive-club-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/midtown-executive-club-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:42.921Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/midtown-executive-club-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/convene-530-fifth-avenue-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/convene-530-fifth-avenue-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:43.162Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/convene-530-fifth-avenue-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/wework-office-space-coworking-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/wework-office-space-coworking-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:43.391Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/wework-office-space-coworking-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/forum-at-ballantyne-commons-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/forum-at-ballantyne-commons-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:43.618Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/forum-at-ballantyne-commons-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/venture-x-charlotte-toringdon-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/venture-x-charlotte-toringdon-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:43.849Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/venture-x-charlotte-toringdon-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spaces-south-end-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/spaces-south-end-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:44.090Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spaces-south-end-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/spur-line-creative-charlotte-nc": {
+      "url": "https://sparklocal.co/resources/listing/spur-line-creative-charlotte-nc",
+      "submittedAt": "2026-03-02T08:42:44.327Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/spur-line-creative-charlotte-nc\"}}"
+    },
+    "https://sparklocal.co/resources/listing/small-business-insurance-new-york-ny": {
+      "url": "https://sparklocal.co/resources/listing/small-business-insurance-new-york-ny",
+      "submittedAt": "2026-03-02T08:42:44.566Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/small-business-insurance-new-york-ny\"}}"
+    },
+    "https://sparklocal.co/resources/listing/ivy-street-coworking-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/ivy-street-coworking-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:44.814Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/ivy-street-coworking-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/collective-impact-center-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/collective-impact-center-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:45.049Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/collective-impact-center-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/mission-cowork-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/mission-cowork-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:45.288Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/mission-cowork-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/cowork-connect-coworking-space-san-diego-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/cowork-connect-coworking-space-san-diego-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:45.520Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/cowork-connect-coworking-space-san-diego-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-pacific-beach-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-pacific-beach-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:45.747Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-pacific-beach-san-diego-ca\"}}"
+    },
+    "https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-san-diego-san-diego-ca": {
+      "url": "https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-san-diego-san-diego-ca",
+      "submittedAt": "2026-03-02T08:42:45.985Z",
+      "status": "success",
+      "response": "{\"urlNotificationMetadata\":{\"url\":\"https://sparklocal.co/resources/listing/downtown-works-coworking-office-space-san-diego-san-diego-ca\"}}"
     }
   }
 }
