@@ -2,12 +2,14 @@
 // Renders markdown content with clean prose styling
 
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
   getPostBySlug,
   getAllPostSlugs,
   formatBlogDate,
+  extractFAQsFromContent,
 } from "@/lib/blog";
 
 interface PageProps {
@@ -31,6 +33,11 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
+  // Use featuredImage from frontmatter, or default to conventional path
+  // (Blog engine always generates featured images at /blog/images/{slug}-featured.png)
+  const featuredImage = post.featuredImage || `/blog/images/${slug}-featured.png`;
+  const ogImage = `https://sparklocal.co${featuredImage}`;
+
   return {
     title: post.title,
     description: post.description,
@@ -47,7 +54,7 @@ export async function generateMetadata({
       tags: post.tags,
       images: [
         {
-          url: "https://sparklocal.co/og-default.png",
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -58,7 +65,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: post.title,
       description: post.description,
-      images: ["https://sparklocal.co/og-default.png"],
+      images: [ogImage],
     },
     alternates: {
       canonical: `https://sparklocal.co/blog/${post.slug}`,
@@ -73,13 +80,19 @@ function ArticleStructuredData({
   slug,
   date,
   author,
+  featuredImage,
 }: {
   title: string;
   description: string;
   slug: string;
   date: string;
   author: string;
+  featuredImage?: string;
 }) {
+  const imageUrl = featuredImage
+    ? `https://sparklocal.co${featuredImage}`
+    : `https://sparklocal.co/og-default.png`;
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -88,6 +101,7 @@ function ArticleStructuredData({
     url: `https://sparklocal.co/blog/${slug}`,
     datePublished: date,
     dateModified: date,
+    image: imageUrl,
     author: {
       "@type": "Organization",
       name: author,
@@ -118,6 +132,80 @@ function ArticleStructuredData({
   );
 }
 
+// Breadcrumb structured data
+function BreadcrumbStructuredData({
+  title,
+  slug,
+}: {
+  title: string;
+  slug: string;
+}) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://sparklocal.co",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://sparklocal.co/blog",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: title,
+        item: `https://sparklocal.co/blog/${slug}`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
+// FAQ structured data
+function FAQStructuredData({
+  faqs,
+}: {
+  faqs: { question: string; answer: string }[];
+}) {
+  if (faqs.length === 0) return null;
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(structuredData),
+      }}
+    />
+  );
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
@@ -125,6 +213,15 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) {
     notFound();
   }
+
+  // Use featuredImage from frontmatter, or default to conventional path
+  // (Blog engine always generates featured images at /blog/images/{slug}-featured.png)
+  const featuredImage = post.featuredImage || `/blog/images/${slug}-featured.png`;
+  // Always show featured image - blog engine guarantees image generation
+  const hasFeaturedImage = true;
+
+  // Extract FAQs from Q&A-style H2 headings
+  const faqs = extractFAQsFromContent(post.content);
 
   return (
     <>
@@ -134,7 +231,10 @@ export default async function BlogPostPage({ params }: PageProps) {
         slug={post.slug}
         date={post.date}
         author={post.author}
+        featuredImage={featuredImage}
       />
+      <BreadcrumbStructuredData title={post.title} slug={post.slug} />
+      {faqs.length > 0 && <FAQStructuredData faqs={faqs} />}
 
       <main className="min-h-screen">
         {/* Header */}
@@ -186,6 +286,24 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {/* Featured Image */}
+        {hasFeaturedImage && (
+          <section className="px-4 sm:px-6 -mt-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="relative aspect-[1200/630] rounded-xl overflow-hidden shadow-warm-lg">
+                <Image
+                  src={featuredImage}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 896px"
+                />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Content */}
         <article className="py-12 px-4 sm:px-6">
