@@ -1,0 +1,47 @@
+[
+  {
+    "runDate": "2026-03-02T08:10:48.745Z",
+    "config": {
+      "dryRun": false,
+      "skipEnrichment": false,
+      "skipIndexNow": false,
+      "batchSize": 25,
+      "maxListings": 500,
+      "maxCities": 100
+    },
+    "duration": 3279.2,
+    "results": [
+      {
+        "step": "enrich_listings",
+        "success": false,
+        "processed": 498,
+        "errors": 2
+      },
+      {
+        "step": "enrich_cities",
+        "success": true,
+        "processed": 0,
+        "errors": 0,
+        "details": "No cities to enrich"
+      },
+      {
+        "step": "recalculate_counts",
+        "success": true,
+        "processed": 1,
+        "errors": 0
+      },
+      {
+        "step": "indexnow",
+        "success": true,
+        "processed": 1000,
+        "errors": 0
+      },
+      {
+        "step": "category_content",
+        "success": true,
+        "processed": 9,
+        "errors": 0
+      }
+    ]
+  }
+]

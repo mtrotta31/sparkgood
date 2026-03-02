@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "business-attorney",
+    "displayName": "Business Attorneys",
+    "description": "Find experienced business attorneys to help with incorporation, contracts, intellectual property, employment law, and other legal needs. The right legal counsel protects your business and helps you grow with confidence.",
+    "icon": "⚖️"
+  },
+  {
+    "slug": "accountant",
+    "displayName": "Accountants & CPAs",
+    "description": "Connect with certified accountants and CPAs who specialize in small business finances. Get help with bookkeeping, tax planning, financial statements, and strategic financial advice.",
+    "icon": "📊"
+  },
+  {
+    "slug": "marketing-agency",
+    "displayName": "Marketing Agencies",
+    "description": "Partner with marketing agencies that understand small business needs. From digital marketing and SEO to branding and social media, find experts to help grow your customer base.",
+    "icon": "📣"
+  },
+  {
+    "slug": "print-shop",
+    "displayName": "Print & Design Shops",
+    "description": "Find local print shops for business cards, marketing materials, signage, and promotional items. Quality print materials help establish your brand and attract customers.",
+    "icon": "🖨️"
+  },
+  {
+    "slug": "commercial-real-estate",
+    "displayName": "Commercial Real Estate",
+    "description": "Work with commercial real estate agents to find the perfect location for your business. Whether you need retail space, office space, or industrial property, local experts can help.",
+    "icon": "🏬"
+  },
+  {
+    "slug": "business-insurance",
+    "displayName": "Business Insurance",
+    "description": "Protect your business with the right insurance coverage. Find agents who specialize in general liability, professional liability, property insurance, and workers' compensation.",
+    "icon": "🛡️"
+  },
+  {
+    "slug": "chamber-of-commerce",
+    "displayName": "Chambers of Commerce",
+    "description": "Join your local chamber of commerce for networking, advocacy, and business resources. Chambers connect you with other business owners and community leaders.",
+    "icon": "🤝"
+  },
+  {
+    "slug": "virtual-office",
+    "displayName": "Virtual Offices",
+    "description": "Get a professional business address without the overhead of physical office space. Virtual offices provide mail handling, meeting rooms on demand, and a prestigious address for your business.",
+    "icon": "📬"
+  },
+  {
+    "slug": "business-consultant",
+    "displayName": "Business Consultants",
+    "description": "Work with business consultants who can help you solve problems, improve operations, and accelerate growth. Find experts in strategy, operations, finance, and more.",
+    "icon": "💼"
+  }
+]
