@@ -203,3 +203,5 @@ Getting a small business grant requires strategy and persistence. Here's what to
 - **Get help if you're stuck.** Business consultants, SBDCs, and accountants specialize in grant applications. A few hours of paid consulting can mean the difference between a strong application and a rejected one.
 
 The money is out there. The question is whether you're willing to put in the work to get it.
+
+**Related:** [How Much Does It Cost to Start a Business? A Real Breakdown by Type](/blog/how-much-does-it-cost-to-start-a-business)

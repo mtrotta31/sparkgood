@@ -130,3 +130,5 @@ SparkLocal helps you turn your idea into an actionable launch plan — with mark
 [Try the free business builder](/builder) and see what your business could look like.
 
 The right city gives you an edge. The right plan helps you use it.
+
+**Related:** [How Much Does It Cost to Start a Business? A Real Breakdown by Type](/blog/how-much-does-it-cost-to-start-a-business)
