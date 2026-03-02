@@ -1,0 +1,30 @@
+{
+  "keyword": "how much does it cost to start a business",
+  "slug": "how-much-does-it-cost-to-start-a-business",
+  "searchVolume": 3600,
+  "difficulty": 35,
+  "score": 60,
+  "cluster": "getting-started",
+  "internalLinks": {
+    "categoryPages": [
+      {
+        "url": "/resources",
+        "label": "resource directory"
+      }
+    ],
+    "cityPages": [],
+    "stateGuides": [],
+    "otherBlogPosts": [
+      {
+        "url": "/blog/best-cities-to-start-a-business-2026",
+        "label": "best cities to start a business 2026"
+      },
+      {
+        "url": "/blog/how-to-get-a-small-business-grant",
+        "label": "how to get a small business grant"
+      }
+    ],
+    "builderCTA": "/builder"
+  },
+  "selectedAt": "2026-03-02T00:59:59.945Z"
+}

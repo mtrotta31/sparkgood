@@ -157,13 +157,12 @@ SEO REQUIREMENTS:
 - Include semantic variations of the target keyword throughout.
 - Write a compelling meta description (150-160 chars) that includes the target keyword and a value proposition.
 
-SPARKLOCAL MENTIONS (CRITICAL - HARD LIMIT):
-- You must mention SparkLocal BY NAME no more than 2 times in the entire post. This is a hard limit.
-- One mention should reference real directory data (e.g., "SparkLocal's directory lists 170+ grants across all 50 states").
-- The other can be in the Next Steps section.
-- Internal links to sparklocal.co pages are fine and don't count as mentions — it's the word "SparkLocal" in visible text that's limited.
-- DO NOT be promotional. Let the internal links do the selling.
-- If you find yourself wanting to say "SparkLocal" more than twice, use generic phrasing like "the directory", "our resource database", or "the grants directory" instead.
+SPARKLOCAL MENTIONS (REQUIRED):
+- Mention SparkLocal BY NAME exactly 1-2 times. Do NOT use zero mentions — readers should know what site they're on. Do NOT exceed 2 mentions.
+- Once when referencing directory data (e.g., "SparkLocal lists 55+ federal grants across all 50 states").
+- Once in the Next Steps section when directing readers to explore resources.
+- Internal links to sparklocal.co pages don't count as mentions — it's the word "SparkLocal" in visible text that matters.
+- DO NOT be promotional beyond these mentions. Let the internal links do the selling.
 
 INTERNAL LINKS:
 - Include provided internal links naturally within the text using markdown link syntax.
@@ -171,6 +170,20 @@ INTERNAL LINKS:
 - Link to 2-3 directory category pages.
 - Link to 1-2 city hub pages or state guides if relevant.
 - Link to 1-2 related blog posts if provided.
+
+CORRECT CATEGORY PAGE URLs (use these exact paths):
+- /resources/grant (grants)
+- /resources/coworking (coworking spaces)
+- /resources/accelerator (accelerators)
+- /resources/sba (SBA resources)
+- /resources/business-attorney (business attorneys)
+- /resources/business-consultant (business consultants)
+- /resources/business-insurance (business insurance)
+- /resources/marketing-agency (marketing agencies)
+- /resources/chamber-of-commerce (chambers of commerce)
+- /resources/virtual-office (virtual offices)
+- /resources/commercial-real-estate (commercial real estate)
+- /resources/accountant (accountants)
 
 OUTPUT FORMAT:
 Return ONLY the markdown content with frontmatter. No explanation, no preamble.
@@ -487,11 +500,11 @@ async function main() {
     // Strip markdown code blocks if present
     markdown = markdown.replace(/^```(?:markdown|md)?\n?/i, '').replace(/\n?```$/i, '').trim();
 
-    // Auto-fix: reduce excess SparkLocal mentions
+    // Auto-fix: reduce excess SparkLocal mentions (only if > 3, to allow some flexibility)
     const originalMentions = countSparkLocalMentions(markdown);
-    markdown = reduceSparkLocalMentions(markdown, blogConfig.maxSparkLocalMentions);
-    const fixedMentions = countSparkLocalMentions(markdown);
-    if (originalMentions > fixedMentions) {
+    if (originalMentions > 3) {
+      markdown = reduceSparkLocalMentions(markdown, blogConfig.maxSparkLocalMentions);
+      const fixedMentions = countSparkLocalMentions(markdown);
       console.log(`  Auto-fixed SparkLocal mentions: ${originalMentions} → ${fixedMentions}`);
     }
 
