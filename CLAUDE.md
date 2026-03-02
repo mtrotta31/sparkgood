@@ -470,6 +470,7 @@ sparklocal/
 │   ├── fix-city-intros.ts       # Removes SparkLocal references from city intros
 │   ├── generate-state-guides.ts # Generate 50 state business guides (Claude Haiku)
 │   ├── submit-indexnow.ts       # Submit URLs to Bing/Yandex for instant indexing
+│   ├── submit-google-indexing.ts # Submit URLs to Google Indexing API (190/day quota)
 │   ├── sync-locations.ts        # Syncs location pages for SEO
 │   ├── smart-expand.ts          # Smart Expansion Engine (coverage scoring, Outscraper API)
 │   ├── post-expand-pipeline.ts  # Post-expansion enrichment + IndexNow
@@ -638,7 +639,11 @@ npx tsx scripts/fix-city-intros.ts --dry-run  # Preview city intro fixes (remove
 npx tsx scripts/fix-city-intros.ts            # Apply city intro fixes
 
 # Search Engine Indexing
-npx tsx scripts/submit-indexnow.ts  # Submit all URLs to Bing/Yandex via IndexNow
+npx tsx scripts/submit-indexnow.ts              # Submit all URLs to Bing/Yandex via IndexNow
+npx tsx scripts/submit-google-indexing.ts       # Submit up to 190 URLs to Google Indexing API
+npx tsx scripts/submit-google-indexing.ts --dry-run   # Preview URLs to submit
+npx tsx scripts/submit-google-indexing.ts --status    # Show submission stats
+npx tsx scripts/submit-google-indexing.ts --reset     # Clear history, start fresh
 
 # Smart Expansion Engine
 npx tsx scripts/smart-expand.ts --dry-run                    # Preview what would be scraped
@@ -744,6 +749,7 @@ The core product is fully functional with payments:
 - ✅ Blog featured images via Satori
 - ✅ Blog cross-linking (new posts link to related, old posts updated)
 - ✅ GitHub Actions workflow for fully automated blog publishing
+- ✅ Google Indexing API workflow (daily, 190 URLs/run, quota-aware)
 
 **Future:**
 - Pro Toolkit (Claude Code skills package)
@@ -946,6 +952,15 @@ The `scripts/enrich-content-seo.ts` script generates AI content for directory pa
   - `keyword-pool.json` — Discovered keywords with volume, difficulty, CPC, intent
   - `selected-topic.json` — Current topic with mapped internal links
   - `last-post-faqs.json` — Extracted FAQs for schema markup
+
+### Google Indexing API (`scripts/submit-google-indexing.ts`)
+- **GitHub Action:** `.github/workflows/google-indexing.yml` runs daily at 8 AM UTC
+- **Daily Quota:** 190 URLs per run (Google allows 200/day, 10 reserved for blog engine)
+- **Quota Handling:** Detects quota errors via pattern matching; exits 0 when quota exhausted (expected behavior), exits 1 only for real failures (auth, network)
+- **Submission Tracking:** Persists to `scripts/indexing-submitted.json` to avoid resubmitting
+- **URL Sources:** Listings, city pages, state guides, blog posts, static pages
+- **Service Account:** Requires Google Cloud service account with Indexing API enabled, added as owner in Search Console
+- **CLI Flags:** `--dry-run` (preview), `--status` (show stats), `--reset` (clear history)
 
 ### Blog Post Infrastructure (`src/lib/blog.ts`)
 - **BlogPost interface:** slug, title, description, date, author, tags, `featuredImage` (optional path), content, htmlContent
