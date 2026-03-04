@@ -2,6 +2,7 @@
 // "Find everything you need to start a business."
 
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import Footer from "@/components/ui/Footer";
 
@@ -49,14 +50,16 @@ export default async function Home() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal-dark/90 backdrop-blur-sm border-b border-warmwhite/5">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-              <span className="text-sm">✦</span>
-            </div>
-            <span className="font-display text-warmwhite font-semibold">
-              SparkLocal
-            </span>
-          </div>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/sparklocal-logo.svg"
+              alt="SparkLocal"
+              width={140}
+              height={36}
+              className="h-8 w-auto"
+              priority
+            />
+          </Link>
           <div className="flex items-center gap-4">
             <Link
               href="/resources"
@@ -78,9 +81,14 @@ export default async function Home() {
       <section className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-16 text-center">
         {/* Spark Icon */}
         <div className="mb-8 animate-fade-in">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center shadow-lg shadow-spark/20">
-            <span className="text-3xl">✦</span>
-          </div>
+          <Image
+            src="/sparklocal-icon.svg"
+            alt="SparkLocal"
+            width={80}
+            height={80}
+            className="w-20 h-20 drop-shadow-lg"
+            priority
+          />
         </div>
 
         {/* Headline */}
@@ -621,9 +629,13 @@ export default async function Home() {
       {/* Final CTA */}
       <section className="py-32 px-4 bg-gradient-to-b from-charcoal-dark to-charcoal">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center mx-auto mb-8 shadow-lg shadow-spark/20">
-            <span className="text-2xl">✦</span>
-          </div>
+          <Image
+            src="/sparklocal-icon.svg"
+            alt="SparkLocal"
+            width={64}
+            height={64}
+            className="w-16 h-16 mx-auto mb-8 drop-shadow-lg"
+          />
 
           <h2 className="font-display text-4xl md:text-5xl font-bold text-warmwhite mb-6">
             Ready to start your business?
