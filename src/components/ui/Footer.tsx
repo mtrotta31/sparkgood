@@ -2,6 +2,7 @@
 // Used across all pages for consistent navigation and legal links
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -11,13 +12,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center">
-                <span className="text-sm">✦</span>
-              </div>
-              <span className="font-display text-warmwhite font-semibold">
-                SparkLocal
-              </span>
+            <Link href="/" className="inline-block mb-4">
+              <Image
+                src="/sparklocal-logo.svg"
+                alt="SparkLocal"
+                width={140}
+                height={36}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-warmwhite-dim text-sm">
               Everything you need to start a business.

@@ -2,18 +2,21 @@
 // Warm, friendly navigation for the resource directory
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DirectoryNav() {
   return (
     <nav className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-slate-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center shadow-warm">
-            <span className="text-white text-sm font-medium">S</span>
-          </div>
-          <span className="font-display text-xl text-slate-800 font-semibold group-hover:text-spark transition-colors">
-            SparkLocal
-          </span>
+        <Link href="/" className="flex items-center group">
+          <Image
+            src="/sparklocal-logo-dark.svg"
+            alt="SparkLocal"
+            width={150}
+            height={40}
+            className="h-9 w-auto transition-transform group-hover:scale-105"
+            priority
+          />
         </Link>
 
         <div className="flex items-center gap-3">

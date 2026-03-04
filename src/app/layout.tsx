@@ -11,7 +11,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "SparkLocal",
   url: "https://sparklocal.co",
-  logo: "https://sparklocal.co/logo.png",
+  logo: "https://sparklocal.co/sparklocal-logo.png",
   description:
     "AI-powered business planning platform helping entrepreneurs start and grow local businesses with personalized guidance and 2,900+ resources.",
   foundingDate: "2024",
@@ -71,6 +71,16 @@ export const metadata: Metadata = {
   authors: [{ name: "SparkLocal" }],
   creator: "SparkLocal",
   metadataBase: new URL("https://sparklocal.co"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/sparklocal-icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -79,12 +89,21 @@ export const metadata: Metadata = {
     title: "SparkLocal — Start Your Business Today",
     description:
       "AI-powered business planning and 2,900+ local resources. Find coworking, grants, accelerators, and mentors near you.",
+    images: [
+      {
+        url: "/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "SparkLocal — Start Your Business Today",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "SparkLocal — Start Your Business Today",
     description:
       "AI-powered business planning and 2,900+ local resources. Find coworking, grants, accelerators, and mentors near you.",
+    images: ["/og-default.png"],
   },
   robots: {
     index: true,

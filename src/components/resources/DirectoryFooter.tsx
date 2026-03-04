@@ -2,6 +2,7 @@
 // Warm, friendly footer for the resource directory
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DirectoryFooter() {
   return (
@@ -11,13 +12,14 @@ export default function DirectoryFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center shadow-warm">
-                <span className="text-white text-sm font-medium">S</span>
-              </div>
-              <span className="font-display text-xl text-slate-800 font-semibold">
-                SparkLocal
-              </span>
+            <Link href="/" className="inline-block mb-4">
+              <Image
+                src="/sparklocal-logo-dark.svg"
+                alt="SparkLocal"
+                width={150}
+                height={40}
+                className="h-9 w-auto"
+              />
             </Link>
             <p className="text-slate-600 text-sm leading-relaxed">
               Everything you need to start a business in your city.

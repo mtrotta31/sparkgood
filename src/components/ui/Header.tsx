@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModal from "@/components/auth/AuthModal";
 
@@ -39,13 +40,15 @@ export default function Header({
       <header className="fixed top-0 left-0 right-0 z-50 bg-charcoal-dark/95 backdrop-blur-sm border-b border-warmwhite/5">
         <div className="max-w-6xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-spark to-accent flex items-center justify-center transition-transform group-hover:scale-105">
-              <span className="text-sm">✦</span>
-            </div>
-            <span className="font-display text-warmwhite font-semibold hidden sm:inline">
-              SparkLocal
-            </span>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/sparklocal-logo.svg"
+              alt="SparkLocal"
+              width={140}
+              height={36}
+              className="h-8 w-auto transition-transform group-hover:scale-105"
+              priority
+            />
           </Link>
 
           {/* Right side */}

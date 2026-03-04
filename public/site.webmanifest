@@ -1,0 +1,32 @@
+{
+  "name": "SparkLocal",
+  "short_name": "SparkLocal",
+  "description": "AI-powered business planning tools and local resources to help you start your business",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1C1412",
+  "theme_color": "#F59E0B",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/sparklocal-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
