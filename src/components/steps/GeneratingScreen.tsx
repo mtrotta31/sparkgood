@@ -91,7 +91,7 @@ export default function GeneratingScreen({
           <div className="absolute inset-0 flex items-center justify-center">
             <svg
               viewBox="0 0 375 375"
-              className="w-12 h-12 animate-pulse"
+              className="w-12 h-12 animate-pulse spark-glow-sm"
               aria-hidden="true"
             >
               {/* Main flame (amber) */}

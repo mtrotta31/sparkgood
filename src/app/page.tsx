@@ -86,7 +86,7 @@ export default async function Home() {
             alt="SparkLocal"
             width={80}
             height={80}
-            className="w-20 h-20 drop-shadow-lg"
+            className="w-20 h-20 spark-glow"
             priority
           />
         </div>
@@ -634,7 +634,7 @@ export default async function Home() {
             alt="SparkLocal"
             width={64}
             height={64}
-            className="w-16 h-16 mx-auto mb-8 drop-shadow-lg"
+            className="w-16 h-16 mx-auto mb-8 spark-glow"
           />
 
           <h2 className="font-display text-4xl md:text-5xl font-bold text-warmwhite mb-6">

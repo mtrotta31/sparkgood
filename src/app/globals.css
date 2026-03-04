@@ -69,6 +69,26 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* SparkLocal icon glow effect for dark backgrounds */
+  .spark-glow {
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))
+            drop-shadow(0 0 16px rgba(249, 115, 22, 0.3))
+            drop-shadow(0 0 24px rgba(245, 158, 11, 0.2));
+  }
+
+  /* Subtle version of spark glow */
+  .spark-glow-sm {
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3))
+            drop-shadow(0 0 8px rgba(249, 115, 22, 0.2));
+  }
+
+  /* Intense version of spark glow */
+  .spark-glow-lg {
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5))
+            drop-shadow(0 0 24px rgba(249, 115, 22, 0.4))
+            drop-shadow(0 0 36px rgba(245, 158, 11, 0.3));
+  }
 }
 
 /* Selection styling */
