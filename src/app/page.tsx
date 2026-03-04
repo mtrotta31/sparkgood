@@ -80,7 +80,7 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-16 text-center">
         {/* Spark Icon */}
-        <div className="mb-8 animate-fade-in p-6 -m-6 overflow-visible">
+        <div className="mb-8 animate-fade-in px-8 -mx-8 overflow-visible">
           <Image
             src="/sparklocal-icon.svg"
             alt="SparkLocal"
@@ -629,7 +629,7 @@ export default async function Home() {
       {/* Final CTA */}
       <section className="py-32 px-4 bg-gradient-to-b from-charcoal-dark to-charcoal">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="p-6 -mt-6 mb-2 overflow-visible inline-block">
+          <div className="mb-8 px-8 -mx-8 overflow-visible inline-block">
             <Image
               src="/sparklocal-icon.svg"
               alt="SparkLocal"
